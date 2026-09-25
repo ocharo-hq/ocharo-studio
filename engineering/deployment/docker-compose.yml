@@ -1,0 +1,20 @@
+# One UzbekStudio instance per environment. Bring up from engineering/deployment/:
+#
+#   docker compose up -d --build
+#
+# The SQLite store lives on the named volume so data survives container replacement.
+services:
+  uzbekstudio:
+    build:
+      context: ../codebase
+      dockerfile: ../deployment/Dockerfile
+    image: uzbekstudio
+    container_name: uzbekstudio
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18260:8080"
+    volumes:
+      - uzbekstudio-data:/data
+
+volumes:
+  uzbekstudio-data:

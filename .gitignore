@@ -1,0 +1,27 @@
+# Build output
+**/bin/
+**/obj/
+**/dist/
+**/.vite/
+node_modules/
+
+# Local DB + secrets
+*.db
+*.db-shm
+*.db-wal
+**/appsettings.Local.json
+.env
+
+# IDE / OS
+.idea/
+.vs/
+.vscode/*
+.DS_Store
+*.tsbuildinfo
+
+# The frontend build generates the complete hosted SPA.
+engineering/codebase/uzbek-studio.backend-services/UzbekStudio.Api/wwwroot/
+.env.*
+!.env.example
+.local/
+**/*.blend1

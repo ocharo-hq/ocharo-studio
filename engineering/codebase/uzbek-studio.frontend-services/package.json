@@ -1,0 +1,33 @@
+{
+  "name": "uzbekstudio-frontend",
+  "private": true,
+  "packageManager": "npm@11.6.1",
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
+  },
+  "version": "0.1.0",
+  "type": "module",
+  "description": "React UI for UzbekStudio — calls the .NET API and is served from its host in production.",
+  "scripts": {
+    "dev": "vite",
+    "dev-http": "VITE_HTTPS=false vite",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.6",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.0",
+    "vite-plugin-mkcert": "2.1.0"
+  }
+}

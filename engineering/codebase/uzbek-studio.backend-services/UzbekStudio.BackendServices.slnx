@@ -1,0 +1,17 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Services/">
+    <Project Path="UzbekStudio.Api/UzbekStudio.Api.csproj" />
+    <Project Path="UzbekStudio.Application/UzbekStudio.Application.csproj" />
+    <Project Path="UzbekStudio.Domain/UzbekStudio.Domain.csproj" />
+    <Project Path="UzbekStudio.Infrastructure/UzbekStudio.Infrastructure.csproj" />
+    <Project Path="UzbekStudio.Persistence/UzbekStudio.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/UzbekStudio.Tests/UzbekStudio.Tests.csproj" />
+  </Folder>
+</Solution>

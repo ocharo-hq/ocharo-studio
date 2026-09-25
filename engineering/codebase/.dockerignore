@@ -1,0 +1,22 @@
+# Build context = engineering/codebase/ (parent of uzbek-studio.backend-services + uzbek-studio.frontend-services).
+
+# Build outputs — restored/rebuilt fresh inside the image
+**/bin/
+**/obj/
+**/dist/
+**/node_modules/
+
+# Local SQLite stores — don't ship a dev database into an image layer
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# Locally-deployed SPA — the spa stage rebuilds it from source
+uzbek-studio.backend-services/UzbekStudio.Api/wwwroot/
+
+# IDE / VCS / OS cruft
+**/.vs/
+**/.idea/
+**/.git/
+**/*.user
+**/.DS_Store

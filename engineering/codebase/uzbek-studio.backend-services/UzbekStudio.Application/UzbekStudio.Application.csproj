@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <!-- Kit: mediator (IRequest/IRequestHandler), Result/DomainError. -->
+    <PackageReference Include="WoW2.Sdk.Backend.Beta" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UzbekStudio.Domain\UzbekStudio.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Let the test project reach internal handlers for direct unit tests. -->
+    <InternalsVisibleTo Include="UzbekStudio.Tests" />
+  </ItemGroup>
+
+</Project>
