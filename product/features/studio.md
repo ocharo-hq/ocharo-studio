@@ -29,10 +29,22 @@ The mannequin and current garment remain the visual focus. A left menu exposes g
 ### Creative continuity
 
 - Undo restores meaningful editing actions without unexpectedly changing the camera.
+- Saving as a new look preserves the source look and gives the variant a distinct identity.
 - Saving requires or obtains a usable look name and preserves garment identity, garment version, part selections, material identities, texture transforms, and relevant asset versions.
 - Reopening a saved look restores an editable composition rather than only a rendered image.
 - Portable JSON export contains enough versioned data to re-import a compatible look.
 - Preview export produces a clean presentation image without editor chrome.
+- A failed browser-storage write leaves the look marked as a draft, explains the failure, and permits another save attempt.
+
+## Implementation status
+
+The local application implements the five garment-family selectors, per-part materials, pattern placement, camera controls, undo and redo, named saved looks,
+save-as-copy, guarded local persistence, validated JSON import, and JSON and preview export. Authored interpretation meshes and generated textile studies are
+present for the current local build.
+
+Automated domain tests cover state isolation, bounded history, corrupt data, storage failures, persistence retry, save-copy identity, and draft recovery.
+Browser interaction tests exist for the main creation flow and family controls. Human usability, assistive-technology, visual fidelity, performance, and
+cross-browser review remain pending; implementation presence does not establish those acceptance results.
 
 ## Acceptance criteria
 
@@ -42,6 +54,7 @@ The mannequin and current garment remain the visual focus. A left menu exposes g
 4. The garment's authored attachments load with it and no interface offers arbitrary attachment creation.
 5. Undo reverses the last material or texture-placement change; redo reapplies that change.
 6. A named look can be saved, the studio reopened, and that look restored with the same garment, part materials, and texture transforms.
+   Saving a variant as a new look preserves the original.
 7. Exported JSON is portable and versioned; an exported preview is a clean image suitable for sharing.
 8. Compact controls remain usable on narrower screens, while desktop remains the primary editing experience.
 9. Source photographs, generated studies or textures, and authored 3D assets remain distinguishable in product metadata.

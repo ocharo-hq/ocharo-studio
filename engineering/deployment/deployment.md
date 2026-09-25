@@ -3,7 +3,8 @@
 *Last updated: 2026-09-25*
 
 The Dockerfile packages the React SPA and .NET API into one image.
-Its build context is `engineering/codebase/`; compose stores SQLite data in a named volume.
+Its build context is `engineering/codebase/`. Compose runs the stateless host without a database volume; saved looks
+remain in each browser's local storage.
 
 ```sh
 docker compose -f engineering/deployment/docker-compose.yml config

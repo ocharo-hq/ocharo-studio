@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.StaticFiles;
+
 namespace UzbekStudio.Api.Configurations;
 
 /// <summary>Configures the UzbekStudio host — slim orchestrator that delegates to extension methods.</summary>
@@ -7,8 +9,6 @@ public static class HostConfiguration
     public static WebApplicationBuilder Configure(this WebApplicationBuilder builder)
     {
         builder
-            .AddPersistenceLayer()
-            .AddInfrastructureLayer()
             .AddApplicationLayer()
             .AddApiServices();
 
@@ -23,7 +23,10 @@ public static class HostConfiguration
 
         // Serve the React SPA from wwwroot (single-deploy: API + UI in one host).
         app.UseDefaultFiles();
-        app.UseStaticFiles();
+        var contentTypes = new FileExtensionContentTypeProvider();
+        contentTypes.Mappings[".glb"] = "model/gltf-binary";
+        contentTypes.Mappings[".gltf"] = "model/gltf+json";
+        app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = contentTypes });
 
         app.MapControllers();
         app.MapGet("/health", () => Results.Ok(new { status = "healthy", service = "UzbekStudio" }));

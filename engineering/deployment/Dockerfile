@@ -6,9 +6,9 @@
 #
 #   docker build -f engineering/deployment/Dockerfile -t uzbekstudio engineering/codebase
 #
-#   docker run --name uzbekstudio -p 127.0.0.1:18260:8080 -v uzbekstudio-data:/data uzbekstudio
+#   docker run --name uzbekstudio -p 127.0.0.1:18260:8080 uzbekstudio
 #
-# On first run the app creates /data/uzbekstudio.db automatically.
+# Editable designs are stored in the browser; no server data volume is required.
 
 # ---- Stage 1: build the React SPA ----
 FROM node:24-alpine AS spa
@@ -32,10 +32,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 COPY --from=build /app ./
 
-# SQLite store on a volume so data survives container replacement.
-ENV ConnectionStrings__UzbekStudio="Data Source=/data/uzbekstudio.db"
-RUN mkdir -p /data && chown app:app /data
-VOLUME ["/data"]
 
 USER app
 EXPOSE 8080

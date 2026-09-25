@@ -8,9 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UzbekStudio.Application\UzbekStudio.Application.csproj" />
-    <ProjectReference Include="..\UzbekStudio.Infrastructure\UzbekStudio.Infrastructure.csproj" />
-    <ProjectReference Include="..\UzbekStudio.Persistence\UzbekStudio.Persistence.csproj" />
-    <ProjectReference Include="..\UzbekStudio.Domain\UzbekStudio.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

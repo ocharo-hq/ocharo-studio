@@ -6,13 +6,13 @@ A 3D creative studio for fixed-size Uzbek garments and per-part textile placemen
 
 - Shared wow-two workspace conventions apply; repo-specific scope is in `product/features/studio.md`.
 - Open documents only when needed; `.claude/rules/file-references.md` is a lookup table.
-- Current implementation is a foundation, not a completed 3D editor.
+- Current implementation is a working local 3D editor; verification status lives in `engineering/planning/verification.md`.
 - Product code lives under `engineering/codebase/`.
 - Preserve source photos, generated studies, and authored 3D assets as distinct provenance classes.
 - Treat supplied garment photographs as references, never as proof of hidden geometry or fit.
 - Keep sizing, length editing, freeform construction, and decoration editing out of the initial release.
 - Garment definitions own selectable parts and built-in attachments; never expose arbitrary attachment creation.
-- The developer makes the initial commit. Subsequent ordinary local auto commits are authorized after that milestone,
+- The developer's initial commit is `323b2ed`. Ordinary local automatic commits are authorized,
   subject to an active native turn-scoped commit grant. Never push or amend.
 - Keep required runtimes in managed terminal sessions and verify readiness before sharing their URLs.
 

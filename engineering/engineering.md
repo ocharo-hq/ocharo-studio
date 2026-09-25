@@ -2,8 +2,8 @@
 
 *Last updated: 2026-09-25*
 
-.NET 10, React 19, TypeScript, and Vite form the single-host application foundation.
-The 3D editor will run in the browser; the existing API currently exposes only the template greeting example.
+.NET 10, React 19, TypeScript, Vite, and Three.js form the single-host application.
+The WebGL editor runs in the browser; the API exposes studio capability metadata at `GET /api/studio`.
 
 - [Architecture](architecture/architecture.md): renderer, garment contracts, persistence, and asset authoring.
 - [Codebase](codebase/codebase.md): solution and frontend package.

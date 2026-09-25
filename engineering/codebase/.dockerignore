@@ -20,3 +20,7 @@ uzbek-studio.backend-services/UzbekStudio.Api/wwwroot/
 **/.git/
 **/*.user
 **/.DS_Store
+
+# Local browser verification output
+**/test-results/
+**/playwright-report/

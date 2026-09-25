@@ -1,0 +1,197 @@
+import type { GarmentDefinition, GarmentId, MaterialDefinition } from "./types";
+
+export const MATERIALS: readonly MaterialDefinition[] = [
+  {
+    id: "atlas-rose",
+    name: "Pomegranate atlas",
+    family: "Ikat",
+    color: "#ddad9a",
+    textureUrl: "/assets/textures/atlas-rose.png",
+    roughness: 0.58,
+    metalness: 0,
+    repeat: [1, 1],
+    provenance: "AI-generated atlas-inspired textile study",
+  },
+  {
+    id: "adras-indigo",
+    name: "Indigo adras",
+    family: "Ikat",
+    color: "#647ca9",
+    textureUrl: "/assets/textures/adras-indigo.png",
+    roughness: 0.8,
+    metalness: 0,
+    repeat: [1, 1],
+    provenance: "AI-generated adras-inspired textile study",
+  },
+  {
+    id: "bekasam-gold",
+    name: "Golden bekasam",
+    family: "Stripe",
+    color: "#c59c4b",
+    textureUrl: "/assets/textures/bekasam-gold.png",
+    roughness: 0.56,
+    metalness: 0,
+    repeat: [1, 1],
+    provenance: "AI-generated bekasam-inspired textile study",
+  },
+  {
+    id: "ikat-garden",
+    name: "Garden ikat",
+    family: "Ikat",
+    color: "#5d8365",
+    textureUrl: "/assets/textures/ikat-garden.png",
+    roughness: 0.7,
+    metalness: 0,
+    repeat: [1, 1],
+    provenance: "AI-generated ikat-inspired textile study",
+  },
+  {
+    id: "ivory",
+    name: "Ivory silk",
+    family: "Solid",
+    color: "#eee9db",
+    roughness: 0.6,
+    metalness: 0,
+    repeat: [1, 1],
+    provenance: "Authored material",
+  },
+  {
+    id: "sand",
+    name: "Warm linen",
+    family: "Solid",
+    color: "#c2a78b",
+    roughness: 0.95,
+    metalness: 0,
+    repeat: [1, 1],
+    provenance: "Authored material",
+  },
+  {
+    id: "ink",
+    name: "Midnight velvet",
+    family: "Solid",
+    color: "#26383f",
+    roughness: 0.98,
+    metalness: 0,
+    repeat: [1, 1],
+    provenance: "Authored material",
+  },
+  {
+    id: "pomegranate",
+    name: "Pomegranate silk",
+    family: "Solid",
+    color: "#773b44",
+    roughness: 0.55,
+    metalness: 0,
+    repeat: [1, 1],
+    provenance: "Authored material",
+  },
+  {
+    id: "sage",
+    name: "Sage cotton",
+    family: "Solid",
+    color: "#839080",
+    roughness: 0.92,
+    metalness: 0,
+    repeat: [1, 1],
+    provenance: "Authored material",
+  },
+  {
+    id: "gold",
+    name: "Antique gold",
+    family: "Solid",
+    color: "#b49656",
+    roughness: 0.58,
+    metalness: 0.35,
+    repeat: [1, 1],
+    provenance: "Authored material",
+  },
+];
+const part = (
+  id: GarmentDefinition["parts"][number]["id"],
+  name: string,
+  defaultMaterialId: string,
+) => ({ id, name, defaultMaterialId });
+export const GARMENTS: readonly GarmentDefinition[] = [
+  {
+    id: "nimcha",
+    name: "Nimcha",
+    subtitle: "The wrap vest",
+    description: "A sculpted vest with generous lapels and a side-tied waist.",
+    assetVersion: 1,
+    modelUrl: "/assets/models/nimcha.glb",
+    parts: [
+      part("body", "Main panels", "atlas-rose"),
+      part("collar", "Lapel & collar", "pomegranate"),
+      part("trim", "Edge binding", "pomegranate"),
+      part("belt", "Side tie", "pomegranate"),
+    ],
+    attachments: "Side tie · included",
+  },
+  {
+    id: "baska",
+    name: "Baska",
+    subtitle: "The peplum silhouette",
+    description: "A fitted waist opens into a soft, sculptural peplum.",
+    assetVersion: 1,
+    modelUrl: "/assets/models/baska.glb",
+    parts: [
+      part("body", "Bodice & peplum", "ikat-garden"),
+      part("trim", "Border", "sage"),
+      part("belt", "Waist sash", "sage"),
+    ],
+    attachments: "Waist sash · included",
+  },
+  {
+    id: "kostyum",
+    name: "Kostyum",
+    subtitle: "The cape jacket",
+    description: "A cropped, open jacket with airy sleeves and framed cuffs.",
+    assetVersion: 1,
+    modelUrl: "/assets/models/kostyum.glb",
+    parts: [
+      part("body", "Jacket panels", "adras-indigo"),
+      part("collar", "Collar", "ink"),
+      part("sleeves", "Sleeves", "adras-indigo"),
+      part("trim", "Cuffs & edges", "ink"),
+    ],
+    attachments: "Gold clasp · included",
+  },
+  {
+    id: "korset",
+    name: "Korset",
+    subtitle: "The shaped bodice",
+    description: "A strapless bodice with a defined waist and flared hem.",
+    assetVersion: 1,
+    modelUrl: "/assets/models/korset.glb",
+    parts: [
+      part("body", "Bodice", "bekasam-gold"),
+      part("trim", "Binding", "pomegranate"),
+    ],
+    attachments: "Front fastenings · included",
+  },
+  {
+    id: "abaya",
+    name: "Abaya",
+    subtitle: "The long robe",
+    description: "A flowing open robe, shaped by an integrated waist belt.",
+    assetVersion: 1,
+    modelUrl: "/assets/models/abaya.glb",
+    parts: [
+      part("body", "Robe panels", "adras-indigo"),
+      part("collar", "Front facing", "ink"),
+      part("sleeves", "Sleeves", "adras-indigo"),
+      part("belt", "Belt", "ink"),
+    ],
+    attachments: "Belt & knot · included",
+  },
+];
+export function getGarment(id: GarmentId): GarmentDefinition {
+  const garment = GARMENTS.find((item) => item.id === id);
+  if (!garment) throw new Error(`Unknown garment: ${id}`);
+  return garment;
+}
+export function getMaterial(id: string): MaterialDefinition {
+  const material = MATERIALS.find((item) => item.id === id);
+  if (!material) throw new Error(`Unknown material: ${id}`);
+  return material;
+}

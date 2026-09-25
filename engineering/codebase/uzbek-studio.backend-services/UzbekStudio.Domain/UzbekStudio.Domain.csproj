@@ -1,8 +1,3 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <!-- Kit: IKeyedEntity<T> base for entities. -->
-    <PackageReference Include="WoW2.Sdk.Backend.Beta" />
-  </ItemGroup>
-
 </Project>

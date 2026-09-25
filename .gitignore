@@ -25,3 +25,7 @@ engineering/codebase/uzbek-studio.backend-services/UzbekStudio.Api/wwwroot/
 !.env.example
 .local/
 **/*.blend1
+
+# Browser verification artifacts
+**/test-results/
+**/playwright-report/

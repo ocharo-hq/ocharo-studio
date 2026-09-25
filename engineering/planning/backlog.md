@@ -2,14 +2,22 @@
 
 *Last updated: 2026-09-25*
 
-## Initial studio
+## Implemented
 
-- Mannequin and versioned fixed-size garment assets.
-- Per-category part and built-in attachment definitions.
-- Material library with generated textile textures and provenance.
-- One-click garment/material application; texture rotation and offsets.
-- Contextual floating controls, undo/redo, and keyboard-accessible selection.
-- Save/reopen, portable design files, and preview export.
+- fixed mannequin and five versioned, fixed-size garment interpretation assets.
+- family-specific part and built-in attachment definitions.
+- four generated textile textures and six solid materials with provenance.
+- one-click garment and material application with degree rotation and normalized U/V offsets.
+- responsive floating controls, camera tools, undo/redo, keyboard controls, and guarded errors.
+- autosaved drafts, saved looks, save-copy, reopen, validated JSON, and PNG preview export.
+- `GET /api/studio` capability metadata without greeting or database infrastructure.
+
+## Remaining
+
+- executed automated and visual checks are recorded in `verification.md`; human validation remains.
+- review accessibility with assistive technology and keyboard-only use.
+- validate asset fidelity, clipping, UV placement, performance, and export usefulness with a test user.
+- validate the workflow and visual interpretations with Maftuna.
 
 ## Deferred
 

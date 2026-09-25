@@ -1,0 +1,38 @@
+name: Verify studio
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: engineering/codebase/uzbek-studio.frontend-services/package-lock.json
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Verify frontend
+        working-directory: engineering/codebase/uzbek-studio.frontend-services
+        run: |
+          npm ci
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+          npx playwright install --with-deps chromium
+      - name: Verify browser workflows
+        working-directory: engineering/codebase/uzbek-studio.frontend-services
+        env:
+          STUDIO_URL: http://127.0.0.1:8262
+        run: npm run test:e2e
+      - name: Verify host
+        working-directory: engineering/codebase/uzbek-studio.backend-services
+        run: |
+          dotnet build UzbekStudio.BackendServices.slnx -p:BuildSpa=false
+          dotnet test UzbekStudio.BackendServices.slnx --no-build

@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-09-25",
+  "tool": "Built-in image_gen",
+  "provenance": "Original AI-generated textile studies inspired by Uzbek textiles; not scans of verified physical fabrics.",
+  "assets": [
+    {
+      "id": "atlas-rose",
+      "prompt": "Use case: stylized-concept. Asset type: square seamless textile color texture for a 3D Uzbek clothing design app. Create a refined original Uzbek atlas-inspired ikat textile. Elongated vertical feathered diamond and flame motifs, warm ivory ground, deep pomegranate red, dusty rose, small saffron accents, restrained midnight outlines. Flat orthographic scanned fabric swatch, uniform illumination, fine silk warp threads, matte color map without specular highlights. Pattern fills entire square; identical edge continuation for repeating in both directions. Four broad vertical motif columns, generous ivory breathing room. No borders, no garment, no folds, no shadows, no labels, no text. 1024x1024.",
+      "output": "/assets/textures/atlas-rose.png",
+      "source": "/Users/max/.codex/generated_images/01a0d962-86b7-74b0-84fa-5ce22eaed56c/exec-762e2c90-eb8e-427a-bc88-1614edec3ab1.png"
+    },
+    {
+      "id": "adras-indigo",
+      "prompt": "Use case: stylized-concept. Asset type: square seamless textile color texture for a 3D Uzbek clothing design app. Create an original Uzbek adras-inspired ikat textile pattern: rich indigo and cobalt blue elongated branching diamond motifs on warm ivory, sparse sage accents, naturally feathered dyed warp edges. Flat orthographic fabric scan with uniform lighting and subtle cotton silk threads. Three wide vertical motif columns. Edge-to-edge repeating pattern with continuous matching opposite edges. Color map only, no lighting gradients, no shadows, no folds, no garment, no borders, no labels, no text. 1024x1024.",
+      "output": "/assets/textures/adras-indigo.png",
+      "source": "/Users/max/.codex/generated_images/01a0d962-86b7-74b0-84fa-5ce22eaed56c/exec-c26a06b6-b584-4971-b2f8-d88c87213310.png"
+    },
+    {
+      "id": "bekasam-gold",
+      "prompt": "Use case: stylized-concept. Asset type: square seamless textile color texture for a 3D Uzbek clothing design app. Original Uzbek bekasam-inspired woven silk striped cloth, warm saffron gold and cream dominant, thin burgundy, teal and midnight vertical bands, subtle fine thread texture. Elegant alternating stripe widths, flat unwrinkled orthographic scanned color texture, evenly lit, every stripe extends perfectly vertically top to bottom. Repeat tile continuous across opposite edges. No borders, no folds, no shadows, no garment, no labels, no text. 1024x1024.",
+      "output": "/assets/textures/bekasam-gold.png",
+      "source": "/Users/max/.codex/generated_images/01a0d962-86b7-74b0-84fa-5ce22eaed56c/exec-390122a1-ef03-4486-a725-9262e7970317.png"
+    },
+    {
+      "id": "ikat-garden",
+      "prompt": "Use case: stylized-concept. Asset type: square seamless textile color texture for a 3D Uzbek clothing design app. Original Uzbek-inspired green ikat textile, emerald and sage elongated feather-edged tulip-like diamond motifs with restrained terracotta centers on creamy ivory. Refined rhythmic alternating vertical motifs, three broad columns. Flat orthographic fabric scan under perfectly even neutral light, subtly visible silk cotton warp threads. Pattern continues across opposite square edges for repeated UV tiling. No borders, no folds, no mannequin, no garment, no shadows, no text. 1024x1024.",
+      "output": "/assets/textures/ikat-garden.png",
+      "source": "/Users/max/.codex/generated_images/01a0d962-86b7-74b0-84fa-5ce22eaed56c/exec-2ec6669d-ec4c-424f-9c3a-f3afad7eb5aa.png"
+    }
+  ]
+}

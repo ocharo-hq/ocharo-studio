@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\UzbekStudio.Application\UzbekStudio.Application.csproj" />
-    <ProjectReference Include="..\..\UzbekStudio.Domain\UzbekStudio.Domain.csproj" />
   </ItemGroup>
 
 </Project>

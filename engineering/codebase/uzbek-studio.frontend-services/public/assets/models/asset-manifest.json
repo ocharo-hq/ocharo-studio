@@ -1,0 +1,157 @@
+{
+  "assetVersion": "1.0.0",
+  "authoredOn": "2026-09-25",
+  "generator": "scripts/author-garments.mjs",
+  "provenance": "deterministic authored geometry inspired by Ocharo references; not a scan or sewing pattern",
+  "coordinates": {
+    "units": "metres",
+    "up": "+Y",
+    "front": "+Z",
+    "origin": "base centre",
+    "waistY": 1.055
+  },
+  "assets": {
+    "mannequin": {
+      "file": "mannequin.glb",
+      "bytes": 310536,
+      "sha256": "bad2ce50514b5b4faa1c3e4b485abbad611c21695fbdd04c90ddd7f1f4c1f38a",
+      "meshes": 11,
+      "triangles": 12248,
+      "parts": [],
+      "bounds": {
+        "min": [
+          -0.46200000184774404,
+          -7.450580430390374e-11,
+          -0.23499999940395355
+        ],
+        "max": [
+          0.46200000184774404,
+          1.7269999998807908,
+          0.23499999940395355
+        ]
+      }
+    },
+    "nimcha": {
+      "file": "nimcha.glb",
+      "bytes": 215060,
+      "sha256": "68258aeed0c06ba567d98778671f81b527546854cccdc1661009dda65afcfd93",
+      "meshes": 14,
+      "triangles": 8072,
+      "parts": [
+        "belt",
+        "body",
+        "collar",
+        "trim"
+      ],
+      "bounds": {
+        "min": [
+          -0.25124606490135193,
+          0.8476417660713196,
+          -0.147958904504776
+        ],
+        "max": [
+          0.25124606490135193,
+          1.5779999494552612,
+          0.1896153837442398
+        ]
+      }
+    },
+    "baska": {
+      "file": "baska.glb",
+      "bytes": 291348,
+      "sha256": "cb36030be93a16e906e90aa697bbbe9c4bcd2efb7972fe515b0ae03635cec7f9",
+      "meshes": 11,
+      "triangles": 11712,
+      "parts": [
+        "belt",
+        "body",
+        "trim"
+      ],
+      "bounds": {
+        "min": [
+          -0.28686219453811646,
+          0.761540949344635,
+          -0.20764902234077454
+        ],
+        "max": [
+          0.28686219453811646,
+          1.1414999961853027,
+          0.20452919602394104
+        ]
+      }
+    },
+    "kostyum": {
+      "file": "kostyum.glb",
+      "bytes": 291616,
+      "sha256": "015e41e7cf20a773d41c7e98b42e035ec45a5838f92056f55311080bb9a4621f",
+      "meshes": 12,
+      "triangles": 11544,
+      "parts": [
+        "body",
+        "collar",
+        "sleeves",
+        "trim"
+      ],
+      "bounds": {
+        "min": [
+          -0.573165237903595,
+          0.9376155138015747,
+          -0.16315720975399017
+        ],
+        "max": [
+          0.573165237903595,
+          1.5779999494552612,
+          0.18141999985277651
+        ]
+      }
+    },
+    "korset": {
+      "file": "korset.glb",
+      "bytes": 247680,
+      "sha256": "c48b7294452c076596727b6a170db9a382bde39f2a9b725a678d4878593fbfde",
+      "meshes": 12,
+      "triangles": 9560,
+      "parts": [
+        "body",
+        "trim"
+      ],
+      "bounds": {
+        "min": [
+          -0.2593116760253906,
+          0.7987338900566101,
+          -0.17248941957950592
+        ],
+        "max": [
+          0.2593116760253906,
+          1.3376251459121704,
+          0.17248724400997162
+        ]
+      }
+    },
+    "abaya": {
+      "file": "abaya.glb",
+      "bytes": 360044,
+      "sha256": "dfc9e77d4c5fadb559245dd0386d95a36fe4eb68e6b3128533ce3056db203a17",
+      "meshes": 16,
+      "triangles": 14412,
+      "parts": [
+        "belt",
+        "body",
+        "collar",
+        "sleeves"
+      ],
+      "bounds": {
+        "min": [
+          -0.5057035684585571,
+          0.22415819764137268,
+          -0.24121978878974915
+        ],
+        "max": [
+          0.5057035684585571,
+          1.5779999494552612,
+          0.2353060394525528
+        ]
+      }
+    }
+  }
+}

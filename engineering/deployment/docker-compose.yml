@@ -2,7 +2,7 @@
 #
 #   docker compose up -d --build
 #
-# The SQLite store lives on the named volume so data survives container replacement.
+# Designs are saved locally in each browser; export JSON for portable backups.
 services:
   uzbekstudio:
     build:
@@ -13,8 +13,3 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:18260:8080"
-    volumes:
-      - uzbekstudio-data:/data
-
-volumes:
-  uzbekstudio-data:

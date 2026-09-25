@@ -6,25 +6,26 @@
 
 ## Current state
 
-Requirements for the first studio slice are confirmed and the repository foundation exists. Product and engineering specifications are documented; the 3D studio, garment meshes, textures, persistence, and exports are not yet implemented. The developer owns the repository's first commit before implementation continues.
+The agreed first-release scope is implemented locally after initial commit `323b2ed`. The running WebGL studio includes
+one mannequin, five garment interpretations, per-part materials and texture placement, local saved looks, JSON and PNG
+export, and responsive controls. Final automated checks and human validation remain tracked in planning and verification.
 
 ## Active tasks
 
 | Task | Status | Notes |
 |---|---|---|
 | Define durable product and engineering scope | Complete | Requirements, architecture, provenance, and implementation handoff are documented. |
-| Complete the nimcha creation workflow | Planned | First executable product slice, including an authored nimcha asset. |
-| Prepare usable textile assets | Planned | Generated textures are allowed; provenance must remain explicit. |
-| Add remaining catalogue families | Planned | Add `baska`, `kostyum`, `korset`, and `abaya` through the proven asset contract. |
+| Complete the nimcha creation workflow | In verification | The complete local workflow and authored interpretation asset exist. |
+| Prepare usable textile assets | In verification | Four generated textures and six solid materials preserve explicit provenance. |
+| Add remaining catalogue families | In verification | `baska`, `kostyum`, `korset`, and `abaya` use the shared asset contract. |
 | Validate the creative workflow | Planned | Observe comprehension, visual usefulness, and saved-look continuity with a selected test user. |
 
 ## Open questions
 
-- Which nimcha design should become the first authored 3D reference asset?
-- Which source-backed or generated textiles should ship in the initial material library?
+- Which catalogue references should anchor fidelity review of the authored garment interpretations?
 - Which exact preview image views and resolutions are most useful to creative users?
-- What visual fidelity and browser performance thresholds are acceptable after the first real asset is loaded?
-- Which remaining family should follow nimcha after the asset workflow is proven?
+- What visual fidelity and browser performance thresholds should gate wider use?
+- Which family should receive the first post-validation asset refinement?
 
 These questions refine delivery; they do not block the confirmed product model.
 

@@ -4,16 +4,19 @@
 
 ## Current state
 
-The venture foundation and product brief are prepared for the developer's initial commit.
-The 3D studio implementation has not started.
+The local product implementation is complete for the agreed first-release scope. It includes the five garment
+families, authored GLBs, generated and solid materials, independent per-part editing, camera controls, undo/redo,
+browser-local draft and saved-look persistence, save-copy, JSON import/export, PNG export, and responsive controls.
 
-## Implementation sequence
+The developer's initial commit is `323b2ed`; ordinary local automatic commits are authorized under the active
+turn-scoped grant. No push is authorized.
 
-1. Author the mannequin and nimcha asset contract; prove part selection and built-in attachments.
-2. Build the floating island editor and texture application/rotation/offset workflow.
-3. Persist editable looks and verify reopen/export behaviour.
-4. Add the remaining catalogue garment families with authored parts and attachments.
-5. Verify visual quality, state isolation, runtime behaviour, and responsive controls.
+## Remaining sequence
 
-The [implementation prompt](implementation-prompt.md) carries the new-chat brief.
-The [verification record](verification.md) separates executed checks from planned product behaviour.
+1. Completed final build, focused, browser, accessibility, asset, and packaged-runtime checks; see verification.
+2. Perform human review of control comprehension, garment fidelity, clipping, and useful export views.
+3. Validate the creation workflow with Maftuna before describing the interpretation assets as approved.
+4. Decide whether deferred decoration or sizing work deserves a separately scoped iteration.
+
+The [implementation prompt](implementation-prompt.md) is the archived foundation brief.
+The [verification record](verification.md) is authoritative for executed checks and remaining validation.

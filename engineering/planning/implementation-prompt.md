@@ -2,7 +2,8 @@
 
 *Last updated: 2026-09-25*
 
-Paste the following into a new task attached to this repository after the developer's first commit.
+> Archived foundation brief. The implementation described below now exists after initial commit `323b2ed`.
+> Do not reuse this prompt as current status. See [planning](planning.md) and [verification](verification.md).
 
 ---
 
