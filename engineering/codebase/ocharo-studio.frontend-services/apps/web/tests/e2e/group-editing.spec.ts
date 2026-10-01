@@ -7,6 +7,7 @@ import {
 import { readFile } from "node:fs/promises";
 
 test.beforeEach(async ({ page }) => {
+  await page.clock.install();
   await page.addInitScript(() => {
     localStorage.setItem(
       "ocharo-studio:settings",
@@ -113,10 +114,26 @@ test("group edits stay coherent and New preserves a meaningful draft", async ({
 
   await page.getByRole("textbox", { name: "Look name" }).fill("Grouped draft");
   const previousId = await exportedId(page);
-  await page.getByRole("button", { name: "New design", exact: true }).click();
-  await expect(page.locator(".studio-toasts")).toContainText(
-    "Previous draft kept in My looks",
-  );
+  // Keep the notification lifetime independent of software-GPU wall time.
+  await page.clock.pauseAt(await page.evaluate(() => Date.now()));
+  const preservationToast = page
+    .locator(".studio-toasts")
+    .getByText("Previous draft kept in My looks. New design ready.", {
+      exact: true,
+    });
+  try {
+    await page.getByRole("button", { name: "New design", exact: true }).click();
+    await expect(page.locator(".studio-toasts")).toContainText(
+      "Previous draft kept in My looks",
+    );
+    await expect(preservationToast).toBeVisible();
+    await page.clock.fastForward(4499);
+    await expect(preservationToast).toBeVisible();
+    await page.clock.fastForward(1);
+    await expect(preservationToast).toBeHidden();
+  } finally {
+    await page.clock.resume();
+  }
   const newId = await exportedId(page);
   expect(newId).not.toBe(previousId);
 
