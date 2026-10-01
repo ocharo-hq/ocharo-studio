@@ -49,7 +49,16 @@ test("landing and studio navigation preserve the latest draft and support histor
   page,
 }) => {
   await suppressOnboarding(page);
+  // A fresh workspace writes its initial draft after the lazy editor mounts.
+  const initialSave = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === "/api/studio/state" &&
+      response.request().method() === "PUT" &&
+      response.ok(),
+    { timeout: 20_000 },
+  );
   await page.goto("/studio");
+  await initialSave;
   await expect(page.locator(".save-status-button")).not.toContainText("Saving");
   await page.getByRole("slider", { name: "Rotation", exact: true }).fill("65");
   await page
@@ -114,7 +123,16 @@ test("studio waits for an in-flight save before navigating home", async ({
   page,
 }) => {
   await suppressOnboarding(page);
+  // A fresh workspace writes its initial draft after the lazy editor mounts.
+  const initialSave = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === "/api/studio/state" &&
+      response.request().method() === "PUT" &&
+      response.ok(),
+    { timeout: 20_000 },
+  );
   await page.goto("/studio");
+  await initialSave;
   await expect(page.locator(".save-status-button")).not.toContainText("Saving");
 
   let releaseWrite: (() => void) | undefined;
@@ -268,7 +286,16 @@ test("edits made during initial storage loading survive leaving and reopening", 
   page,
 }) => {
   await suppressOnboarding(page);
+  // A fresh workspace writes its initial draft after the lazy editor mounts.
+  const initialSave = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === "/api/studio/state" &&
+      response.request().method() === "PUT" &&
+      response.ok(),
+    { timeout: 20_000 },
+  );
   await page.goto("/studio");
+  await initialSave;
   await expect(page.locator(".save-status-button")).not.toContainText("Saving");
   await page.getByRole("link", { name: "Ocharo Studio home" }).click();
 

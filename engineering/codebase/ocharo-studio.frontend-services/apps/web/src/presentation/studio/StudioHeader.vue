@@ -125,6 +125,7 @@ function commitName() {
         class="save-status-button"
         data-tour="save-look"
         aria-label="Save look"
+        aria-describedby="look-save-status"
         :disabled="persistenceStatus === 'loading'"
         @click="
           ['offline', 'conflict'].includes(persistenceStatus)
@@ -134,7 +135,14 @@ function commitName() {
       >
         <component :is="statusIcon" :class="{ spin: busy }" :size="16" />
         <span class="save-divider" aria-hidden="true" />
-        <span class="save-status-label">{{ status }}</span>
+        <span
+          id="look-save-status"
+          class="save-status-label"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          >{{ status }}</span
+        >
       </button>
       <button
         v-if="!materialPage"

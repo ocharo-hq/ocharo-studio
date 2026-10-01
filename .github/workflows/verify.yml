@@ -2,9 +2,15 @@ name: Verify studio
 on: [push, pull_request]
 permissions:
   contents: read
+concurrency:
+  group: studio-verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  verify:
+  checks:
+    name: Frontend and host checks
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
         with:
@@ -14,7 +20,7 @@ jobs:
           version: 10.33.2
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: pnpm
           cache-dependency-path: engineering/codebase/ocharo-studio.frontend-services/pnpm-lock.yaml
       - uses: actions/setup-dotnet@v4
@@ -29,6 +35,40 @@ jobs:
           pnpm typecheck
           pnpm test
           pnpm build
+      - name: Verify host
+        working-directory: engineering/codebase/ocharo-studio.backend-services
+        run: |
+          dotnet build OcharoStudio.BackendServices.slnx -p:BuildSpa=false
+          dotnet test OcharoStudio.BackendServices.slnx --no-build
+
+  browser:
+    name: Browser (${{ matrix.shard }}/3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: engineering/codebase/ocharo-studio.frontend-services/pnpm-lock.yaml
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Prepare browser dependencies
+        working-directory: engineering/codebase/ocharo-studio.frontend-services
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
           pnpm --filter @ocharo-studio/web exec playwright install --with-deps chromium
       - name: Prepare trusted CI HTTPS
         run: bash engineering/codebase/ocharo-studio.frontend-services/scripts/prepare-ci-https.sh
@@ -36,9 +76,24 @@ jobs:
         working-directory: engineering/codebase/ocharo-studio.frontend-services
         env:
           STUDIO_URL: https://localhost:8262
-        run: pnpm test:e2e
-      - name: Verify host
-        working-directory: engineering/codebase/ocharo-studio.backend-services
+          SHARD: ${{ matrix.shard }}
+        # Each runner keeps a single browser worker for software rendering.
+        # All shards are required; no retries or test exclusions mask failures.
+        run: pnpm --filter @ocharo-studio/web exec playwright test --workers=1 --shard="$SHARD/3"
+
+  verify:
+    name: verify
+    if: always()
+    needs: [checks, browser]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require all checks and browser shards
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
         run: |
-          dotnet build OcharoStudio.BackendServices.slnx -p:BuildSpa=false
-          dotnet test OcharoStudio.BackendServices.slnx --no-build
+          python3 - <<'PY'
+          import json, os
+          results = json.loads(os.environ['RESULTS'])
+          if not results or any(result != 'success' for result in results):
+              raise SystemExit(f'Verification jobs did not all pass: {results}')
+          PY

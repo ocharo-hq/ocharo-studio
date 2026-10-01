@@ -48,7 +48,7 @@ test("phone header actions remain clear of the design name input", async ({
     "Save look",
     "Export",
   ];
-  for (const width of [390, 320]) {
+  for (const width of [560, 480, 390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     const nameInput = page.getByRole("textbox", { name: "Look name" });
     const inputBox = await nameInput.boundingBox();
@@ -71,5 +71,14 @@ test("phone header actions remain clear of the design name input", async ({
         }),
       ).toBe(true);
     }
+    await expect(
+      page.getByRole("button", { name: "Save look", exact: true }),
+    ).toHaveAccessibleDescription(/^(Saving|Saved|Save|Offline|Resolve)$/);
+    const version = page.locator(".app-header .build-identity");
+    await version.locator("summary").focus();
+    await page.keyboard.press("Enter");
+    await expect(version.getByText("Backend", { exact: true })).toBeVisible();
+    await page.keyboard.press("Enter");
+    await expect(version.getByText("Backend", { exact: true })).toBeHidden();
   }
 });

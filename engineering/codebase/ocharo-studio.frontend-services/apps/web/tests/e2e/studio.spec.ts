@@ -122,16 +122,18 @@ test("designs remain independent, editable, saved and portable", async ({
   expect(errors).toEqual([]);
 });
 
-test("every garment renders all views, parts and built-in details", async ({
-  page,
-}) => {
-  const failedAssets: string[] = [];
-  page.on("response", (response) => {
-    if (response.url().includes("/assets/") && response.status() >= 400)
-      failedAssets.push(response.url());
-  });
-  await page.goto("/studio");
-  for (const name of ["Nimcha", "Baska", "Kostyum", "Korset", "Abaya"]) {
+for (const name of ["Nimcha", "Baska", "Kostyum", "Korset", "Abaya"]) {
+  test(`${name} renders all views, parts and built-in details`, async ({
+    page,
+  }) => {
+    // Software-rendered CI verifies each garment independently with all views and parts.
+    test.setTimeout(90_000);
+    const failedAssets: string[] = [];
+    page.on("response", (response) => {
+      if (response.url().includes("/assets/") && response.status() >= 400)
+        failedAssets.push(response.url());
+    });
+    await page.goto("/studio");
     await page
       .getByRole("button", { name: new RegExp(`\\d+ ${name} The`) })
       .click();
@@ -166,10 +168,9 @@ test("every garment renders all views, parts and built-in details", async ({
         page.getByRole("slider", { name: "Rotation", exact: true }),
       ).toHaveValue("90");
     }
-    await page.getByRole("tab", { name: "Garments" }).click();
-  }
-  expect(failedAssets).toEqual([]);
-});
+    expect(failedAssets).toEqual([]);
+  });
+}
 
 test("responsive studio and dark theme keep controls reachable", async ({
   page,
@@ -259,6 +260,8 @@ test("keyboard navigation and automated accessibility checks pass", async ({
 test("canvas changes with materials and orbiting does not change selected parts", async ({
   page,
 }) => {
+  // Material loading, full-canvas readback and a multi-frame orbit use software rendering in CI.
+  test.setTimeout(90_000);
   await page.goto("/studio");
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
     timeout: 20_000,

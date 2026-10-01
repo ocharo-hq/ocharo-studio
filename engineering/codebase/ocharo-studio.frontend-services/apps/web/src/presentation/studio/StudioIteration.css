@@ -253,11 +253,48 @@
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 560px) {
+  .app-header {
+    gap: 4px;
+  }
   .header-leading {
     min-width: 0;
-    gap: 6px;
+    gap: 4px;
   }
+  .header-leading .build-identity {
+    min-width: 0;
+  }
+  .header-leading .build-identity summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header-actions {
+    flex: 0 0 auto;
+    gap: 4px;
+  }
+  .save-status-button {
+    width: 34px;
+    min-width: 34px;
+    justify-content: center;
+    padding: 7px;
+  }
+  .save-status-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .save-divider {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
   .header-leading .brand-authentic .brand-wordmark {
     width: 78px;
     height: 30px;

@@ -3,7 +3,9 @@ import { test, expect, type Page } from "./fixtures/studioFixture";
 
 async function load(page: Page) {
   await page.goto("/studio");
-  await expect(page.locator(".viewport canvas")).toBeVisible();
+  await expect(page.locator(".viewport canvas")).toBeVisible({
+    timeout: 20_000,
+  });
   const skip = page.getByRole("button", { name: "Skip", exact: true });
   if (await skip.isVisible({ timeout: 2000 })) await skip.click();
   await expect(page.locator(".save-status-button")).not.toContainText("Saving");
@@ -67,13 +69,30 @@ test("offline edits retry without claiming an acknowledged save", async ({
   );
   await load(page);
   await page.route("**/api/studio/state", (route) =>
-    route.request().method() === "PUT"
+    route.request().method() === "PUT" &&
+    route.request().postDataJSON()?.draft?.parts?.body?.placement?.rotation ===
+      67
       ? route.abort("failed")
       : route.fallback(),
   );
+  const savedBeforeFailure = await remote(page);
+  const failedWrite = () =>
+    page.waitForEvent("requestfailed", {
+      predicate: (request) =>
+        new URL(request.url()).pathname === "/api/studio/state" &&
+        request.method() === "PUT",
+      timeout: 20_000,
+    });
+  const firstFailure = failedWrite();
   await page.getByRole("slider", { name: "Rotation", exact: true }).fill("67");
+  await firstFailure;
   await expect(page.locator(".save-status-button")).toContainText("Offline");
+  expect((await remote(page)).draft.parts.body.placement.rotation).toBe(
+    savedBeforeFailure.draft.parts.body.placement.rotation,
+  );
+  const recoveryFailure = failedWrite();
   await page.reload();
+  await recoveryFailure;
   await expect(
     page.getByRole("slider", { name: "Rotation", exact: true }),
   ).toHaveValue("67");

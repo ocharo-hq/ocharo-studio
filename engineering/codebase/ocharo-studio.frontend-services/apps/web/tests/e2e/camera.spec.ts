@@ -19,7 +19,7 @@ test.beforeEach(async ({ page }) => {
 async function openStudio(page: Page): Promise<Locator> {
   await page.goto("/studio");
   const canvas = page.locator(".viewport canvas");
-  await expect(canvas).toBeVisible();
+  await expect(canvas).toBeVisible({ timeout: 20_000 });
   // The lazy editor must mount before absence of its loading overlay means ready.
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
     timeout: 20_000,
