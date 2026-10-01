@@ -1,1 +1,4 @@
-engineering/codebase/uzbek-studio.frontend-services/public/assets/textures/*.png filter=lfs diff=lfs merge=lfs -text
+# Git LFS stores supplied images, model releases and preserved archives.
+*.png filter=lfs diff=lfs merge=lfs -text
+*.glb filter=lfs diff=lfs merge=lfs -text
+*.tgz filter=lfs diff=lfs merge=lfs -text

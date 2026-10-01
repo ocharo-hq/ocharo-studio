@@ -1,4 +1,4 @@
-# Build context = engineering/codebase/ (parent of uzbek-studio.backend-services + uzbek-studio.frontend-services).
+# Build context = engineering/codebase/ (parent of ocharo-studio.backend-services + ocharo-studio.frontend-services).
 
 # Build outputs — restored/rebuilt fresh inside the image
 **/bin/
@@ -12,7 +12,7 @@
 **/*.db-wal
 
 # Locally-deployed SPA — the spa stage rebuilds it from source
-uzbek-studio.backend-services/UzbekStudio.Api/wwwroot/
+ocharo-studio.backend-services/OcharoStudio.Api/wwwroot/
 
 # IDE / VCS / OS cruft
 **/.vs/
@@ -24,3 +24,10 @@ uzbek-studio.backend-services/UzbekStudio.Api/wwwroot/
 # Local browser verification output
 **/test-results/
 **/playwright-report/
+
+# Environment-owned configuration and credentials never enter image layers.
+**/appsettings.Local.json
+**/.env
+**/.env.*
+**/*.pfx
+**/*.key

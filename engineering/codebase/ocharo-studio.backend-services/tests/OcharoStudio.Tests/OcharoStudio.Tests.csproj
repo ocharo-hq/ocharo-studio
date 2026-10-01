@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\OcharoStudio.Api\OcharoStudio.Api.csproj" />
+    <ProjectReference Include="..\..\OcharoStudio.Application\OcharoStudio.Application.csproj" />
+    <ProjectReference Include="..\..\OcharoStudio.Persistence\OcharoStudio.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>

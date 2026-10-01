@@ -1,0 +1,54 @@
+{
+  "date": "2026-09-26",
+  "sourceWorkspace": "/Users/max/Projects/10x-ws/workbench/fam/mft-10x-ws",
+  "sourcePath": "context/domains/external/work/career/designer/portfolio/brand/logo/och-logo-approved-ivory-v1.png",
+  "sourceSha256": "32f2efeb381b92fdbf228c6f551909c8d1f78bc1212f1c6b79778cbbf8bcd33e",
+  "sourceStatus": "Approved generated tilted-needle master; exact original copied. No new logo generated or traced.",
+  "files": [
+    {
+      "path": "ocharo-approved-ivory.png",
+      "bytes": 1236126,
+      "sha256": "32f2efeb381b92fdbf228c6f551909c8d1f78bc1212f1c6b79778cbbf8bcd33e"
+    },
+    {
+      "path": "ocharo-wordmark.webp",
+      "bytes": 17484,
+      "sha256": "2a9894ce362d04d4cef43f67d349e18c318aa0f36dcd811294f5a288bd675247"
+    },
+    {
+      "path": "ocharo-icon-source.webp",
+      "bytes": 6120,
+      "sha256": "1b79059a719f4e8f16b71903f94f91d6120d038d3df122bd1aa0d0ad87905275"
+    }
+  ],
+  "runtimeWordmark": {
+    "path": "ocharo-wordmark.webp",
+    "dimensions": [
+      768,
+      512
+    ],
+    "encoding": "cwebp -q 95 -m 6 -resize 768 512; approved artwork geometry unchanged",
+    "display": "Inline DOM SVG at original coordinates; viewBox 288 325 1000 345. CSS grayscale/contrast with multiply for light surfaces; invert/screen for dark surfaces."
+  },
+  "runtimeFavicon": {
+    "path": "../../favicon.svg",
+    "bytes": 8606,
+    "sha256": "bf282069428a852342bdf4a52ad70cc959f872ac8055b79451e95fba38b8585c",
+    "sourceDimensions": [
+      384,
+      256
+    ],
+    "encoding": "cwebp -q 95 -m 6 -resize 384 256; embedded data URI",
+    "display": "SVG clip isolates the source tilted needle from its adjoining letters on a rounded ivory square. This app icon adaptation is not a newly approved brand master.",
+    "clipPath": "M658 660 684 577 698 537 782 362 800 333 827 330 835 354 817 385 700 575Z"
+  },
+  "excludedDrafts": [
+    "och-logo-black-transparent-v1.png",
+    "och-logo-white-transparent-v1.png"
+  ],
+  "verification": [
+    "Original source SHA256 matches copied PNG.",
+    "Headless Chrome decoded the self-contained favicon at16/32/64/128px.",
+    "Wordmark inspected in desktop/phone and light/dark native CSS layouts."
+  ]
+}

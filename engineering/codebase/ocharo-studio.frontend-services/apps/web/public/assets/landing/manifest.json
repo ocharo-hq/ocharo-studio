@@ -1,0 +1,168 @@
+{
+  "createdAt": "2026-09-28",
+  "capture": "Actual StudioScene renderer: StudioScene.capture(), the same call behind Export → Preview image, driven headlessly (Playwright Chromium, ANGLE Metal on Apple M4 Max) through a Vite dev server. No image generation, photo editing, or cropping.",
+  "sourceUrl": "https://localhost:8262/ (temporary review page instantiating StudioScene)",
+  "view": "front preset (full-height framing)",
+  "browserViewport": {
+    "width": 1300,
+    "height": 1390
+  },
+  "deviceScaleFactor": 1,
+  "assets": [
+    {
+      "id": "nimcha",
+      "garmentId": "nimcha",
+      "bodyMaterialId": "atlas-rose",
+      "otherParts": "Unmodified catalogue defaults",
+      "file": "/assets/landing/nimcha.png",
+      "bytes": 276416,
+      "sha256": "e3efa61323124128f62aca3e353100d5f51c91a394fd3a549af01e862d5fa618",
+      "canvas": {
+        "width": 800,
+        "height": 1000,
+        "cssWidth": 800,
+        "cssHeight": 1000
+      },
+      "width": 800,
+      "height": 1000,
+      "transparentPixels": 567953,
+      "opaquePixels": 175691,
+      "partialAlphaPixels": 56356,
+      "camera": {
+        "preset": "front",
+        "position": [
+          0,
+          0.86,
+          3.3
+        ],
+        "target": [
+          0,
+          0.76,
+          0
+        ],
+        "verticalFovDegrees": 32,
+        "aspect": 0.8,
+        "source": "StudioScene.ts front preset and PerspectiveCamera; no custom zoom."
+      }
+    },
+    {
+      "id": "baska",
+      "garmentId": "baska",
+      "bodyMaterialId": "ikat-garden",
+      "otherParts": "Unmodified catalogue defaults",
+      "file": "/assets/landing/baska.png",
+      "bytes": 306985,
+      "sha256": "9f575831698f28ff910c006447276782a5277b209a50ef18cf71e4d089d4684c",
+      "canvas": {
+        "width": 800,
+        "height": 1000,
+        "cssWidth": 800,
+        "cssHeight": 1000
+      },
+      "width": 800,
+      "height": 1000,
+      "transparentPixels": 567340,
+      "opaquePixels": 176327,
+      "partialAlphaPixels": 56333,
+      "camera": {
+        "preset": "front",
+        "position": [
+          0,
+          0.86,
+          3.3
+        ],
+        "target": [
+          0,
+          0.76,
+          0
+        ],
+        "verticalFovDegrees": 32,
+        "aspect": 0.8,
+        "source": "StudioScene.ts front preset and PerspectiveCamera; no custom zoom."
+      },
+      "partAssignments": {
+        "body": {
+          "materialId": "ikat-garden",
+          "placement": {
+            "rotation": 0,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1,
+            "materialAnchorX": 0.5,
+            "materialAnchorY": 0.5,
+            "garmentAnchorX": 0.5,
+            "garmentAnchorY": 0.5
+          }
+        },
+        "trim": {
+          "materialId": "sage",
+          "placement": {
+            "rotation": 0,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1,
+            "materialAnchorX": 0.5,
+            "materialAnchorY": 0.5,
+            "garmentAnchorX": 0.5,
+            "garmentAnchorY": 0.5
+          }
+        },
+        "belt": {
+          "materialId": "sage",
+          "placement": {
+            "rotation": 0,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1,
+            "materialAnchorX": 0.5,
+            "materialAnchorY": 0.5,
+            "garmentAnchorX": 0.5,
+            "garmentAnchorY": 0.5
+          }
+        }
+      },
+      "modelSha256": "cd4a6c6c1a3628a967f92d1d956cd95e32aa52a43392c3e866b4176c5149a930",
+      "mannequinModelSha256": "bad2ce50514b5b4faa1c3e4b485abbad611c21695fbdd04c90ddd7f1f4c1f38a",
+      "alphaNote": "Native renderer transparency, including its semitransparent floor shadow; no compositing or alpha editing."
+    },
+    {
+      "id": "korset",
+      "garmentId": "korset",
+      "bodyMaterialId": "bekasam-gold",
+      "otherParts": "Unmodified catalogue defaults",
+      "file": "/assets/landing/korset.png",
+      "bytes": 275774,
+      "sha256": "29db4d74ccbf1f896cf7e5a1daa8dcf815deb4c486cac19253ad35dad9642943",
+      "canvas": {
+        "width": 800,
+        "height": 1000,
+        "cssWidth": 800,
+        "cssHeight": 1000
+      },
+      "width": 800,
+      "height": 1000,
+      "transparentPixels": 568509,
+      "opaquePixels": 175383,
+      "partialAlphaPixels": 56108,
+      "camera": {
+        "preset": "front",
+        "position": [
+          0,
+          0.86,
+          3.3
+        ],
+        "target": [
+          0,
+          0.76,
+          0
+        ],
+        "verticalFovDegrees": 32,
+        "aspect": 0.8,
+        "source": "StudioScene.ts front preset and PerspectiveCamera; no custom zoom."
+      }
+    }
+  ],
+  "errors": [],
+  "models": "assetVersion 2.0.0 — Ocharo silhouette and remodelled garments synced from mft-10x-ws/assets/3d/ocharo-garments",
+  "rendering": "Neutral tone mapping, 4x multisampling, soft key-light shadows and per-kind cloth shading (weave relief, sheen)"
+}

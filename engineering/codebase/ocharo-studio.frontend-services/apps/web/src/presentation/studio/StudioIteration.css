@@ -1,0 +1,304 @@
+@import "@wow-two-beta/ui-vue/presentation/overlays/tour-popover/styles.css";
+@import "@wow-two-beta/ui-vue/presentation/overlays/modal/styles.css";
+
+.app-header {
+  position: relative;
+}
+
+.workspace:focus-visible {
+  outline: none;
+}
+
+.header-leading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.new-design-button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+  font-size: 11px;
+  font-weight: 600;
+}
+.new-design-button:hover {
+  color: var(--paper);
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.new-design-button:focus-visible,
+.part-multiselect-trigger:focus-visible,
+.part-multiselect-options button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.studio-confirmation-modal {
+  width: min(430px, calc(100vw - 32px));
+  padding: 24px;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 0 30px 100px #0003;
+}
+
+.studio-confirmation-title {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.studio-confirmation-description {
+  display: block;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.studio-confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.confirmation-danger {
+  color: var(--paper);
+  background: var(--accent);
+}
+
+.confirmation-danger:hover {
+  background: color-mix(in srgb, var(--accent) 88%, var(--ink));
+}
+
+.document-heading {
+  position: absolute;
+  left: 50%;
+  width: min(34vw, 390px);
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  transform: translateX(-50%);
+}
+.document-heading input {
+  width: 100%;
+  text-align: center;
+  transition: background-color 160ms ease;
+}
+.document-heading.is-focused input {
+  text-align: left;
+}
+.document-heading small {
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.document-heading.is-focused {
+  align-items: flex-start;
+}
+
+.part-multiselect {
+  position: relative;
+}
+.part-multiselect-trigger {
+  min-width: 150px;
+  min-height: 34px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  color: var(--ink);
+  border-radius: 8px;
+  background: var(--wash);
+  font-size: 11px;
+  text-align: left;
+}
+.part-multiselect-trigger svg:last-child {
+  transition: transform 150ms ease;
+}
+.part-multiselect-trigger svg.is-open {
+  transform: rotate(180deg);
+}
+.part-multiselect-options {
+  width: 230px;
+  max-width: calc(100vw - 28px);
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 85;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: 0 18px 48px #18231d26;
+  white-space: normal;
+}
+.part-multiselect-options button {
+  min-width: 0;
+  min-height: 38px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 12px;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.part-multiselect-options button:hover,
+.part-multiselect-options button.selected {
+  background: var(--wash);
+}
+.part-option-check {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+.part-multiselect-options button.selected .part-option-check {
+  color: var(--paper);
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.part-multiselect-options small {
+  color: var(--accent);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.part-multiselect-options p {
+  margin: 6px 8px 4px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+.selection-hint {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 1180px) {
+  .new-design-button span {
+    display: none;
+  }
+  .new-design-button {
+    width: 38px;
+    justify-content: center;
+    padding: 8px;
+  }
+  .document-heading {
+    width: min(30vw, 220px);
+  }
+}
+
+@media (max-width: 560px) {
+  .new-design-button {
+    width: 30px;
+    min-height: 28px;
+    padding: 5px;
+    border-radius: 7px;
+  }
+  .document-heading {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    top: 56px;
+    bottom: auto;
+    transform: none;
+    text-align: center;
+  }
+  .document-heading input {
+    text-align: center;
+  }
+  .document-heading.is-focused input {
+    text-align: left;
+  }
+  .document-heading.is-focused {
+    text-align: left;
+  }
+  .part-multiselect-trigger {
+    min-width: 118px;
+  }
+  .part-multiselect {
+    position: static;
+  }
+  .part-multiselect-options {
+    left: 50%;
+    width: min(260px, calc(100vw - 28px));
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 400px) {
+  .header-leading {
+    min-width: 0;
+    gap: 6px;
+  }
+  .header-leading .brand-authentic .brand-wordmark {
+    width: 78px;
+    height: 30px;
+  }
+  .header-leading .brand-product,
+  .export-button span {
+    display: none;
+  }
+  .export-button {
+    width: 34px;
+    min-height: 34px;
+    padding: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .document-heading input,
+  .part-multiselect-trigger svg:last-child {
+    transition: none;
+  }
+}
+
+/* Explicit review handoff controls; previews remain editorial evidence. */
+.review-package-note {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  margin: 0.5rem 0 1rem;
+}
+.review-approval {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+.review-file-action {
+  margin-right: 0.5rem;
+  margin-top: 0.5rem;
+}

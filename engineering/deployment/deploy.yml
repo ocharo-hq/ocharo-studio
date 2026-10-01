@@ -1,0 +1,15 @@
+descriptor: 1
+product: ocharo-studio
+services:
+  studio:
+    build: { dockerfile: deployment/Dockerfile }
+    paths:
+      - codebase/ocharo-studio.backend-services/**
+      - codebase/ocharo-studio.frontend-services/**
+    health: /health
+    settings:
+      required: [OcharoPlatform:BaseUrl]
+    volumes:
+      data: /app/appdata
+    sites:
+      app: { exposure: private }

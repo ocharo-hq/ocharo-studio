@@ -1,6 +1,13 @@
-# Uzbek Studio — Product Flows
+# Ocharo Studio — Product Flows
 
-*Last updated: 2026-09-25*
+*Last updated: 2026-09-26*
+
+## Enter the studio
+
+1. Open `/` to see the landing introduction, five forms, textile examples and three-step workflow.
+2. Select Open studio to enter `/studio`; direct editor links and refresh also work.
+3. First-use onboarding belongs to the editor; landing visits do not consume an invitation.
+4. The brand link returns home; reopening the editor restores the current draft.
 
 ## Create a new look
 

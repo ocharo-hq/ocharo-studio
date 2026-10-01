@@ -1,15 +1,22 @@
-# One UzbekStudio instance per environment. Bring up from engineering/deployment/:
+# One OcharoStudio instance per environment. Bring up from engineering/deployment/:
 #
 #   docker compose up -d --build
 #
-# Designs are saved locally in each browser; export JSON for portable backups.
+# Studio state is persisted in the mounted SQLite data volume.
 services:
-  uzbekstudio:
+  ocharo-studio:
     build:
       context: ../codebase
       dockerfile: ../deployment/Dockerfile
-    image: uzbekstudio
-    container_name: uzbekstudio
+    image: ocharo-studio
+    container_name: ocharo-studio
     restart: unless-stopped
     ports:
       - "127.0.0.1:18260:8080"
+    environment:
+      DB_CONNECTION: "Data Source=/app/appdata/ocharo-studio.db;Cache=Shared;Default Timeout=5"
+    volumes:
+      - ocharo-studio-data:/app/appdata
+
+volumes:
+  ocharo-studio-data:

@@ -1,8 +1,8 @@
-# Uzbek Studio — Product
+# Ocharo Studio — Product
 
 *Last updated: 2026-09-25*
 
-Uzbek Studio is a browser-based 3D creative studio for composing contemporary Uzbek clothing looks. A designer chooses an authored garment, applies textile images to its selectable parts, positions each pattern, and saves the result as an editable look.
+Ocharo Studio is a browser-based 3D creative studio for composing contemporary Uzbek clothing looks. A designer chooses an authored garment, applies textile images to its selectable parts, positions each pattern, and saves the result as an editable look.
 
 ## Product promise
 

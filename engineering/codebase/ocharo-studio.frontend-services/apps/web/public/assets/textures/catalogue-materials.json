@@ -1,0 +1,2184 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-26",
+  "sourceWorkspace": "/Users/max/Projects/10x-ws/workbench/fam/mft-10x-ws",
+  "catalogueBaseline": "v22",
+  "scope": "All 29 classified product records; six unclassified looks excluded.",
+  "provenance": "Textiles are individually generated visual approximations from genuine catalogue photographs/video preview frames. Generated garment references are indexed separately, never treated as original photos.",
+  "limits": [
+    "Trade names do not prove fibre composition or physical weave.",
+    "Pattern scale, seamless repeat and rendering finish are approximate.",
+    "Scarf embroidery is baked only as surface appearance; beadwork, fringes and edge ornament remain separate deferred decoration.",
+    "The common category mesh does not reproduce all photographed panel layouts or reversible styles."
+  ],
+  "counts": {
+    "products": 29,
+    "sourcePhotos": 49,
+    "sourceVideos": 11,
+    "materialKinds": 8,
+    "textures": 21,
+    "materials": 36,
+    "solids": 13
+  },
+  "textures": [
+    {
+      "id": "paisley-ivory-on-black",
+      "name": "Ivory paisley",
+      "runtimeUrl": "/assets/textures/catalogue/paisley-ivory-on-black.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 137236,
+      "runtimeSha256": "0857ac3c17e7d1f37b6899af55bc6614347bf985aae70c7902ba2988cc4688e5",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-00c637c9-9c26-4156-971f-117e25637dfd.png",
+      "generatedOriginalSha256": "86e4d7893316881ef9300f1ea86859189710419e624bef666029e8b6a501bd41",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/korset-v01/media/och-korset-v01-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "5aed5ca3ca4f4b94a60ae2d46a331c7ed93df1effc9b579c7b3c714b76c7336d",
+      "prompt": "Use case: style-transfer. Asset type: seamless square base-color textile texture for a 3D garment editor. Input is a genuine garment photograph used ONLY as pattern reference. Reconstruct a clean flat print design of this specified cloth: IMPORTANT: true opaque INK BLACK ground #101012, flat and absolutely uniform, ivory outlined paisleys. NO grey background and absolutely NO soft fold/cloud/lighting gradients. Ivory medium comma-shaped paisley motifs filled with concentric outlines, two circles and little curls. Loose stagger in varied directions. Exclude hem border. Two solid contrasting inks; scanned PRINT DESIGN, not a fabric photograph. Preserve source colours and motifs. 1024x1024 square, design fills every pixel, opposite edges continue seamlessly. Absolutely flat colour map, opaque black where black, uniform colours, subtle fine threads. No photograph lighting, no folds, shadows, seams, gradients, people, garments, backgrounds, text, logos, borders, beadwork or tassels. One texture.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "abaya-v01",
+        "baska-v06",
+        "korset-v01",
+        "nimcha-v06"
+      ]
+    },
+    {
+      "id": "shoyi-monochrome-ikat",
+      "name": "Monochrome broad ikat",
+      "runtimeUrl": "/assets/textures/catalogue/shoyi-monochrome-ikat.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 168780,
+      "runtimeSha256": "e6624f2d7d21e1ab4f320c3c845ff63d1019051891a533404069d7f4a97aa5f1",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-384d0526-945e-4f7c-9141-e5f9f702a66b.png",
+      "generatedOriginalSha256": "cea31f244a9f5f0eaf3a8bea6a0d53fdcfe6ba8e7f07d99fefba94b288fac9f0",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/korset-v02/media/och-korset-v02-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "3363221db411afc8e64f7e779643bd03da82bd1f47acd05cab171cb4abb6c90e",
+      "prompt": "Use case: style-transfer. Asset type: seamless square textile base-color texture for a 3D garment editor. Input image is a genuine source garment photograph, used only as a textile appearance reference. Create a flat orthographic approximation of its specified fabric, removing all garment shape and perspective. Bold black and ivory warp ikat, wide vertically aligned flame/diamond and oval motifs with feathered edges, horizontal levels of large ivory ovals and jagged black pointed bands. Preserve very large striking contrast. Preserve source palette and characteristic shapes. Fill the entire 1024x1024 square with repeating fabric; opposite edges should match for UV tiling. Fine subtle textile threads only. Uniform neutral illumination, no baked highlights, shadows, folds, seams, people, background, text, logos, borders or tassels. One finished texture, not a contact sheet.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "baska-v03",
+        "korset-v02",
+        "kostyum-v03"
+      ]
+    },
+    {
+      "id": "atlas-red-monochrome-ikat",
+      "name": "Crimson scroll ikat",
+      "runtimeUrl": "/assets/textures/catalogue/atlas-red-monochrome-ikat.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 186242,
+      "runtimeSha256": "96e3b6537034c0209d9c0bdb8da3dc7d9a509da439f9d4087e38140c1c1b7a02",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-c5aa8024-27e0-4691-bdbc-c0bc8ba98995.png",
+      "generatedOriginalSha256": "703f540304b3820db648a606f755a42f5268fb09d5e266ece6ab317103af0c60",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/baska-v04/media/och-baska-v04-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "cef17ab39755e58a4a0f5096161e06f9256f88e44e2dd2ed5143af3a037bb0bf",
+      "prompt": "Use case: style-transfer. Asset type: seamless square textile base-color texture for a 3D garment editor. Input image is a genuine source garment photograph, used only as a textile appearance reference. Create a flat orthographic approximation of its specified fabric, removing all garment shape and perspective. The patterned side and waistband cloth only: ivory ground with bold black elongated organic ikat motifs enclosing scarlet red heart-like lozenges and red scroll forms, narrow black hatching, softly feathered dye edges. Exclude the plain red central panels. Preserve source palette and characteristic shapes. Fill the entire 1024x1024 square with repeating fabric; opposite edges should match for UV tiling. Fine subtle textile threads only. Uniform neutral illumination, no baked highlights, shadows, folds, seams, people, background, text, logos, borders or tassels. One finished texture, not a contact sheet.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "baska-v04"
+      ]
+    },
+    {
+      "id": "atlas-narrow-monochrome-ikat",
+      "name": "Monochrome streak ikat",
+      "runtimeUrl": "/assets/textures/catalogue/atlas-narrow-monochrome-ikat.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 160448,
+      "runtimeSha256": "7239608812544f96705b4572bf2fdea4c4c60551b2606dd0686f37164f512491",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-16320301-7e4a-4a16-9f00-b33489cef67a.png",
+      "generatedOriginalSha256": "3b8b9065bd84bb6281a3a3990a29de5f09041f96adc8e7fec6aac9d1c65c0753",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/kostyum-v01/media/och-kostyum-v01-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "e5aa1c48ad4c2ec40d2ad7dcbb4712377b1b9086a5e37cbf3c6ef871193eabc9",
+      "prompt": "Use case: style-transfer. Asset type: seamless square textile base-color texture for a 3D garment editor. Input image is a genuine source garment photograph, used only as a textile appearance reference. Create a flat orthographic approximation of its specified fabric, removing all garment shape and perspective. Narrow vertical black and ivory ikat streaks with elongated broken diamond chains and jagged feathered edges. Much narrower and denser than large-oval ikat; preserve approximately eight alternating vertical motif columns. Preserve source palette and characteristic shapes. Fill the entire 1024x1024 square with repeating fabric; opposite edges should match for UV tiling. Fine subtle textile threads only. Uniform neutral illumination, no baked highlights, shadows, folds, seams, people, background, text, logos, borders or tassels. One finished texture, not a contact sheet.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "kostyum-v01"
+      ]
+    },
+    {
+      "id": "beqasam-jewel-stripe",
+      "name": "Jewel stripe",
+      "runtimeUrl": "/assets/textures/catalogue/beqasam-jewel-stripe.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 85882,
+      "runtimeSha256": "d53055fab81d4c54daa26254c1a1560b32549f403bf63a6427b2d1a2341ec3e6",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-ac459904-66e9-40c1-9de5-722934761ca9.png",
+      "generatedOriginalSha256": "33006e006820d45b5e1c932827de47c425b1a57dbcf2768aeeaba4077034a578",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/kostyum-v02/media/och-kostyum-v02-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "b6af874eb70b20d6a10d149823eedfe86864a87ebbc06808baef40e31600e7b5",
+      "prompt": "Use case: style-transfer. Asset type: seamless square base-color textile texture for a 3D garment editor. Input is a genuine garment photograph used ONLY as pattern reference. Reconstruct a clean flat print design of this specified cloth: Straight vertical woven stripe sequence from the jacket: forest emerald green broad bands, narrow magenta purple, mustard yellow, ivory and black stripes, with occasional turquoise thin lines. About six repeating stripe groups across the square; no diagonal stripes. Exclude plain green lapels. Preserve source colours and motifs. 1024x1024 square, design fills every pixel, opposite edges continue seamlessly. Absolutely flat colour map, opaque black where black, uniform colours, subtle fine threads. No photograph lighting, no folds, shadows, seams, gradients, people, garments, backgrounds, text, logos, borders, beadwork or tassels. One texture.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "kostyum-v02"
+      ]
+    },
+    {
+      "id": "atlas-floral-jewel-ikat",
+      "name": "Warm floral ikat",
+      "runtimeUrl": "/assets/textures/catalogue/atlas-floral-jewel-ikat.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 148408,
+      "runtimeSha256": "4bd8f6010afdf741c6a3c47bc37cdf0aaa647c26ad4f1e8a9b46944a519e0dd3",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-50551a47-6e68-4bc7-b8a8-01c0b02971e0.png",
+      "generatedOriginalSha256": "76daaeb5d3fda6b50a4884d5b073fd7cb01ae3b54d25ec83ad0cd13b7efad24f",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/kostyum-v04/media/och-kostyum-v04-source-photo-01.png",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "0be2cb60758bb9a0680174a7445592bdf50103e5dd82203f3d15d133570a6f68",
+      "prompt": "Use case: style-transfer. Asset type: seamless square base-color textile texture for a 3D garment editor. Input is a genuine garment photograph used ONLY as pattern reference. Reconstruct a clean flat print design of this specified cloth: Ivory cloth with staggered generous diamond-like floral ikat medallions in black, coral red, orange and yellow; the source jacket has large black flower shapes with red/orange centres alternating warm ochre flower shapes. Preserve generous ivory negative space and softly jagged warp edges. Preserve source colours and motifs. 1024x1024 square, design fills every pixel, opposite edges continue seamlessly. Absolutely flat colour map, opaque black where black, uniform colours, subtle fine threads. No photograph lighting, no folds, shadows, seams, gradients, people, garments, backgrounds, text, logos, borders, beadwork or tassels. One texture.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "kostyum-v04"
+      ]
+    },
+    {
+      "id": "scarf-red-paisley",
+      "name": "Scarlet filigree paisley",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-red-paisley.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 230978,
+      "runtimeSha256": "f8ef005181901eed9fbcf073049ddabf0f1f17d3f367ddc10d1dec094fd5e7bf",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-48d5b674-c17e-4878-972e-96d87f88b9ca.png",
+      "generatedOriginalSha256": "51b11df63400e6bb6d71be052d3d89c77ce8905925be1b9b9e878c974fa4218b",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v01/media/och-nimcha-v01-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "a508bdcf5dd16e280d8c2334911db51cbdd54a3898a155ff322b6e4aeb50cdcc",
+      "prompt": "Use case: product-mockup. Asset type: opaque seamless fabric texture for a 3D garment. Source photo is ONLY a pattern reference. Reconstruct a complete flat rectangular cloth swatch, not a cutout of motifs. The patterned scarf front panel only: oversized scarlet red teardrop paisleys on pure black. Paisley interiors filled with very fine black floral scroll filigree, framed with red linework. Approximately three large elongated vertical teardrops across square. Exclude solid black lapels and tie. The fabric background must be fully preserved: solid ink BLACK cloth behind the coloured motifs. CRITICAL: Every pixel is opaque. NO transparent background, NO extracted embroidery, NO alpha mask, NO empty space. Motifs sit ON top of continuous opaque fabric. Keep exact source palette and large motif character. Flat top-down scan, fine threads, absolutely uniform illumination, no folds, no garment edges, no lighting gradients, no words or people. Square 1024x1024, patterns continue beyond all four edges for repeating UV mapping.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v01"
+      ]
+    },
+    {
+      "id": "scarf-sand-garden",
+      "name": "Sand garden",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-sand-garden.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 182980,
+      "runtimeSha256": "5c77100428e99a318cd26995e4364f00fc09a41ced2524921b501e164178d4db",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-79b3320c-82d2-4f6c-9476-2edd0d2636e8.png",
+      "generatedOriginalSha256": "75371c388cd57c540f0ae4b442632a972e0b1026dc827e5bc32477bd0179d686",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v02/media/och-nimcha-v02-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "66bf939f13dc4e662f34dfcbe9e805ab6db29f0bdbb77d9cc8f8725ff40cdaef",
+      "prompt": "Use case: style-transfer. Asset type: seamless square base-color textile texture for a 3D garment editor. Input is a genuine garment photograph used ONLY as pattern reference. Reconstruct a clean flat print design of this specified cloth: The patterned front insert, not solid sand lapel: warm sandy yellow beige ground with lively large orange, teal green, deep blue and ochre stylised flowers and curling leaves. Flat floral scarf cloth. Preserve source colours and motifs. 1024x1024 square, design fills every pixel, opposite edges continue seamlessly. Absolutely flat opaque colour map, solid ink black where black, uniform colours, subtle fine threads. No photograph lighting, no folds, shadows, seams, gradients, people, garments, backgrounds, text, logos, borders, beadwork or tassels. One texture.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v02"
+      ]
+    },
+    {
+      "id": "scarf-blue-paisley",
+      "name": "Blue filigree paisley",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-blue-paisley.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 344224,
+      "runtimeSha256": "eca16166776abb65d529989106910c6534c9e0c85ab9dc5697de3167bd26a7d7",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-52bfa0b0-9e48-43f0-a649-a5d5ec120e0d.png",
+      "generatedOriginalSha256": "d3080252bcc1b9f92af878e087bdc0774a755045e217138fdc9dfe9b5bac0fcb",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v03/media/och-nimcha-v03-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "7c42ef3d42b94e4cb3a2428a181988b653b1e23a6639fbd5ab36f5e23c2792c9",
+      "prompt": "Use case: product-mockup. Asset type: opaque seamless fabric texture for a 3D garment. Source photo is ONLY a pattern reference. Reconstruct a complete flat rectangular cloth swatch, not a cutout of motifs. The scarf insert: large upright slate blue/navy paisleys on ivory, long curled teardrops filled with many fine ivory floral filigree lines. Approximately three tall ornate paisleys across. Solid ivory ground stays bright. The fabric background must be fully preserved: solid warm ivory cloth behind blue motifs. CRITICAL: Every pixel is opaque. NO transparent background, NO extracted embroidery, NO alpha mask, NO empty space. Motifs sit ON top of continuous opaque fabric. Keep exact source palette and large motif character. Flat top-down scan, fine threads, absolutely uniform illumination, no folds, no garment edges, no lighting gradients, no words or people. Square 1024x1024, patterns continue beyond all four edges for repeating UV mapping.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v03"
+      ]
+    },
+    {
+      "id": "scarf-gold-damask",
+      "name": "Gold damask",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-gold-damask.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 396388,
+      "runtimeSha256": "511bbc8b952d8007d6a6f05a29e22f4bd38df2cb741bd36ad3f58495820db151",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-137bd562-db01-42da-967a-44036a28b049.png",
+      "generatedOriginalSha256": "b51f941f3c023bc8de421c6da094622c9f90dccded7f00d449cbfa6a5557d20c",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v04/media/och-nimcha-v04-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "dbd8aaf31737b69f0e13925c9ea2a762e967ecffde2d35a9e2bd7650de57a76b",
+      "prompt": "Use case: style-transfer. Asset type: seamless square base-color textile texture for a 3D garment editor. Input is a genuine garment photograph used ONLY as pattern reference. Reconstruct a clean flat print design of this specified cloth: The patterned scarf insert: intricate warm antique gold and ivory floral damask medallions and curling stems densely tiled across ink black. Approximately four ornate repeating flowers across. Exclude lower border and hanging embroidery. Preserve source colours and motifs. 1024x1024 square, design fills every pixel, opposite edges continue seamlessly. Absolutely flat opaque colour map, solid ink black where black, uniform colours, subtle fine threads. No photograph lighting, no folds, shadows, seams, gradients, people, garments, backgrounds, text, logos, borders, beadwork or tassels. One texture.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v04"
+      ]
+    },
+    {
+      "id": "scarf-ivory-floral",
+      "name": "Ivory floral",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-ivory-floral.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 289854,
+      "runtimeSha256": "de6fbe7e345749f3141d8aa588f0d0bf233158cef823977a1f379761ea7dda03",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-dfea86c7-2638-4ed5-a144-8650285a41a6.png",
+      "generatedOriginalSha256": "3f82af20222f79f093d5112324841611028339519c8ce3bf804358c5960c5e33",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v05/media/och-nimcha-v05-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "516d1c009dc4033bbc9cb5d2d8d331a09bb2f9c90049369000ed9385a47f29e1",
+      "prompt": "Use case: product-mockup. Asset type: opaque seamless fabric texture for a 3D garment. Source photo is ONLY a pattern reference. Reconstruct a complete flat rectangular cloth swatch, not a cutout of motifs. The patterned scarf insert: dense fine ivory and silver-white floral rosettes, round starburst flowers, curled leaves and branches on opaque black. Delicate, monochrome, approximately five flower heads across. No gold tint. The fabric background must be fully preserved: solid ink BLACK cloth behind the coloured motifs. CRITICAL: Every pixel is opaque. NO transparent background, NO extracted embroidery, NO alpha mask, NO empty space. Motifs sit ON top of continuous opaque fabric. Keep exact source palette and large motif character. Flat top-down scan, fine threads, absolutely uniform illumination, no folds, no garment edges, no lighting gradients, no words or people. Square 1024x1024, patterns continue beyond all four edges for repeating UV mapping.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v05"
+      ]
+    },
+    {
+      "id": "scarf-crimson-vine",
+      "name": "Crimson vine",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-crimson-vine.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 232518,
+      "runtimeSha256": "70cef2a9c78a8717053f1d8516e1d3316a91a2c3b3990a85944ce08cdb81933c",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-5a4e1781-154d-4edf-9b47-250684c9df64.png",
+      "generatedOriginalSha256": "f5f2880b991a1a1ceb8b06281208ca952b21c2f55b7ce8a5222ce5c21bf525d3",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v07/media/och-nimcha-v07-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "2b11225ff775834dd60d39ea5a526b144e40da9909d4d333fbcdfe2a8d0e0cea",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes the cloth's motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: The scarf insert: ivory background with deep crimson tulip/peony-like flowers, olive green and gold sinuous scrolling vines, small pale pink buds. Preserve airy ivory negative space and large stylised red blossoms. Exclude gold edge fringe. IMPORTANT BACKGROUND: preserve the specified solid coloured fabric ground behind every motif. This ground is part of the cloth and MUST BE OPAQUE. Do not remove the fabric ground; no transparent pixels. All four edges of the fabric continue beyond frame and match for seamless tiling. Flat top-down textile scan with uniform even colour, subtle threads; no folds or lighting gradients, no garments, people, words, borders, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v07"
+      ]
+    },
+    {
+      "id": "atlas-gold-pendant",
+      "name": "Gold pendant",
+      "runtimeUrl": "/assets/textures/catalogue/atlas-gold-pendant.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 215160,
+      "runtimeSha256": "67b9fd420e19de203d85bc94212ea710c748dc794fad30d2a2f6709b156845ee",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-a6fc11cf-d08f-4faa-8cb6-247bb88d6b14.png",
+      "generatedOriginalSha256": "a872ed4e5ed3c4b0ee2f05d6748fc3577ea762bd3549102b146006cd93e933d1",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v08/media/och-nimcha-v08-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "b83f1a1cbd978dd54568ae4daa8b4445cf5bb982d002aea96bbc80f97bd985df",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes the cloth's motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: Black Atlas cloth with tall slender ivory lattice pendant/diamond motifs, tiny warm yellow diamond centres and hanging thin white lines; staggered vertical rows, fine intricate white geometric lattice. Preserve generous black negative space. This is crisp geometry, not floral paisley. IMPORTANT BACKGROUND: preserve the specified solid coloured fabric ground behind every motif. This ground is part of the cloth and MUST BE OPAQUE. Do not remove the fabric ground; no transparent pixels. All four edges of the fabric continue beyond frame and match for seamless tiling. Flat top-down textile scan with uniform even colour, subtle threads; no folds or lighting gradients, no garments, people, words, borders, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v08"
+      ]
+    },
+    {
+      "id": "atlas-red-heart-ikat",
+      "name": "Crimson heart ikat",
+      "runtimeUrl": "/assets/textures/catalogue/atlas-red-heart-ikat.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 169822,
+      "runtimeSha256": "87b12463496ebb5997251658af3a5e205eb5f15a8c9fab8eb0ba5504da16082a",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-8b8be9d2-426a-47fa-9d32-469616eaec0c.png",
+      "generatedOriginalSha256": "867df19c8378a211e44b15180b5a10495e7b31e71e9fe7e705395c9c275605de",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v09/media/och-nimcha-v09-source-photo-02.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "ecc48f004ec09133656defce74e0a28368a7ff4372c36599c5a0a737dda13764",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes the cloth's motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: The patterned insert only: broad ivory, black and scarlet-red angular ikat hearts/stepped lozenges with black concentric stepped outlines and small red blocks between, horizontal rows connected through long vertical black and white feathered streaks. Distinct heart-like red cores; preserve broad motifs and white areas. IMPORTANT BACKGROUND: preserve the specified solid coloured fabric ground behind every motif. This ground is part of the cloth and MUST BE OPAQUE. Do not remove the fabric ground; no transparent pixels. All four edges of the fabric continue beyond frame and match for seamless tiling. Flat top-down textile scan with uniform even colour, subtle threads; no folds or lighting gradients, no garments, people, words, borders, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v09"
+      ]
+    },
+    {
+      "id": "scarf-ivory-botanical",
+      "name": "Ivory botanical",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-ivory-botanical.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 296090,
+      "runtimeSha256": "ba0df1f93abd08a253b9256d498b35dc288cf3a1ced2ff3ab4f3246792599626",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-ccf67135-854c-434f-8126-fa4999d2c884.png",
+      "generatedOriginalSha256": "a61216fc3624f6293dfb842a0dde1b42100a5bb22f29d7f2e6fb971c02e70a9a",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v10/media/och-nimcha-v10-source-photo-02.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "e59244ee2e9bc049e2af2c0b3974e336eeb8f76c9eda9618639cc2fb1e300e5b",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes the cloth's motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: Ivory scarf field with large stylised coral-red and orange flower rosettes, muted mustard yellow petals, blue/teal large pointed leaves and curling branches. Broad lively botanical motifs with creamy space between; flatter ornamental floral embroidery character. Exclude scarf edge border. IMPORTANT BACKGROUND: preserve the specified solid coloured fabric ground behind every motif. This ground is part of the cloth and MUST BE OPAQUE. Do not remove the fabric ground; no transparent pixels. All four edges of the fabric continue beyond frame and match for seamless tiling. Flat top-down textile scan with uniform even colour, subtle threads; no folds or lighting gradients, no garments, people, words, borders, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v10"
+      ]
+    },
+    {
+      "id": "scarf-black-botanical",
+      "name": "Black botanical",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-black-botanical.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 244466,
+      "runtimeSha256": "9ed844df9bf73bf1613be6d6067e5f7f17a263f930b47fd4664e79c4357f08e7",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-496a8e4b-ff71-4855-b79d-13beeaec5347.png",
+      "generatedOriginalSha256": "dfe3393d68e537daa8c068a21a24799f5c6c333c682555c0aeaa1c01af73c55e",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v11/media/och-nimcha-v11-source-photo-02.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "9639aa5f09f0851a4b37ddb11d76912cd842c891e081c1a4e3d10f89fdfa0e5a",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes the cloth's motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: Black scarf ground with large crimson/red round flower medallions, peach small blossoms, muted olive green and antique gold curving stems and leaves. Keep generous black between bold warm floral branches; gold vines slender, flowers red. IMPORTANT BACKGROUND: preserve the specified solid coloured fabric ground behind every motif. This ground is part of the cloth and MUST BE OPAQUE. Do not remove the fabric ground; no transparent pixels. All four edges of the fabric continue beyond frame and match for seamless tiling. Flat top-down textile scan with uniform even colour, subtle threads; no folds or lighting gradients, no garments, people, words, borders, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v11"
+      ]
+    },
+    {
+      "id": "atlas-scarlet-paisley",
+      "name": "Scarlet outline paisley",
+      "runtimeUrl": "/assets/textures/catalogue/atlas-scarlet-paisley.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 146280,
+      "runtimeSha256": "327c7f7dc59111b0e4b98df572a3179752a68b7e247d51e8d454d1141078fe4e",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-9bcb0e56-b390-4068-92ae-e3928360c57b.png",
+      "generatedOriginalSha256": "2d0a00212c63a5ac76c1fec3fc80a8bc82e1307079d988760d335b3b5afbf531",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v12/media/och-nimcha-v12-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "af10ce5d8fd610ba2f631e13c0fb719285bc83fb7ee018dcd568b2e8df92bed9",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes the cloth's motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: Pure black Atlas ground with medium scarlet red outlined comma paisleys; paisley interiors use simple circles and curved parallel bands, each shape has substantial black interior. Loose diagonal stagger alternating directions. Exclude the distinct straight striped lapel border. IMPORTANT BACKGROUND: preserve the specified solid coloured fabric ground behind every motif. This ground is part of the cloth and MUST BE OPAQUE. Do not remove the fabric ground; no transparent pixels. All four edges of the fabric continue beyond frame and match for seamless tiling. Flat top-down textile scan with uniform even colour, subtle threads; no folds or lighting gradients, no garments, people, words, borders, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v12"
+      ]
+    },
+    {
+      "id": "scarf-jewel-scroll",
+      "name": "Jewel scroll",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-jewel-scroll.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 310398,
+      "runtimeSha256": "b7e67a31b6eed175e043c9703694d0c4012302517b8367a8113fca472ab44f9e",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-aa7941a5-39bc-4a21-ae0c-cecf3cc285fb.png",
+      "generatedOriginalSha256": "0ac5ed80eb279a80f3f8c2c83bd87cdbe685b46861d8a85bf15dced8fae3865a",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v13/media/och-nimcha-v13-source-photo-02.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "ab9d1732707b14ac45014602cf2d3e85a43c248025aeb0dcf01eb00923f6430d",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes the cloth's motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: Black scarf ground with pink and mustard-yellow stylised flower heads, bright turquoise/teal curling leafy vines and golden outlines. Airy intertwined curling branches; preserve saturated jewel colours, black open spaces. Exclude lower gold fringe and embroidered border. IMPORTANT BACKGROUND: preserve the specified solid coloured fabric ground behind every motif. This ground is part of the cloth and MUST BE OPAQUE. Do not remove the fabric ground; no transparent pixels. All four edges of the fabric continue beyond frame and match for seamless tiling. Flat top-down textile scan with uniform even colour, subtle threads; no folds or lighting gradients, no garments, people, words, borders, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v13"
+      ]
+    },
+    {
+      "id": "scarf-burgundy-vine",
+      "name": "Burgundy vine",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-burgundy-vine.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 381178,
+      "runtimeSha256": "237f9720cf946844104a18141e6f7e7a8cb72b49d857f21f8e661d9211337211",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-34d9260e-3eb6-482b-bc3b-e699c6343d09.png",
+      "generatedOriginalSha256": "3466ea1d13ed08025de0690b77c2e84c00d54ddefcfc27f64d009b50e698bcb9",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v14/media/och-nimcha-v14-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "fdc5673d42ba56d32e8a224e57a10d454cdd59bffe3e31d4b520bd801d20bf7e",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes the cloth's motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: Deep burgundy red scarf ground with light turquoise blue daisy-shaped flowers, ivory blossoms and fine warm cream/gold scrolling leaf stems. Dense but readable floral vines, warm ochre leaves, pale blue petals. Exclude solid burgundy lapel and tie. IMPORTANT BACKGROUND: preserve the specified solid coloured fabric ground behind every motif. This ground is part of the cloth and MUST BE OPAQUE. Do not remove the fabric ground; no transparent pixels. All four edges of the fabric continue beyond frame and match for seamless tiling. Flat top-down textile scan with uniform even colour, subtle threads; no folds or lighting gradients, no garments, people, words, borders, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v14"
+      ]
+    },
+    {
+      "id": "gobelen-crimson-stripe",
+      "name": "Crimson geometric stripe",
+      "runtimeUrl": "/assets/textures/catalogue/gobelen-crimson-stripe.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 316998,
+      "runtimeSha256": "fc8367971c8081f8511bc375abd1d5dde21fe687a1a9c29b825bd0f8423755ef",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-0c4af2a7-6abe-4a6e-b201-7002ad50b00e.png",
+      "generatedOriginalSha256": "e62e4c22ebf457ce93a77629aa3fcdd4d2f4ccc570a9cd4d6a17f68cba459580",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/nimcha-v15/media/och-nimcha-v15-source-photo-01.jpg",
+      "sourceReferenceKind": "source-photo",
+      "sourceReferenceSha256": "fdc9a5c47d4e84f053a28b08fb7eea227802d94445f037b9f3753ab95cfc98b1",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes cloth motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: Gobelen woven tapestry cloth insert: narrow vertical repeating decorative bands in burgundy red, black and ivory; alternating tiny hooked scrolls, white diamond chains on black, red geometric diamonds and dotted dark lines. At least six stripe groups across square. Preserve vertical orientation and coarse tapestry thread character. Exclude fringe and solid black lapel. BACKGROUND: the solid coloured cloth ground is part of this material and must be preserved, fully opaque. Every pixel is opaque fabric. All edges continue beyond frame and match for UV repeat. Flat top-down textile scan, uniformly lit, no folds or illumination gradients, no garments, people, words, separate border, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v15"
+      ]
+    },
+    {
+      "id": "scarf-gold-on-red",
+      "name": "Gold on scarlet",
+      "runtimeUrl": "/assets/textures/catalogue/scarf-gold-on-red.webp",
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeBytes": 307176,
+      "runtimeSha256": "d2e8184580f6379f8988d2f7dd13e513a42cdb64585a82f18dfe7acc5d93f15a",
+      "generatedOriginal": "/Users/max/.codex/generated_images/01a0d963-149e-7331-9eeb-3c7e8417d80f/exec-8a741fd7-844a-4d5f-8978-efd600e09f36.png",
+      "generatedOriginalSha256": "c82d7027a31347a60c447671707c132e6673f4867bc743f2c0838f3ff37d6535",
+      "sourceReference": "context/domains/external/work/career/designer/portfolio/products/review/och-nimcha-v16-video-01-preview.jpg",
+      "sourceReferenceKind": "source-video-preview",
+      "sourceReferenceSha256": "92f100cd75920baea82847eb8809ded72da6d2dab6e9abe9a9d36bf7c42f4be7",
+      "prompt": "Use case: product-mockup. Asset type: square opaque seamless fabric texture. Reference photograph establishes cloth motifs and colours only. Generate a rectangular complete cloth swatch filling the entire 1024x1024 image: The patterned scarf insert only: rich scarlet red ground with dense ivory and warm antique gold ornamental floral damask medallions, small leaves and curling stems, refined tiny blossoms. Three or four vertical repeats across square. Exclude edge border and fringe; preserve solid red ground between gold motifs. BACKGROUND: the solid rich scarlet RED cloth ground is part of this material and must be preserved, fully opaque. Every pixel is opaque fabric. All edges continue beyond frame and match for UV repeat. Flat top-down textile scan, uniformly lit, no folds or illumination gradients, no garments, people, words, separate border, beadwork or fringe.",
+      "tool": "Built-in image_gen",
+      "status": "assistant-inspected-generated-approximation",
+      "sourceProductIds": [
+        "nimcha-v16"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "id": "catalogue-atlas-paisley-ivory-on-black",
+      "kind": "atlas",
+      "name": "Atlas · Ivory paisley",
+      "family": "Paisley",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/paisley-ivory-on-black.webp",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "korset"
+      ],
+      "sourceProductIds": [
+        "korset-v01"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from korset-v01. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-synthetic-fabric-paisley-ivory-on-black",
+      "kind": "synthetic-fabric",
+      "name": "Synthetic cloth · Ivory paisley",
+      "family": "Paisley",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/paisley-ivory-on-black.webp",
+      "roughness": 0.72,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska",
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "baska-v06",
+        "nimcha-v06"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from baska-v06, nimcha-v06. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-synthetic-poplin-paisley-ivory-on-black",
+      "kind": "synthetic-poplin",
+      "name": "Synthetic poplin · Ivory paisley",
+      "family": "Paisley",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/paisley-ivory-on-black.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "abaya"
+      ],
+      "sourceProductIds": [
+        "abaya-v01"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from abaya-v01. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-shoyi-monochrome-ikat",
+      "kind": "shoyi",
+      "name": "Shoyi · Monochrome broad ikat",
+      "family": "Ikat",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/shoyi-monochrome-ikat.webp",
+      "roughness": 0.48,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska",
+        "korset",
+        "kostyum"
+      ],
+      "sourceProductIds": [
+        "baska-v03",
+        "korset-v02",
+        "kostyum-v03"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from baska-v03, korset-v02, kostyum-v03. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-atlas-red-monochrome-ikat",
+      "kind": "atlas",
+      "name": "Atlas · Crimson scroll ikat",
+      "family": "Ikat",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/atlas-red-monochrome-ikat.webp",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska"
+      ],
+      "sourceProductIds": [
+        "baska-v04"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from baska-v04. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-atlas-narrow-monochrome-ikat",
+      "kind": "atlas",
+      "name": "Atlas · Monochrome streak ikat",
+      "family": "Ikat",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/atlas-narrow-monochrome-ikat.webp",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "kostyum"
+      ],
+      "sourceProductIds": [
+        "kostyum-v01"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from kostyum-v01. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-beqasam-jewel-stripe",
+      "kind": "beqasam",
+      "name": "Beqasam · Jewel stripe",
+      "family": "Stripe",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/beqasam-jewel-stripe.webp",
+      "roughness": 0.65,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "kostyum"
+      ],
+      "sourceProductIds": [
+        "kostyum-v02"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from kostyum-v02. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-atlas-floral-jewel-ikat",
+      "kind": "atlas",
+      "name": "Atlas · Warm floral ikat",
+      "family": "Ikat",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/atlas-floral-jewel-ikat.webp",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "kostyum"
+      ],
+      "sourceProductIds": [
+        "kostyum-v04"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from kostyum-v04. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-red-paisley",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Scarlet filigree paisley",
+      "family": "Paisley",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-red-paisley.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v01"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v01. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-sand-garden",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Sand garden",
+      "family": "Floral",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-sand-garden.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v02"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v02. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-blue-paisley",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Blue filigree paisley",
+      "family": "Paisley",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-blue-paisley.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v03"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v03. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-gold-damask",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Gold damask",
+      "family": "Floral",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-gold-damask.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v04"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v04. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-ivory-floral",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Ivory floral",
+      "family": "Floral",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-ivory-floral.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v05"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v05. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-crimson-vine",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Crimson vine",
+      "family": "Floral",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-crimson-vine.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v07"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v07. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-atlas-gold-pendant",
+      "kind": "atlas",
+      "name": "Atlas · Gold pendant",
+      "family": "Geometry",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/atlas-gold-pendant.webp",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v08"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v08. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-atlas-red-heart-ikat",
+      "kind": "atlas",
+      "name": "Atlas · Crimson heart ikat",
+      "family": "Ikat",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/atlas-red-heart-ikat.webp",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v09"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v09. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-ivory-botanical",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Ivory botanical",
+      "family": "Floral",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-ivory-botanical.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v10"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v10. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-black-botanical",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Black botanical",
+      "family": "Floral",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-black-botanical.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v11"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v11. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-atlas-scarlet-paisley",
+      "kind": "atlas",
+      "name": "Atlas · Scarlet outline paisley",
+      "family": "Paisley",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/atlas-scarlet-paisley.webp",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v12"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v12. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-jewel-scroll",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Jewel scroll",
+      "family": "Floral",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-jewel-scroll.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v13"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v13. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-burgundy-vine",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Burgundy vine",
+      "family": "Floral",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-burgundy-vine.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v14"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v14. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-gobelen-crimson-stripe",
+      "kind": "gobelen",
+      "name": "Gobelen · Crimson geometric stripe",
+      "family": "Stripe",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/gobelen-crimson-stripe.webp",
+      "roughness": 0.94,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v15"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v15. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-scarf-gold-on-red",
+      "kind": "indian-scarf",
+      "name": "Indian scarf · Gold on scarlet",
+      "family": "Floral",
+      "color": "#ffffff",
+      "textureUrl": "/assets/textures/catalogue/scarf-gold-on-red.webp",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v16"
+      ],
+      "provenance": "Catalogue-informed AI cloth approximation from nimcha-v16. Not a fabric scan; motifs, scale and finish remain approximate."
+    },
+    {
+      "id": "catalogue-barbi-ink",
+      "kind": "barbi",
+      "name": "Barbi · Ink",
+      "family": "Solid",
+      "color": "#151719",
+      "roughness": 0.86,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska",
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "baska-v01",
+        "nimcha-v01",
+        "nimcha-v04",
+        "nimcha-v05",
+        "nimcha-v11",
+        "nimcha-v13",
+        "nimcha-v15"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-barbi-ivory",
+      "kind": "barbi",
+      "name": "Barbi · Ivory",
+      "family": "Solid",
+      "color": "#f0ede4",
+      "roughness": 0.86,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska",
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "baska-v05",
+        "nimcha-v03",
+        "nimcha-v07",
+        "nimcha-v09",
+        "nimcha-v10"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-barbi-sand",
+      "kind": "barbi",
+      "name": "Barbi · Sand",
+      "family": "Solid",
+      "color": "#cdb995",
+      "roughness": 0.86,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v02"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-barbi-scarlet",
+      "kind": "barbi",
+      "name": "Barbi · Scarlet",
+      "family": "Solid",
+      "color": "#ac1c27",
+      "roughness": 0.86,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska",
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "baska-v04",
+        "nimcha-v09",
+        "nimcha-v16"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-barbi-burgundy",
+      "kind": "barbi",
+      "name": "Barbi · Burgundy",
+      "family": "Solid",
+      "color": "#651c39",
+      "roughness": 0.86,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "nimcha-v14"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-atlas-ink",
+      "kind": "atlas",
+      "name": "Atlas · Ink",
+      "family": "Solid",
+      "color": "#17191d",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska",
+        "korset",
+        "kostyum",
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "baska-v02",
+        "korset-v01",
+        "kostyum-v01",
+        "nimcha-v08",
+        "nimcha-v12"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-atlas-ivory",
+      "kind": "atlas",
+      "name": "Atlas · Ivory",
+      "family": "Solid",
+      "color": "#f2ead8",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "korset",
+        "kostyum"
+      ],
+      "sourceProductIds": [
+        "korset-v01",
+        "kostyum-v04"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-atlas-emerald",
+      "kind": "atlas",
+      "name": "Atlas · Emerald",
+      "family": "Solid",
+      "color": "#145e4e",
+      "roughness": 0.42,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "kostyum"
+      ],
+      "sourceProductIds": [
+        "kostyum-v02"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-shoyi-ink",
+      "kind": "shoyi",
+      "name": "Shoyi · Ink",
+      "family": "Solid",
+      "color": "#151719",
+      "roughness": 0.48,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska",
+        "kostyum"
+      ],
+      "sourceProductIds": [
+        "baska-v03",
+        "kostyum-v03"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-synthetic-ink",
+      "kind": "synthetic-fabric",
+      "name": "Synthetic cloth · Ink",
+      "family": "Solid",
+      "color": "#17191d",
+      "roughness": 0.72,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska",
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "baska-v06",
+        "nimcha-v06"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-synthetic-ivory",
+      "kind": "synthetic-fabric",
+      "name": "Synthetic cloth · Ivory",
+      "family": "Solid",
+      "color": "#f0ede4",
+      "roughness": 0.72,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "baska",
+        "nimcha"
+      ],
+      "sourceProductIds": [
+        "baska-v06",
+        "nimcha-v06"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-poplin-ink",
+      "kind": "synthetic-poplin",
+      "name": "Synthetic poplin · Ink",
+      "family": "Solid",
+      "color": "#17191d",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "abaya"
+      ],
+      "sourceProductIds": [
+        "abaya-v01"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    },
+    {
+      "id": "catalogue-poplin-ivory",
+      "kind": "synthetic-poplin",
+      "name": "Synthetic poplin · Ivory",
+      "family": "Solid",
+      "color": "#f0ede4",
+      "roughness": 0.78,
+      "metalness": 0,
+      "repeat": [
+        1,
+        1
+      ],
+      "garmentIds": [
+        "abaya"
+      ],
+      "sourceProductIds": [
+        "abaya-v01"
+      ],
+      "provenance": "Authored solid colour/finish approximation of catalogue cloth. No colour calibration or fibre composition is inferred."
+    }
+  ],
+  "products": [
+    {
+      "id": "abaya-v01",
+      "garment": "abaya",
+      "fabricLabel": "Sintetik poplin",
+      "kinds": [
+        "synthetic-poplin"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/abaya-v01/och-abaya-v01.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/abaya-v01/media/och-abaya-v01-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/abaya-v01/media/och-abaya-v01-source-photo-02.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/abaya-v01/media/och-abaya-v01-source-photo-03.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/abaya-v01/references/och-abaya-v01-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/abaya-v01/references/och-abaya-v01-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "paisley-ivory-on-black"
+      ],
+      "solidIds": [
+        "poplin-ink",
+        "poplin-ivory"
+      ],
+      "appearanceNote": "Outlined ivory paisley on black; front binding uses separate ivory curved-line bands, not reconstructed as repeating cloth.",
+      "materialIds": [
+        "catalogue-synthetic-poplin-paisley-ivory-on-black",
+        "catalogue-poplin-ink",
+        "catalogue-poplin-ivory"
+      ]
+    },
+    {
+      "id": "baska-v01",
+      "garment": "baska",
+      "fabricLabel": "Barbi",
+      "kinds": [
+        "barbi"
+      ],
+      "decorationLabel": "Kashta va munchoqlar",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/baska-v01/och-baska-v01.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v01/media/och-baska-v01-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/baska-v01/media/och-baska-v01-source-photo-02.jpg"
+      ],
+      "sourceVideos": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v01/media/och-baska-v01-source-video-01.mp4"
+      ],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v01/references/och-baska-v01-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/baska-v01/references/och-baska-v01-product-three-quarter-r01.png"
+      ],
+      "textureIds": [],
+      "solidIds": [
+        "barbi-ink"
+      ],
+      "appearanceNote": "Solid black Barbi; ivory circular floral embroidery and dangling beads remain separate decoration, not base cloth.",
+      "materialIds": [
+        "catalogue-barbi-ink"
+      ]
+    },
+    {
+      "id": "baska-v02",
+      "garment": "baska",
+      "fabricLabel": "Atlas",
+      "kinds": [
+        "atlas"
+      ],
+      "decorationLabel": "Qo‘lda ishlangan biser va popop kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/baska-v02/och-baska-v02.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v02/media/och-baska-v02-source-photo-01.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v02/references/och-baska-v02-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/baska-v02/references/och-baska-v02-product-three-quarter-r01.png"
+      ],
+      "textureIds": [],
+      "solidIds": [
+        "atlas-ink"
+      ],
+      "appearanceNote": "Solid black Atlas; ornate embroidered/beaded waistband and dangling beads remain decoration.",
+      "materialIds": [
+        "catalogue-atlas-ink"
+      ]
+    },
+    {
+      "id": "baska-v03",
+      "garment": "baska",
+      "fabricLabel": "Shoyi",
+      "kinds": [
+        "shoyi"
+      ],
+      "decorationLabel": "Qo‘lda ishlangan biser va popop kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/baska-v03/och-baska-v03.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v03/media/och-baska-v03-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/baska-v03/media/och-baska-v03-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v03/references/och-baska-v03-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/baska-v03/references/och-baska-v03-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "shoyi-monochrome-ikat"
+      ],
+      "solidIds": [
+        "shoyi-ink"
+      ],
+      "appearanceNote": "Broad monochrome ikat Shoyi; beaded waistband and fringe remain decoration.",
+      "materialIds": [
+        "catalogue-shoyi-monochrome-ikat",
+        "catalogue-shoyi-ink"
+      ]
+    },
+    {
+      "id": "baska-v04",
+      "garment": "baska",
+      "fabricLabel": "Atlas & barbi",
+      "kinds": [
+        "atlas",
+        "barbi"
+      ],
+      "decorationLabel": "Munchoqlar",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/baska-v04/och-baska-v04.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v04/media/och-baska-v04-source-photo-01.jpg"
+      ],
+      "sourceVideos": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v04/media/och-baska-v04-source-video-01.mp4",
+        "context/domains/external/work/career/designer/portfolio/products/baska-v04/media/och-baska-v04-source-video-02.mp4"
+      ],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v04/references/och-baska-v04-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/baska-v04/references/och-baska-v04-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "atlas-red-monochrome-ikat"
+      ],
+      "solidIds": [
+        "barbi-scarlet"
+      ],
+      "appearanceNote": "Red Barbi front panels with red/ivory/black Atlas side panels and waistband; bead edge remains decoration.",
+      "materialIds": [
+        "catalogue-atlas-red-monochrome-ikat",
+        "catalogue-barbi-scarlet"
+      ]
+    },
+    {
+      "id": "baska-v05",
+      "garment": "baska",
+      "fabricLabel": "Barbi",
+      "kinds": [
+        "barbi"
+      ],
+      "decorationLabel": "Kashta va munchoqlar",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/baska-v05/och-baska-v05.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v05/media/och-baska-v05-source-photo-01.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v05/references/och-baska-v05-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/baska-v05/references/och-baska-v05-product-three-quarter-r01.png"
+      ],
+      "textureIds": [],
+      "solidIds": [
+        "barbi-ivory"
+      ],
+      "appearanceNote": "Ivory Barbi; black circular floral embroidery and dangling beads remain separate decoration.",
+      "materialIds": [
+        "catalogue-barbi-ivory"
+      ]
+    },
+    {
+      "id": "baska-v06",
+      "garment": "baska",
+      "fabricLabel": "Sintetik mato",
+      "kinds": [
+        "synthetic-fabric"
+      ],
+      "decorationLabel": "Munchoqlar",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/baska-v06/och-baska-v06.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v06/media/och-baska-v06-source-photo-01.jpg"
+      ],
+      "sourceVideos": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v06/media/och-baska-v06-source-video-01.mp4"
+      ],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/baska-v06/references/och-baska-v06-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/baska-v06/references/och-baska-v06-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "paisley-ivory-on-black"
+      ],
+      "solidIds": [
+        "synthetic-ink",
+        "synthetic-ivory"
+      ],
+      "appearanceNote": "Synthetic cloth with outlined ivory paisley and separate curved-line border bands; bead fringe excluded.",
+      "materialIds": [
+        "catalogue-synthetic-fabric-paisley-ivory-on-black",
+        "catalogue-synthetic-ink",
+        "catalogue-synthetic-ivory"
+      ]
+    },
+    {
+      "id": "korset-v01",
+      "garment": "korset",
+      "fabricLabel": "Atlas",
+      "kinds": [
+        "atlas"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/korset-v01/och-korset-v01.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/korset-v01/media/och-korset-v01-source-photo-01.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/korset-v01/references/och-korset-v01-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/korset-v01/references/och-korset-v01-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "paisley-ivory-on-black"
+      ],
+      "solidIds": [
+        "atlas-ink",
+        "atlas-ivory"
+      ],
+      "appearanceNote": "Atlas outlined ivory paisley; separate hem border not reproduced in field repeat.",
+      "materialIds": [
+        "catalogue-atlas-paisley-ivory-on-black",
+        "catalogue-atlas-ink",
+        "catalogue-atlas-ivory"
+      ]
+    },
+    {
+      "id": "korset-v02",
+      "garment": "korset",
+      "fabricLabel": "Shoyi",
+      "kinds": [
+        "shoyi"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/korset-v02/och-korset-v02.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/korset-v02/media/och-korset-v02-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/korset-v02/media/och-korset-v02-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/korset-v02/references/och-korset-v02-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/korset-v02/references/och-korset-v02-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "shoyi-monochrome-ikat"
+      ],
+      "solidIds": [],
+      "appearanceNote": "Broad black/ivory ikat Shoyi.",
+      "materialIds": [
+        "catalogue-shoyi-monochrome-ikat"
+      ]
+    },
+    {
+      "id": "kostyum-v01",
+      "garment": "kostyum",
+      "fabricLabel": "Atlas",
+      "kinds": [
+        "atlas"
+      ],
+      "decorationLabel": "Popukli bezak",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/kostyum-v01/och-kostyum-v01.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v01/media/och-kostyum-v01-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v01/media/och-kostyum-v01-source-photo-02.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v01/media/och-kostyum-v01-source-photo-03.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v01/media/och-kostyum-v01-source-photo-04.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v01/media/och-kostyum-v01-source-photo-05.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v01/references/och-kostyum-v01-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v01/references/och-kostyum-v01-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "atlas-narrow-monochrome-ikat"
+      ],
+      "solidIds": [
+        "atlas-ink"
+      ],
+      "appearanceNote": "Narrow black/ivory streak ikat Atlas; large hem tassels are separate decoration.",
+      "materialIds": [
+        "catalogue-atlas-narrow-monochrome-ikat",
+        "catalogue-atlas-ink"
+      ]
+    },
+    {
+      "id": "kostyum-v02",
+      "garment": "kostyum",
+      "fabricLabel": "Beqasam & atlas",
+      "kinds": [
+        "beqasam",
+        "atlas"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/kostyum-v02/och-kostyum-v02.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v02/media/och-kostyum-v02-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v02/media/och-kostyum-v02-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v02/references/och-kostyum-v02-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v02/references/och-kostyum-v02-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "beqasam-jewel-stripe"
+      ],
+      "solidIds": [
+        "atlas-emerald"
+      ],
+      "appearanceNote": "Multicolour Beqasam striped body and sleeves with solid emerald Atlas lapels/cuffs.",
+      "materialIds": [
+        "catalogue-beqasam-jewel-stripe",
+        "catalogue-atlas-emerald"
+      ]
+    },
+    {
+      "id": "kostyum-v03",
+      "garment": "kostyum",
+      "fabricLabel": "Shoyi",
+      "kinds": [
+        "shoyi"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/kostyum-v03/och-kostyum-v03.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v03/media/och-kostyum-v03-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v03/media/och-kostyum-v03-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v03/references/och-kostyum-v03-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v03/references/och-kostyum-v03-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "shoyi-monochrome-ikat"
+      ],
+      "solidIds": [
+        "shoyi-ink"
+      ],
+      "appearanceNote": "Broad black/ivory ikat Shoyi with black lapels/cuffs.",
+      "materialIds": [
+        "catalogue-shoyi-monochrome-ikat",
+        "catalogue-shoyi-ink"
+      ]
+    },
+    {
+      "id": "kostyum-v04",
+      "garment": "kostyum",
+      "fabricLabel": "Atlas",
+      "kinds": [
+        "atlas"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/kostyum-v04/och-kostyum-v04.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v04/media/och-kostyum-v04-source-photo-01.png"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v04/references/och-kostyum-v04-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/kostyum-v04/references/och-kostyum-v04-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "atlas-floral-jewel-ikat"
+      ],
+      "solidIds": [
+        "atlas-ivory"
+      ],
+      "appearanceNote": "Ivory Atlas with black, orange and yellow floral ikat; ivory lapels/cuffs.",
+      "materialIds": [
+        "catalogue-atlas-floral-jewel-ikat",
+        "catalogue-atlas-ivory"
+      ]
+    },
+    {
+      "id": "nimcha-v01",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v01/och-nimcha-v01.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v01/media/och-nimcha-v01-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v01/media/och-nimcha-v01-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v01/references/och-nimcha-v01-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v01/references/och-nimcha-v01-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-red-paisley"
+      ],
+      "solidIds": [
+        "barbi-ink"
+      ],
+      "appearanceNote": "Large scarlet filigree paisley scarf insert on black Barbi.",
+      "materialIds": [
+        "catalogue-scarf-red-paisley",
+        "catalogue-barbi-ink"
+      ]
+    },
+    {
+      "id": "nimcha-v02",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v02/och-nimcha-v02.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v02/media/och-nimcha-v02-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v02/media/och-nimcha-v02-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v02/references/och-nimcha-v02-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v02/references/och-nimcha-v02-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-sand-garden"
+      ],
+      "solidIds": [
+        "barbi-sand"
+      ],
+      "appearanceNote": "Sand scarf with orange/blue/green florals on sand Barbi.",
+      "materialIds": [
+        "catalogue-scarf-sand-garden",
+        "catalogue-barbi-sand"
+      ]
+    },
+    {
+      "id": "nimcha-v03",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v03/och-nimcha-v03.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v03/media/och-nimcha-v03-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v03/media/och-nimcha-v03-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v03/references/och-nimcha-v03-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v03/references/och-nimcha-v03-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-blue-paisley"
+      ],
+      "solidIds": [
+        "barbi-ivory"
+      ],
+      "appearanceNote": "Slate blue filigree paisley on ivory scarf and ivory Barbi.",
+      "materialIds": [
+        "catalogue-scarf-blue-paisley",
+        "catalogue-barbi-ivory"
+      ]
+    },
+    {
+      "id": "nimcha-v04",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v04/och-nimcha-v04.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v04/media/och-nimcha-v04-source-photo-01.jpg"
+      ],
+      "sourceVideos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v04/media/och-nimcha-v04-source-video-01.mp4"
+      ],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v04/references/och-nimcha-v04-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v04/references/och-nimcha-v04-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-gold-damask"
+      ],
+      "solidIds": [
+        "barbi-ink"
+      ],
+      "appearanceNote": "Gold/ivory ornate floral scarf on black Barbi; border embroidery excluded from repeat.",
+      "materialIds": [
+        "catalogue-scarf-gold-damask",
+        "catalogue-barbi-ink"
+      ]
+    },
+    {
+      "id": "nimcha-v05",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v05/och-nimcha-v05.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v05/media/och-nimcha-v05-source-photo-01.jpg"
+      ],
+      "sourceVideos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v05/media/och-nimcha-v05-source-video-01.mp4"
+      ],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v05/references/och-nimcha-v05-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v05/references/och-nimcha-v05-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-ivory-floral"
+      ],
+      "solidIds": [
+        "barbi-ink"
+      ],
+      "appearanceNote": "Dense ivory floral scarf on black Barbi.",
+      "materialIds": [
+        "catalogue-scarf-ivory-floral",
+        "catalogue-barbi-ink"
+      ]
+    },
+    {
+      "id": "nimcha-v06",
+      "garment": "nimcha",
+      "fabricLabel": "Sintetik mato",
+      "kinds": [
+        "synthetic-fabric"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v06/och-nimcha-v06.json",
+      "sourcePhotos": [],
+      "sourceVideos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v06/media/och-nimcha-v06-source-video-01.mp4",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v06/media/och-nimcha-v06-source-video-02.mp4"
+      ],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v06/references/och-nimcha-v06-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v06/references/och-nimcha-v06-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "paisley-ivory-on-black"
+      ],
+      "solidIds": [
+        "synthetic-ink",
+        "synthetic-ivory"
+      ],
+      "appearanceNote": "Video evidence: asymmetric half-vest in synthetic outlined paisley cloth. This studio retains the common nimcha silhouette.",
+      "materialIds": [
+        "catalogue-synthetic-fabric-paisley-ivory-on-black",
+        "catalogue-synthetic-ink",
+        "catalogue-synthetic-ivory"
+      ]
+    },
+    {
+      "id": "nimcha-v07",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v07/och-nimcha-v07.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v07/media/och-nimcha-v07-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v07/media/och-nimcha-v07-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v07/references/och-nimcha-v07-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v07/references/och-nimcha-v07-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-crimson-vine"
+      ],
+      "solidIds": [
+        "barbi-ivory"
+      ],
+      "appearanceNote": "Ivory scarf with crimson flowers and olive-gold curving stems on ivory Barbi; fringe excluded.",
+      "materialIds": [
+        "catalogue-scarf-crimson-vine",
+        "catalogue-barbi-ivory"
+      ]
+    },
+    {
+      "id": "nimcha-v08",
+      "garment": "nimcha",
+      "fabricLabel": "Atlas",
+      "kinds": [
+        "atlas"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v08/och-nimcha-v08.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v08/media/och-nimcha-v08-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v08/media/och-nimcha-v08-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v08/references/och-nimcha-v08-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v08/references/och-nimcha-v08-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "atlas-gold-pendant"
+      ],
+      "solidIds": [
+        "atlas-ink"
+      ],
+      "appearanceNote": "Black Atlas with ivory fine diamond/pendant geometry and small yellow diamond centres.",
+      "materialIds": [
+        "catalogue-atlas-gold-pendant",
+        "catalogue-atlas-ink"
+      ]
+    },
+    {
+      "id": "nimcha-v09",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & atlas",
+      "kinds": [
+        "barbi",
+        "atlas"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v09/och-nimcha-v09.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v09/media/och-nimcha-v09-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v09/media/och-nimcha-v09-source-photo-02.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v09/media/och-nimcha-v09-source-photo-03.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v09/references/och-nimcha-v09-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v09/references/och-nimcha-v09-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "atlas-red-heart-ikat"
+      ],
+      "solidIds": [
+        "barbi-ivory",
+        "barbi-scarlet"
+      ],
+      "appearanceNote": "Ivory/black/red angular heart-like ikat Atlas insert on ivory Barbi; distinct from Baska-v04. Photo02 additionally shows a red lapel; fibre/panel assignment is unconfirmed, so the red Barbi option is an appearance approximation within its declared kinds.",
+      "materialIds": [
+        "catalogue-atlas-red-heart-ikat",
+        "catalogue-barbi-ivory",
+        "catalogue-barbi-scarlet"
+      ]
+    },
+    {
+      "id": "nimcha-v10",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v10/och-nimcha-v10.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v10/media/och-nimcha-v10-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v10/media/och-nimcha-v10-source-photo-02.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v10/media/och-nimcha-v10-source-photo-03.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v10/references/och-nimcha-v10-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v10/references/och-nimcha-v10-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-ivory-botanical"
+      ],
+      "solidIds": [
+        "barbi-ivory"
+      ],
+      "appearanceNote": "Ivory scarf with large coral, mustard and blue floral motifs and vine branches on ivory Barbi.",
+      "materialIds": [
+        "catalogue-scarf-ivory-botanical",
+        "catalogue-barbi-ivory"
+      ]
+    },
+    {
+      "id": "nimcha-v11",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v11/och-nimcha-v11.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v11/media/och-nimcha-v11-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v11/media/och-nimcha-v11-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v11/references/och-nimcha-v11-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v11/references/och-nimcha-v11-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-black-botanical"
+      ],
+      "solidIds": [
+        "barbi-ink"
+      ],
+      "appearanceNote": "Black scarf with red flower medallions and muted gold/olive foliage on black Barbi.",
+      "materialIds": [
+        "catalogue-scarf-black-botanical",
+        "catalogue-barbi-ink"
+      ]
+    },
+    {
+      "id": "nimcha-v12",
+      "garment": "nimcha",
+      "fabricLabel": "Atlas",
+      "kinds": [
+        "atlas"
+      ],
+      "decorationLabel": "Yo‘q",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v12/och-nimcha-v12.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v12/media/och-nimcha-v12-source-photo-01.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v12/references/och-nimcha-v12-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v12/references/och-nimcha-v12-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "atlas-scarlet-paisley"
+      ],
+      "solidIds": [
+        "atlas-ink"
+      ],
+      "appearanceNote": "Simple scarlet outlined paisley on black Atlas, distinct from large filigree Nimcha-v01 scarf.",
+      "materialIds": [
+        "catalogue-atlas-scarlet-paisley",
+        "catalogue-atlas-ink"
+      ]
+    },
+    {
+      "id": "nimcha-v13",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v13/och-nimcha-v13.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v13/media/och-nimcha-v13-source-photo-01.jpg",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v13/media/och-nimcha-v13-source-photo-02.jpg"
+      ],
+      "sourceVideos": [],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v13/references/och-nimcha-v13-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v13/references/och-nimcha-v13-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-jewel-scroll"
+      ],
+      "solidIds": [
+        "barbi-ink"
+      ],
+      "appearanceNote": "Black scarf with pink/yellow floral shapes and bright turquoise/gold curling vines; black Barbi.",
+      "materialIds": [
+        "catalogue-scarf-jewel-scroll",
+        "catalogue-barbi-ink"
+      ]
+    },
+    {
+      "id": "nimcha-v14",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v14/och-nimcha-v14.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v14/media/och-nimcha-v14-source-photo-01.jpg"
+      ],
+      "sourceVideos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v14/media/och-nimcha-v14-source-video-01.mp4"
+      ],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v14/references/och-nimcha-v14-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v14/references/och-nimcha-v14-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-burgundy-vine"
+      ],
+      "solidIds": [
+        "barbi-burgundy"
+      ],
+      "appearanceNote": "Burgundy scarf with light blue blossoms and ivory/gold leafy vines; burgundy Barbi.",
+      "materialIds": [
+        "catalogue-scarf-burgundy-vine",
+        "catalogue-barbi-burgundy"
+      ]
+    },
+    {
+      "id": "nimcha-v15",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & gobelen",
+      "kinds": [
+        "barbi",
+        "gobelen"
+      ],
+      "decorationLabel": "Popukli bezak",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v15/och-nimcha-v15.json",
+      "sourcePhotos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v15/media/och-nimcha-v15-source-photo-01.jpg"
+      ],
+      "sourceVideos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v15/media/och-nimcha-v15-source-video-01.mp4"
+      ],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v15/references/och-nimcha-v15-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v15/references/och-nimcha-v15-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "gobelen-crimson-stripe"
+      ],
+      "solidIds": [
+        "barbi-ink"
+      ],
+      "appearanceNote": "Gobelen insert with vertical burgundy/black/ivory geometric bands; black Barbi, burgundy fringe excluded.",
+      "materialIds": [
+        "catalogue-gobelen-crimson-stripe",
+        "catalogue-barbi-ink"
+      ]
+    },
+    {
+      "id": "nimcha-v16",
+      "garment": "nimcha",
+      "fabricLabel": "Barbi & Hindiston sharfi",
+      "kinds": [
+        "barbi",
+        "indian-scarf"
+      ],
+      "decorationLabel": "Sharfda popop usulidagi gul kashtasi",
+      "canonicalJson": "context/domains/external/work/career/designer/portfolio/products/nimcha-v16/och-nimcha-v16.json",
+      "sourcePhotos": [],
+      "sourceVideos": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v16/media/och-nimcha-v16-source-video-01.mov"
+      ],
+      "generatedReferences": [
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v16/references/och-nimcha-v16-product-front-r01.png",
+        "context/domains/external/work/career/designer/portfolio/products/nimcha-v16/references/och-nimcha-v16-product-three-quarter-r01.png"
+      ],
+      "textureIds": [
+        "scarf-gold-on-red"
+      ],
+      "solidIds": [
+        "barbi-scarlet"
+      ],
+      "appearanceNote": "Video evidence: red scarf with dense gold/ivory ornamental flowers; red Barbi. Hanging edge embroidery excluded.",
+      "materialIds": [
+        "catalogue-scarf-gold-on-red",
+        "catalogue-barbi-scarlet"
+      ]
+    }
+  ],
+  "verification": {
+    "checkedAt": "2026-09-26",
+    "sourcePhotosVisuallyInspected": 49,
+    "sourceVideoPreviewsVisuallyInspected": [
+      "nimcha-v06",
+      "nimcha-v16"
+    ],
+    "runtimeTexturesVisuallyInspected": 21,
+    "runtimeDimensions": [
+      1024,
+      1024
+    ],
+    "runtimeAlpha": "All opaque; verified programmatically",
+    "runtimeTotalBytes": 4951506,
+    "repeatQuality": "Visually inspected 2x2; generated repeat joins remain approximate",
+    "automatedCoverage": "tests/catalogue.test.ts: 3 passed; 29 products, kind coverage, 21 files/URLs/hashes, material reachability and defaults"
+  }
+}

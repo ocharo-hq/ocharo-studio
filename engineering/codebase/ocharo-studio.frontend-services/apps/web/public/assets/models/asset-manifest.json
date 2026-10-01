@@ -1,0 +1,192 @@
+{
+  "release": {
+    "id": "ocharo-garments@2.0.0",
+    "version": "2.0.0",
+    "sha256": "9672e9b74e70521154455487d53f0196db4ce2b3fde8e0a9f0d85b27f0bfbf2a"
+  },
+  "assetVersion": "2.0.0",
+  "source": "ocharo-ws/workbench/ocharo-assets/engineering/codebase/ocharo-assets.library/garments (Blender build: source/build.py)",
+  "importer": "scripts/sync-garments.mjs",
+  "provenance": "authored 3D interpretation of the Ocharo brand silhouette and garment references; not a scan or sewing pattern",
+  "coordinates": {
+    "units": "metres",
+    "up": "+Y",
+    "front": "+Z",
+    "origin": "floor centre",
+    "waistY": 1.12
+  },
+  "assets": {
+    "mannequin": {
+      "file": "mannequin.glb",
+      "librarySource": "och-silhouette.glb",
+      "bytes": 538664,
+      "sha256": "c1ee171ed3abe0e5d0ec74fc207b8d2c18afc2d9319753b7c638d88cef66ff46",
+      "meshes": 3,
+      "triangles": 23472,
+      "parts": [],
+      "showWith": {
+        "silhouette_arms": "sleeves"
+      },
+      "bounds": {
+        "min": [
+          -0.34201,
+          0.003,
+          -0.3288
+        ],
+        "max": [
+          0.33301,
+          1.506,
+          0.31337
+        ]
+      }
+    },
+    "model": {
+      "file": "model.glb",
+      "librarySource": "och-model.glb",
+      "bytes": 1095016,
+      "sha256": "eb84d6f9a5154f05e0583babef76157f14c0c22341801d3b0e05d3d976352d7e",
+      "meshes": 5,
+      "triangles": 46828,
+      "parts": [],
+      "bounds": {
+        "min": [
+          -0.34201,
+          0.003,
+          -0.3288
+        ],
+        "max": [
+          0.33301,
+          1.71822,
+          0.31337
+        ]
+      }
+    },
+    "nimcha": {
+      "file": "nimcha.glb",
+      "librarySource": "och-nimcha.glb",
+      "bytes": 844916,
+      "sha256": "3958ed00db00458fd24da0d2bc8e02e1cb95fca2339c8f5e36d7acc8d2776209",
+      "meshes": 4,
+      "triangles": 31240,
+      "parts": [
+        "belt",
+        "body",
+        "collar",
+        "trim"
+      ],
+      "bounds": {
+        "min": [
+          -0.18183,
+          0.8382,
+          -0.13013
+        ],
+        "max": [
+          0.16648,
+          1.44887,
+          0.13694
+        ]
+      }
+    },
+    "baska": {
+      "file": "baska.glb",
+      "librarySource": "och-baska.glb",
+      "bytes": 420848,
+      "sha256": "26eae4b87b8da3e91e2cfdb78c88df1c47ca4d6f6e7366f8d293dcbf25794e78",
+      "meshes": 3,
+      "triangles": 15944,
+      "parts": [
+        "belt",
+        "body",
+        "trim"
+      ],
+      "bounds": {
+        "min": [
+          -0.20832,
+          0.61044,
+          -0.11421
+        ],
+        "max": [
+          0.20832,
+          1.15092,
+          0.21159
+        ]
+      }
+    },
+    "kostyum": {
+      "file": "kostyum.glb",
+      "librarySource": "och-kostyum.glb",
+      "bytes": 832432,
+      "sha256": "310a2b66d9212c9f22b9b99d3b42fdbe84e90772aa0d1f2470aa5ff15a367b55",
+      "meshes": 5,
+      "triangles": 33196,
+      "parts": [
+        "body",
+        "collar",
+        "sleeves",
+        "trim"
+      ],
+      "bounds": {
+        "min": [
+          -0.35025,
+          0.84141,
+          -0.10988
+        ],
+        "max": [
+          0.35025,
+          1.44793,
+          0.13072
+        ]
+      }
+    },
+    "korset": {
+      "file": "korset.glb",
+      "librarySource": "och-korset.glb",
+      "bytes": 474124,
+      "sha256": "925fde7295b39824620e5913f9258749675c551b20638399eb54f49a0ff94276",
+      "meshes": 3,
+      "triangles": 17732,
+      "parts": [
+        "body",
+        "trim"
+      ],
+      "bounds": {
+        "min": [
+          -0.21005,
+          0.87897,
+          -0.19162
+        ],
+        "max": [
+          0.21983,
+          1.30578,
+          0.18508
+        ]
+      }
+    },
+    "abaya": {
+      "file": "abaya.glb",
+      "librarySource": "och-abaya.glb",
+      "bytes": 945628,
+      "sha256": "ece6862cb047301b2c3ebe041819bd10ac5e8952c2bed0070020027f47cccada",
+      "meshes": 4,
+      "triangles": 37388,
+      "parts": [
+        "belt",
+        "body",
+        "collar",
+        "sleeves"
+      ],
+      "bounds": {
+        "min": [
+          -0.39431,
+          0.01421,
+          -0.34319
+        ],
+        "max": [
+          0.39431,
+          1.43941,
+          0.31615
+        ]
+      }
+    }
+  }
+}

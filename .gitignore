@@ -20,7 +20,7 @@ node_modules/
 *.tsbuildinfo
 
 # The frontend build generates the complete hosted SPA.
-engineering/codebase/uzbek-studio.backend-services/UzbekStudio.Api/wwwroot/
+engineering/codebase/ocharo-studio.backend-services/OcharoStudio.Api/wwwroot/
 .env.*
 !.env.example
 .local/

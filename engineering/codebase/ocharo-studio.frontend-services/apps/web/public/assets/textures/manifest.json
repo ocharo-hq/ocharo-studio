@@ -1,0 +1,139 @@
+{
+  "generatedAt": "2026-09-25",
+  "tool": "Built-in image_gen",
+  "provenance": "Original AI-generated textile studies inspired by Uzbek textiles; not scans of verified physical fabrics.",
+  "assets": [
+    {
+      "id": "atlas-rose",
+      "prompt": "Use case: stylized-concept. Asset type: square seamless textile color texture for a 3D Uzbek clothing design app. Create a refined original Uzbek atlas-inspired ikat textile. Elongated vertical feathered diamond and flame motifs, warm ivory ground, deep pomegranate red, dusty rose, small saffron accents, restrained midnight outlines. Flat orthographic scanned fabric swatch, uniform illumination, fine silk warp threads, matte color map without specular highlights. Pattern fills entire square; identical edge continuation for repeating in both directions. Four broad vertical motif columns, generous ivory breathing room. No borders, no garment, no folds, no shadows, no labels, no text. 1024x1024.",
+      "output": "/assets/textures/atlas-rose.png",
+      "source": "/Users/max/.codex/generated_images/01a0d962-86b7-74b0-84fa-5ce22eaed56c/exec-762e2c90-eb8e-427a-bc88-1614edec3ab1.png",
+      "originalSha256": "e911abbea81a66ae5f5f174ce3544d87e39dea3714f08b04c10ec607663c66d8",
+      "originalBytes": 2570812,
+      "runtimeUrl": "/assets/textures/atlas-rose.webp",
+      "runtimeSha256": "57ce28c008ca3d12e9292310cc3f07ff096443e7f8074926b578ac98da40390e",
+      "runtimeBytes": 143960,
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeEncoding": {
+        "format": "WebP",
+        "encoder": "cwebp",
+        "quality": 84,
+        "method": 6,
+        "resize": [
+          1024,
+          1024
+        ],
+        "convertedAt": "2026-09-26",
+        "sourceDimensions": [
+          1254,
+          1254
+        ],
+        "alphaHandling": "source already opaque",
+        "opaque": true
+      }
+    },
+    {
+      "id": "adras-indigo",
+      "prompt": "Use case: stylized-concept. Asset type: square seamless textile color texture for a 3D Uzbek clothing design app. Create an original Uzbek adras-inspired ikat textile pattern: rich indigo and cobalt blue elongated branching diamond motifs on warm ivory, sparse sage accents, naturally feathered dyed warp edges. Flat orthographic fabric scan with uniform lighting and subtle cotton silk threads. Three wide vertical motif columns. Edge-to-edge repeating pattern with continuous matching opposite edges. Color map only, no lighting gradients, no shadows, no folds, no garment, no borders, no labels, no text. 1024x1024.",
+      "output": "/assets/textures/adras-indigo.png",
+      "source": "/Users/max/.codex/generated_images/01a0d962-86b7-74b0-84fa-5ce22eaed56c/exec-c26a06b6-b584-4971-b2f8-d88c87213310.png",
+      "originalSha256": "6a37e0ac0336dcfc510bd6cce9a02d180728d17827bcd3f1264e567fc0ccea5e",
+      "originalBytes": 3408462,
+      "runtimeUrl": "/assets/textures/adras-indigo.webp",
+      "runtimeSha256": "41649c27407afd6d5d0dd60572a0629f827a9363acc3f19dea7c4c86b66df1ff",
+      "runtimeBytes": 143386,
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeEncoding": {
+        "format": "WebP",
+        "encoder": "cwebp",
+        "quality": 84,
+        "method": 6,
+        "resize": [
+          1024,
+          1024
+        ],
+        "convertedAt": "2026-09-26",
+        "sourceDimensions": [
+          1254,
+          1254
+        ],
+        "alphaHandling": "discard source alpha to preserve RGB sampled by opaque garment material",
+        "sourceAlphaRange": [
+          135,
+          247
+        ],
+        "opaque": true
+      }
+    },
+    {
+      "id": "bekasam-gold",
+      "prompt": "Use case: stylized-concept. Asset type: square seamless textile color texture for a 3D Uzbek clothing design app. Original Uzbek bekasam-inspired woven silk striped cloth, warm saffron gold and cream dominant, thin burgundy, teal and midnight vertical bands, subtle fine thread texture. Elegant alternating stripe widths, flat unwrinkled orthographic scanned color texture, evenly lit, every stripe extends perfectly vertically top to bottom. Repeat tile continuous across opposite edges. No borders, no folds, no shadows, no garment, no labels, no text. 1024x1024.",
+      "output": "/assets/textures/bekasam-gold.png",
+      "source": "/Users/max/.codex/generated_images/01a0d962-86b7-74b0-84fa-5ce22eaed56c/exec-390122a1-ef03-4486-a725-9262e7970317.png",
+      "originalSha256": "8f6615e8918bb69e0befdb5910c0ae5c2e58f6324eb152c9213eb736cd9faecc",
+      "originalBytes": 2837156,
+      "runtimeUrl": "/assets/textures/bekasam-gold.webp",
+      "runtimeSha256": "ccccbd51b2909aac093724490ae3eadfe0f3f9c5f280d68954a600c542318b57",
+      "runtimeBytes": 123518,
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeEncoding": {
+        "format": "WebP",
+        "encoder": "cwebp",
+        "quality": 84,
+        "method": 6,
+        "resize": [
+          1024,
+          1024
+        ],
+        "convertedAt": "2026-09-26",
+        "sourceDimensions": [
+          1254,
+          1254
+        ],
+        "alphaHandling": "source already opaque",
+        "opaque": true
+      }
+    },
+    {
+      "id": "ikat-garden",
+      "prompt": "Use case: stylized-concept. Asset type: square seamless textile color texture for a 3D Uzbek clothing design app. Original Uzbek-inspired green ikat textile, emerald and sage elongated feather-edged tulip-like diamond motifs with restrained terracotta centers on creamy ivory. Refined rhythmic alternating vertical motifs, three broad columns. Flat orthographic fabric scan under perfectly even neutral light, subtly visible silk cotton warp threads. Pattern continues across opposite square edges for repeated UV tiling. No borders, no folds, no mannequin, no garment, no shadows, no text. 1024x1024.",
+      "output": "/assets/textures/ikat-garden.png",
+      "source": "/Users/max/.codex/generated_images/01a0d962-86b7-74b0-84fa-5ce22eaed56c/exec-2ec6669d-ec4c-424f-9c3a-f3afad7eb5aa.png",
+      "originalSha256": "af740a83af61c1999cc65e3f2d1768636489cb5cb198a0fbbd68139046538021",
+      "originalBytes": 3251912,
+      "runtimeUrl": "/assets/textures/ikat-garden.webp",
+      "runtimeSha256": "625507dc7a9cfc16d7c7403447f3b6f9aefb5e51a156b5b8f41e256f922f2ffc",
+      "runtimeBytes": 238684,
+      "runtimeDimensions": [
+        1024,
+        1024
+      ],
+      "runtimeEncoding": {
+        "format": "WebP",
+        "encoder": "cwebp",
+        "quality": 84,
+        "method": 6,
+        "resize": [
+          1024,
+          1024
+        ],
+        "convertedAt": "2026-09-26",
+        "sourceDimensions": [
+          1254,
+          1254
+        ],
+        "alphaHandling": "source already opaque",
+        "opaque": true
+      }
+    }
+  ]
+}

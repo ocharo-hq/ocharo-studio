@@ -1,0 +1,23 @@
+<Project>
+
+  <!--
+    Solution-wide build defaults for every OcharoStudio.* project (Clean Architecture, .NET 10).
+    Per-project .csproj files stay minimal: they declare only references, not these settings.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- CI supplies the product version. Local builds are explicitly unreleased. -->
+    <Version Condition="'$(APP_VERSION)' != ''">$(APP_VERSION)</Version>
+    <Version Condition="'$(APP_VERSION)' == ''">0.0.0</Version>
+    <InformationalVersion Condition="'$(APP_VERSION)' != ''">$(APP_VERSION)</InformationalVersion>
+    <InformationalVersion Condition="'$(APP_VERSION)' == ''">dev</InformationalVersion>
+    <SourceRevisionId Condition="'$(VCS_REF)' != ''">$(VCS_REF)</SourceRevisionId>
+    <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+</Project>

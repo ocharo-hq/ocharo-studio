@@ -1,28 +1,24 @@
-# Engineering backlog
+# Ocharo Studio — Backlog
 
-*Last updated: 2026-09-25*
+*Last updated: 2026-10-01*
 
-## Implemented
+## Features
 
-- fixed mannequin and five versioned, fixed-size garment interpretation assets.
-- family-specific part and built-in attachment definitions.
-- four generated textile textures and six solid materials with provenance.
-- one-click garment and material application with degree rotation and normalized U/V offsets.
-- responsive floating controls, camera tools, undo/redo, keyboard controls, and guarded errors.
-- autosaved drafts, saved looks, save-copy, reopen, validated JSON, and PNG preview export.
-- `GET /api/studio` capability metadata without greeting or database infrastructure.
+| Feature | State | Spec |
+|---|---|---|
+| Garment design | planned | [studio.md](../../product/features/studio.md) |
+| Shared materials | planned | [materials.md](../../product/features/materials.md) |
+| Creative handoff | planned | [creative-handoff.md](../../product/features/creative-handoff.md) |
 
-## Remaining
+## Product and delivery
 
-- executed automated and visual checks are recorded in `verification.md`; human validation remains.
-- review accessibility with assistive technology and keyboard-only use.
-- validate asset fidelity, clipping, UV placement, performance, and export usefulness with a test user.
-- validate the workflow and visual interpretations with Maftuna.
-
-## Deferred
-
-- Garment length and size editing.
-- Decorative overlays and embroidery editing.
-- Freeform garment construction and arbitrary attachments.
-- Physical fit guarantees, cloth simulation, and sewing-pattern export.
-- Ordering, checkout, pricing, accounts, and collaborative editing.
+| Item | Type | Notes |
+|---|---|---|
+| Human garment review | product | Validate fidelity, clipping, controls and useful exports with Maftuna. |
+| Accessibility | engineering | Assistive-technology and keyboard-only acceptance. |
+| Metric textile mapping | feature | Calibrate measured tiles before displaying centimetres. |
+| Material revisions | feature | Variants and immutable comparisons preserve source assets. |
+| Model rendering | product | Choose generated stills or rotatable scenes and exact scene IDs. |
+| Normalized storage | engineering | Design entity APIs before changing existing SQLite snapshots. |
+| Garment extensions | feature | Sizing, length, decorations and outfit composition need authored support. |
+| Production rollout | engineering | Validate actual authenticated deployment and restore procedures. |

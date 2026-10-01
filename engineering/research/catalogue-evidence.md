@@ -1,6 +1,6 @@
 # Catalogue evidence
 
-*Last updated: 2026-09-25*
+*Last updated: 2026-09-26*
 
 ## Source and baseline
 
@@ -80,7 +80,7 @@ The agreed app scope uses newly authored single-size garments on a fixed mannequ
 
 ## Textile register
 
-Workspace-relative source: `context/domains/external/work/ventures/ocharostile/ideas/pattern-catalogue.html`.
+Workspace-relative source: `context/domains/external/work/ventures/ocharo/ideas/pattern-catalogue.html`.
 
 This is a proposed cloth/motif/colourway system, not a sewing-pattern library or ready 3D material set. Lines 103–126 define seven cloth IDs, fourteen motif IDs, six colourway IDs, and generation conventions. Several motif names explicitly say “ask her”; lines 178–180 distinguish literature labels from Maftuna's own terminology. Treat cultural names, meanings, and prescribed motif scales as source claims awaiting appropriate confirmation, not established app metadata.
 

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="WoW2.Sdk.Backend.Beta" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OcharoStudio.Application\OcharoStudio.Application.csproj" />
+  </ItemGroup>
+
+</Project>

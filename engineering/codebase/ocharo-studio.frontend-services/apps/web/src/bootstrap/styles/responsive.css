@@ -1,0 +1,209 @@
+@media (max-width: 1180px) {
+  .app-header {
+    padding-inline: 20px;
+  }
+  .workspace {
+    --studio-panel-inset: 16px;
+    --studio-panel-width: 260px;
+  }
+}
+
+@media (max-width: 820px) {
+  .app-header {
+    height: 76px;
+  }
+  .workspace {
+    height: calc(100dvh - 76px);
+    display: block;
+    padding: 0;
+    overflow: hidden;
+  }
+  .scene-area {
+    position: absolute;
+    inset: 0;
+    height: auto;
+  }
+
+  .viewport {
+    inset: 80px 0 170px;
+  }
+
+  .context-toolbar {
+    top: 12px;
+    left: 50%;
+  }
+  .camera-tools {
+    top: auto;
+    bottom: 116px;
+    left: 50%;
+  }
+  .orbit-hint {
+    top: auto;
+    bottom: 91px;
+    left: 50%;
+    max-width: calc(100% - 32px);
+  }
+  .mobile-sheet-switch {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    z-index: 7;
+    width: min(330px, calc(100% - 32px));
+    padding: 4px;
+    transform: translateX(-50%);
+  }
+  .mobile-sheet-switch button {
+    min-height: 40px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+  .mobile-sheet-switch button.active {
+    color: var(--paper);
+    background: var(--ink);
+  }
+  .studio-sheet {
+    position: absolute;
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: 68px;
+    width: auto;
+    height: min(48dvh, 420px);
+    z-index: 6;
+    border-radius: 20px 20px 14px 14px;
+  }
+  .workspace[data-sheet-open="library"] .inspector,
+  .workspace[data-sheet-open="inspector"] .library,
+  .workspace[data-sheet-open="canvas"] .library,
+  .workspace[data-sheet-open="canvas"] .inspector {
+    display: none;
+  }
+  .library-content,
+  .inspector-content {
+    padding: 18px;
+  }
+  .guide-launcher {
+    right: 14px;
+    bottom: 126px;
+  }
+  .studio-toasts {
+    top: 88px;
+    right: 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  body {
+    min-width: 320px;
+  }
+  .app-header {
+    height: 98px;
+    padding: 10px 12px 40px;
+  }
+  .header-actions {
+    gap: 5px;
+  }
+  .header-actions .icon-button {
+    display: inline-flex;
+  }
+  .save-status-button {
+    min-width: 64px;
+    gap: 5px;
+    padding: 8px 6px;
+  }
+  .export-button {
+    min-height: 36px;
+    padding: 8px 10px;
+  }
+  .document-heading {
+    display: block;
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 5px;
+    padding: 0;
+  }
+  .document-heading input {
+    width: 100%;
+    font-size: 11px;
+  }
+  .workspace {
+    height: calc(100dvh - 98px);
+  }
+
+  .viewport {
+    inset: 74px 0 168px;
+  }
+  .context-toolbar {
+    top: 10px;
+    max-width: calc(100% - 20px);
+  }
+  .tool-label {
+    display: none;
+  }
+  .camera-tools {
+    bottom: 111px;
+  }
+  .camera-tools .camera-presets button {
+    padding-inline: 7px;
+  }
+  .camera-tools .icon-button:nth-last-child(-n + 2) {
+    display: none;
+  }
+  .orbit-hint {
+    bottom: 67px;
+  }
+
+  .studio-sheet {
+    left: 8px;
+    right: 8px;
+    bottom: 62px;
+    height: min(35dvh, 300px);
+  }
+  .mobile-sheet-switch {
+    bottom: 10px;
+  }
+  .material-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .material-swatch {
+    height: 92px;
+  }
+  .guide-launcher {
+    bottom: 115px;
+  }
+}
+@media (max-width: 360px) {
+  .camera-tools {
+    left: 16px;
+    transform: none;
+  }
+}
+
+/* The canvas occupies the space above an open sheet; it never hides the edited garment underneath. */
+@media (max-width: 820px) {
+  .workspace {
+    --sheet-height: min(48dvh, 420px);
+    --sheet-bottom: 68px;
+  }
+  .workspace:not([data-sheet-open="canvas"]) .viewport {
+    bottom: calc(var(--sheet-height) + var(--sheet-bottom) + 62px);
+  }
+  .workspace:not([data-sheet-open="canvas"]) .camera-tools {
+    bottom: calc(var(--sheet-height) + var(--sheet-bottom) + 8px);
+  }
+  .workspace:not([data-sheet-open="canvas"]) .orbit-hint {
+    display: none;
+  }
+  .workspace:not([data-sheet-open="canvas"]) .guide-launcher {
+    bottom: calc(var(--sheet-height) + var(--sheet-bottom) + 66px);
+  }
+}
+@media (max-width: 560px) {
+  .workspace {
+    --sheet-height: min(35dvh, 300px);
+    --sheet-bottom: 62px;
+  }
+}

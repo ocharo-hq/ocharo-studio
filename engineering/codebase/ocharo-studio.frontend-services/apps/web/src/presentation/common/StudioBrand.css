@@ -1,0 +1,38 @@
+.brand.brand-authentic {
+  gap: 8px;
+  min-height: 44px;
+}
+
+.brand-authentic .brand-wordmark {
+  display: block;
+  width: 148px;
+  height: 51px;
+  flex-shrink: 0;
+  filter: grayscale(1) contrast(2);
+  mix-blend-mode: multiply;
+}
+
+.brand-authentic .brand-product {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  padding-top: 13px;
+}
+
+:root.dark .brand-authentic .brand-wordmark {
+  filter: grayscale(1) contrast(2) invert(1);
+  mix-blend-mode: screen;
+}
+
+@media (max-width: 640px) {
+  .brand-authentic .brand-wordmark {
+    width: 108px;
+    height: 38px;
+  }
+
+  .brand-authentic .brand-product {
+    font-size: 8px;
+    padding-top: 10px;
+  }
+}

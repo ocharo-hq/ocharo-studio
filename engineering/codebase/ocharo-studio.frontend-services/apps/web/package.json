@@ -1,0 +1,42 @@
+{
+  "name": "@ocharo-studio/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Vue UI for Ocharo Studio, served from its .NET API host in production.",
+  "scripts": {
+    "dev": "vite",
+    "dev-http": "VITE_HTTPS=false vite",
+    "typecheck": "vue-tsc -b && node scripts/check-sfc.mjs",
+    "build": "pnpm typecheck && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "assets:sync": "node scripts/sync-garments.mjs",
+    "lint": "node scripts/check-boundaries.mjs && node scripts/export-catalog.mjs --check",
+    "format:check": "prettier --check src scripts tests *.ts",
+    "catalog:export": "node scripts/export-catalog.mjs"
+  },
+  "dependencies": {
+    "@lucide/vue": "1.48.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@wow-two-beta/ui-vue": "0.0.9",
+    "tailwindcss": "^4.3.3",
+    "three": "^0.186.1",
+    "vue": "3.5.41",
+    "vue-router": "4.6.4"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "24.13.6",
+    "@types/three": "^0.186.0",
+    "@vitejs/plugin-vue": "5.2.4",
+    "prettier": "^3.9.9",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.0",
+    "vite-plugin-mkcert": "2.1.0",
+    "vitest": "^5.0.2",
+    "vue-tsc": "2.2.12"
+  }
+}

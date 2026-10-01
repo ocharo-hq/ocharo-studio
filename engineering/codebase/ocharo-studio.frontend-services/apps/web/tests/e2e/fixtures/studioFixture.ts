@@ -1,0 +1,121 @@
+import { randomUUID } from "node:crypto";
+import { test as base, expect, type Page } from "@playwright/test";
+
+export { expect };
+export type { Page, Locator } from "@playwright/test";
+
+/** Exercises real client persistence with a deterministic authenticated, revisioned transport. */
+export const test = base.extend<{ authenticatedStudio: void }>({
+  authenticatedStudio: [
+    async ({ context }, use) => {
+      const workspaceId = randomUUID();
+      const organizationId = randomUUID();
+      const token = `synthetic-browser-review-${randomUUID()}`;
+      let state: Record<string, unknown> = {
+        revision: 0,
+        draft: null,
+        looks: [],
+        settings: {},
+        materials: {},
+      };
+      await context.addInitScript(
+        ({ token }) => {
+          sessionStorage.setItem("ocharo-studio:integration-ticket", token);
+        },
+        { token },
+      );
+      await context.route("**/api/studio/{session,state}", async (route) => {
+        const request = route.request();
+        const headers = request.headers();
+        if (headers.authorization !== `Bearer ${token}`) {
+          await route.fulfill({ status: 401, json: {} });
+          return;
+        }
+        if (new URL(request.url()).pathname.endsWith("/session")) {
+          await route.fulfill({
+            headers: { "Cache-Control": "no-store" },
+            json: {
+              workspaceId,
+              organizationId,
+              userId: "synthetic-browser-review-member",
+              canEdit: true,
+              expiresAt: new Date(Date.now() + 300_000).toISOString(),
+            },
+          });
+          return;
+        }
+        if (headers["x-studio-workspace"] !== workspaceId) {
+          await route.fulfill({ status: 403, json: {} });
+          return;
+        }
+        if (request.method() === "PUT") {
+          const proposed = request.postDataJSON();
+          if (proposed.revision !== state.revision) {
+            await route.fulfill({
+              status: 409,
+              json: { title: "Revision conflict" },
+            });
+            return;
+          }
+          state = { ...proposed, revision: Number(state.revision) + 1 };
+        }
+        await route.fulfill({
+          headers: { "Cache-Control": "no-store" },
+          json: state,
+        });
+      });
+      await use();
+    },
+    { auto: true },
+  ],
+});
+test.use({ ignoreHTTPSErrors: false });
+
+/** Reads through browser routing so the request uses the same auth boundary as the editor. */
+export async function readRemote(page: Page) {
+  return page.evaluate(async () => {
+    const authorization = {
+      Authorization: `Bearer ${sessionStorage.getItem("ocharo-studio:integration-ticket")}`,
+    };
+    const session = await fetch("/api/studio/session", {
+      headers: authorization,
+      credentials: "omit",
+    });
+    if (!session.ok)
+      throw new Error(`Review session rejected: ${session.status}`);
+    const identity = await session.json();
+    const response = await fetch("/api/studio/state", {
+      headers: { ...authorization, "X-Studio-Workspace": identity.workspaceId },
+      credentials: "omit",
+    });
+    if (!response.ok)
+      throw new Error(`Review state rejected: ${response.status}`);
+    return response.json();
+  });
+}
+
+export async function writeRemote(page: Page, state: Record<string, unknown>) {
+  return page.evaluate(async (value) => {
+    const authorization = {
+      Authorization: `Bearer ${sessionStorage.getItem("ocharo-studio:integration-ticket")}`,
+    };
+    const session = await fetch("/api/studio/session", {
+      headers: authorization,
+      credentials: "omit",
+    });
+    const identity = await session.json();
+    const response = await fetch("/api/studio/state", {
+      method: "PUT",
+      credentials: "omit",
+      body: JSON.stringify(value),
+      headers: {
+        ...authorization,
+        "Content-Type": "application/json",
+        "X-Studio-Workspace": identity.workspaceId,
+      },
+    });
+    if (!response.ok)
+      throw new Error(`Review state rejected: ${response.status}`);
+    return response.json();
+  }, state);
+}

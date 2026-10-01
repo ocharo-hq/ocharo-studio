@@ -1,0 +1,16 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Services/">
+    <Project Path="OcharoStudio.Api/OcharoStudio.Api.csproj" />
+    <Project Path="OcharoStudio.Application/OcharoStudio.Application.csproj" />
+    <Project Path="OcharoStudio.Domain/OcharoStudio.Domain.csproj" />
+    <Project Path="OcharoStudio.Persistence/OcharoStudio.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/OcharoStudio.Tests/OcharoStudio.Tests.csproj" />
+  </Folder>
+</Solution>

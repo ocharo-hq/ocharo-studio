@@ -1,0 +1,369 @@
+.material-studio {
+  padding: 28px;
+  max-width: 1800px;
+  margin: auto;
+}
+.material-studio:focus-visible {
+  outline: none;
+}
+.material-storage-status {
+  margin-top: 8px;
+}
+.material-studio-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.material-studio-heading h1 {
+  font:
+    36px/1.2 Georgia,
+    serif;
+  margin: 12px 0 8px;
+  outline: none;
+}
+.material-studio-heading p {
+  font-size: 13px;
+  color: var(--muted);
+}
+.material-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.material-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.material-editor-actions .button {
+  font-size: 13px;
+}
+.material-studio-layout {
+  display: grid;
+  grid-template-columns: 230px minmax(240px, 1fr) 310px;
+  align-items: start;
+  gap: 20px;
+}
+.material-browser {
+  overflow: hidden;
+}
+.material-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.material-search input {
+  width: 100%;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--ink);
+  border: none;
+  background: transparent;
+}
+.material-browser-list {
+  max-height: calc(100dvh - 290px);
+  min-height: 300px;
+  overflow: auto;
+  padding: 8px;
+}
+.material-browser-item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 14px;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 9px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  text-align: left;
+}
+.material-browser-item:hover {
+  background: var(--wash);
+}
+.material-browser-item.selected {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.material-browser-swatch {
+  width: 40px;
+  height: 48px;
+  border-radius: 7px;
+  background-size: cover;
+}
+.material-browser-item strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+.material-browser-item small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.material-tile-section {
+  padding: 24px;
+  min-width: 0;
+}
+.material-tile-heading {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 20px;
+}
+.material-tile-heading small {
+  font-size: 12px;
+  color: var(--muted);
+}
+.material-tile-heading h2 {
+  font:
+    28px/1.2 Georgia,
+    serif;
+  margin-top: 7px;
+  overflow-wrap: anywhere;
+}
+.material-repeat-preview {
+  width: 100%;
+  aspect-ratio: 1;
+  background-repeat: repeat;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--line);
+}
+.material-repeat-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, #fff9 1px, transparent 1px),
+    linear-gradient(to bottom, #fff9 1px, transparent 1px);
+  filter: drop-shadow(0 1px 1px #0008);
+  pointer-events: none;
+}
+.material-preview-hint {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 12px;
+}
+.material-properties {
+  min-width: 0;
+  overflow: hidden;
+}
+.material-model-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px 0;
+}
+.material-model-heading h2 {
+  font-size: 15px;
+  font-weight: 600;
+}
+.material-model-heading span {
+  font-size: 11px;
+  color: var(--muted);
+}
+/* The preview sits inset in its card, clear of the view buttons, with the figure centred. */
+.material-model-preview {
+  height: 276px;
+  margin: 10px 30px 16px;
+}
+.material-preview-views {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 20px 18px;
+}
+.material-preview-views button {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  text-transform: capitalize;
+  background: var(--wash);
+}
+.material-scale-fields {
+  padding: 20px 22px;
+  border-top: 1px solid var(--line);
+}
+.material-scale-fields .range-control {
+  margin-top: 0;
+}
+.material-scale-fields h3 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  font-size: 13px;
+}
+.material-scale-fields h3 span {
+  color: var(--muted);
+}
+.material-save-impact {
+  margin-top: 16px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.material-edit-warning {
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.material-use-list {
+  padding: 0;
+  margin: 12px 0 0;
+  list-style: none;
+  max-height: 190px;
+  overflow: auto;
+}
+.material-use-list li {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+  font-size: 12px;
+}
+.material-use-list span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.material-use-list small {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.material-empty {
+  padding: 18px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.material-studio-entry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  font-size: 13px;
+}
+.material-studio-entry:hover {
+  background: var(--wash);
+}
+.material-studio-entry:disabled {
+  opacity: 0.6;
+}
+.material-page-active .document-heading {
+  display: none;
+}
+@media (max-width: 1180px) {
+  .material-studio-layout {
+    grid-template-columns: 200px minmax(220px, 1fr);
+  }
+  .material-properties {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .material-model-heading {
+    grid-column: 1;
+  }
+  .material-model-preview {
+    grid-column: 1;
+    height: 248px;
+  }
+  .material-preview-views {
+    grid-column: 1;
+  }
+  .material-scale-fields {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    border-top: 0;
+    border-left: 1px solid var(--line);
+  }
+  .material-browser {
+    grid-row: 1 / 3;
+    position: sticky;
+    top: 16px;
+  }
+}
+@media (max-width: 700px) {
+  .material-studio {
+    padding: 16px 12px;
+  }
+  .material-studio-heading {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .material-studio-heading h1 {
+    font-size: 30px;
+  }
+  .material-editor-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .material-editor-actions .button {
+    padding: 10px 7px;
+    font-size: 12px;
+  }
+  .material-studio-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .material-browser {
+    position: static;
+    grid-row: auto;
+  }
+  .material-browser-list {
+    display: flex;
+    min-height: 0;
+    max-height: none;
+    overflow: auto;
+    gap: 6px;
+  }
+  .material-browser-item {
+    flex: 0 0 155px;
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+  .material-browser-item > svg {
+    display: none;
+  }
+  .material-browser-swatch {
+    width: 34px;
+    height: 42px;
+  }
+  .material-search {
+    padding: 12px 16px;
+  }
+  .material-tile-section {
+    padding: 18px;
+  }
+  .material-tile-heading h2 {
+    font-size: 26px;
+  }
+  .material-properties {
+    grid-column: 1;
+    display: block;
+  }
+  .material-scale-fields {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .material-model-preview {
+    height: 300px;
+  }
+}

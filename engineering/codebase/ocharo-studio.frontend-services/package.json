@@ -1,0 +1,25 @@
+{
+  "name": "ocharo-studio-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": ">=10 <11"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @ocharo-studio/web dev",
+    "dev-http": "pnpm --filter @ocharo-studio/web dev-http",
+    "typecheck": "pnpm --filter @ocharo-studio/web typecheck",
+    "build": "pnpm --filter @ocharo-studio/web build && node scripts/deploy.mjs",
+    "preview": "pnpm --filter @ocharo-studio/web preview",
+    "test": "pnpm --filter @ocharo-studio/web test",
+    "test:e2e": "pnpm --filter @ocharo-studio/web test:e2e",
+    "assets:sync": "pnpm --filter @ocharo-studio/web assets:sync",
+    "lint": "pnpm --filter @ocharo-studio/web lint",
+    "format:check": "pnpm --filter @ocharo-studio/web format:check",
+    "catalog:export": "pnpm --filter @ocharo-studio/web catalog:export",
+    "deploy": "pnpm build"
+  }
+}

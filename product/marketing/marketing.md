@@ -2,7 +2,7 @@
 
 *Last updated: 2026-09-25*
 
-Uzbek Studio is a working product name for a creative 3D clothing studio.
+Ocharo Studio is a working product name for a creative 3D clothing studio.
 No public positioning, brand affiliation, campaign, channel plan, or launch commitment is confirmed.
 Maftuna's catalogue is a design reference; this does not make the application an official Ocharo product.
 
