@@ -1,4 +1,4 @@
-import { Agent } from 'node:https';
+import { Agent } from "node:https";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import mkcert from "vite-plugin-mkcert";
@@ -9,7 +9,8 @@ import { readFileSync } from "node:fs";
 // root-relative (base: '/') and API calls use same-origin "/api/..." URLs.
 /** Keeps development proxy overrides on verified HTTPS endpoints. */
 function httpsTarget(value: string): string {
-  if (new URL(value).protocol !== 'https:') throw new Error('The development API target must use HTTPS.');
+  if (new URL(value).protocol !== "https:")
+    throw new Error("The development API target must use HTTPS.");
   return value;
 }
 
@@ -40,11 +41,17 @@ export default defineConfig(({ command }) => {
       strictPort: true,
       proxy: {
         "/api": {
-          target: httpsTarget(process.env.STUDIO_API_URL ?? "https://localhost:8260"),
+          target: httpsTarget(
+            process.env.STUDIO_API_URL ?? "https://localhost:8260",
+          ),
           changeOrigin: false,
           secure: true,
-          ...(command === 'serve' && process.env.VITE_API_CA_PATH
-            ? { agent: new Agent({ ca: readFileSync(process.env.VITE_API_CA_PATH) }) }
+          ...(command === "serve" && process.env.VITE_API_CA_PATH
+            ? {
+                agent: new Agent({
+                  ca: readFileSync(process.env.VITE_API_CA_PATH),
+                }),
+              }
             : {}),
         },
       },

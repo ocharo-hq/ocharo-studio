@@ -30,10 +30,12 @@ jobs:
           pnpm test
           pnpm build
           pnpm --filter @ocharo-studio/web exec playwright install --with-deps chromium
+      - name: Prepare trusted CI HTTPS
+        run: bash engineering/codebase/ocharo-studio.frontend-services/scripts/prepare-ci-https.sh
       - name: Verify browser workflows
         working-directory: engineering/codebase/ocharo-studio.frontend-services
         env:
-          STUDIO_URL: http://127.0.0.1:8262
+          STUDIO_URL: https://localhost:8262
         run: pnpm test:e2e
       - name: Verify host
         working-directory: engineering/codebase/ocharo-studio.backend-services
