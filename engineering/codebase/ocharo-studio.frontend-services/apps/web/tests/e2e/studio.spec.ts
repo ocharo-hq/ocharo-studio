@@ -1,4 +1,9 @@
-import { waitForStudioReady, test, expect } from "./fixtures/studioFixture";
+import {
+  waitForStudioReady,
+  test,
+  expect,
+  type Locator,
+} from "./fixtures/studioFixture";
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -264,18 +269,14 @@ test("keyboard navigation and automated accessibility checks pass", async ({
   await expect(page.getByRole("dialog")).toHaveCount(0);
 });
 
-test("canvas changes with materials and orbiting does not change selected parts", async ({
+test("canvas pixels change when a different material is selected", async ({
   page,
 }) => {
-  // Material loading and all 15 orbit steps render on the CI software GPU.
-  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/studio");
   await waitForStudioReady(page);
-  await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
-    timeout: 20_000,
-  });
   const canvas = page.locator(".viewport canvas");
-  const initial = await canvas.evaluate(canvasHash);
+  const initial = await stableCanvasHash(canvas);
   await page.getByRole("tab", { name: "Textiles" }).click();
   await page
     .getByRole("button", {
@@ -283,37 +284,118 @@ test("canvas changes with materials and orbiting does not change selected parts"
       exact: true,
     })
     .click();
-  await expect.poll(() => canvas.evaluate(canvasHash)).not.toBe(initial);
+  await expect
+    .poll(async () => (await canvas.evaluate(canvasSample)).hash)
+    .not.toBe(initial);
+});
+
+test("orbiting changes the view without changing the selected parts", async ({
+  page,
+}) => {
+  // Real pointer steps still render every view; camera animation has separate coverage.
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/studio");
+  await waitForStudioReady(page);
+  const canvas = page.locator(".viewport canvas");
   await partButton(page, "Lapel & collar").click();
   await page.getByRole("button", { name: "Fit garment" }).click();
-  const rect = await canvas.boundingBox();
-  expect(rect).not.toBeNull();
   await partButton(page, "Main panels").click();
   await expect(partButton(page, "Main panels")).toHaveAttribute(
     "aria-pressed",
     "true",
   );
-  const beforeOrbit = await canvas.evaluate(canvasHash);
-  await page.mouse.move(
-    rect!.x + rect!.width * 0.5,
-    rect!.y + rect!.height * 0.5,
-  );
+  const beforeOrbit = await stableCanvasHash(canvas);
+  const rect = await canvas.boundingBox();
+  expect(rect).not.toBeNull();
+  const start = {
+    x: rect!.x + rect!.width * 0.5,
+    y: rect!.y + rect!.height * 0.5,
+  };
+  const end = {
+    x: rect!.x + rect!.width * 0.7,
+    y: rect!.y + rect!.height * 0.52,
+  };
+  for (const point of [start, end])
+    expect(
+      await canvas.evaluate(
+        (node, point) => document.elementFromPoint(point.x, point.y) === node,
+        point,
+      ),
+      "The drag must target the canvas, not an overlaid control.",
+    ).toBe(true);
+  await canvas.evaluate((node) => {
+    for (const type of ["pointerdown", "pointermove", "pointerup"]) {
+      node.setAttribute(`data-review-${type}`, "0");
+      node.addEventListener(type, (event) => {
+        if (type === "pointermove" && !(event as PointerEvent).buttons) return;
+        const key = `data-review-${type}`;
+        node.setAttribute(key, String(Number(node.getAttribute(key)) + 1));
+      });
+    }
+  });
+  await page.mouse.move(start.x, start.y);
   await page.mouse.down();
-  await page.mouse.move(
-    rect!.x + rect!.width * 0.7,
-    rect!.y + rect!.height * 0.52,
-    { steps: 15 },
-  );
+  await page.mouse.move(end.x, end.y, { steps: 15 });
   await page.mouse.up();
+  const delivered = await canvas.evaluate((node) =>
+    Object.fromEntries(
+      ["pointerdown", "pointermove", "pointerup"].map((type) => [
+        type,
+        Number(node.getAttribute(`data-review-${type}`)),
+      ]),
+    ),
+  );
+  expect(delivered.pointerdown, JSON.stringify(delivered)).toBe(1);
+  expect(delivered.pointerup, JSON.stringify(delivered)).toBe(1);
+  expect(delivered.pointermove, JSON.stringify(delivered)).toBeGreaterThan(0);
   await expect(partButton(page, "Main panels")).toHaveAttribute(
     "aria-pressed",
     "true",
   );
-  await expect.poll(() => canvas.evaluate(canvasHash)).not.toBe(beforeOrbit);
+  await expect
+    .poll(async () => (await canvas.evaluate(canvasSample)).hash, {
+      message: `The view must change after the canvas drag: ${JSON.stringify(delivered)}; baseline=${beforeOrbit}`,
+    })
+    .not.toBe(beforeOrbit);
 });
 
-function canvasHash(node: Element): string {
-  // Hash the full view at thumbnail size; full-resolution export is covered separately.
+interface CanvasSample {
+  hash: string;
+  garmentCoverage: number;
+  tonalRange: number;
+}
+
+async function stableCanvasHash(canvas: Locator): Promise<string> {
+  let previous: CanvasSample | undefined;
+  await expect
+    .poll(
+      async () => {
+        await canvas.evaluate(
+          () =>
+            new Promise<void>((resolve) =>
+              requestAnimationFrame(() => resolve()),
+            ),
+        );
+        const current = await canvas.evaluate(canvasSample);
+        const visible =
+          current.garmentCoverage > 0.25 && current.tonalRange > 12;
+        const settled = visible && previous?.hash === current.hash;
+        previous = visible ? current : undefined;
+        return { visible, settled };
+      },
+      {
+        message:
+          "The garment must be visible and stable across animation frames.",
+      },
+    )
+    .toEqual({ visible: true, settled: true });
+  return previous!.hash;
+}
+
+function canvasSample(node: Element): CanvasSample {
+  // Hash the full view at thumbnail size; render tests cover full-size export.
   const sample = document.createElement("canvas");
   sample.width = 96;
   sample.height = 96;
@@ -323,5 +405,24 @@ function canvasHash(node: Element): string {
   const data = context.getImageData(0, 0, 96, 96).data;
   let hash = 2166136261;
   for (const value of data) hash = Math.imul(hash ^ value, 16777619);
-  return (hash >>> 0).toString(16);
+
+  // The centered torso must contain opaque detail, not a transparent canvas or floor shadow.
+  let opaque = 0;
+  let darkest = 255;
+  let lightest = 0;
+  for (let y = 24; y < 60; y++)
+    for (let x = 38; x < 58; x++) {
+      const offset = (y * 96 + x) * 4;
+      if (data[offset + 3]! < 200) continue;
+      opaque++;
+      const luminance =
+        (data[offset]! + data[offset + 1]! + data[offset + 2]!) / 3;
+      darkest = Math.min(darkest, luminance);
+      lightest = Math.max(lightest, luminance);
+    }
+  return {
+    hash: (hash >>> 0).toString(16),
+    garmentCoverage: opaque / (20 * 36),
+    tonalRange: opaque > 0 ? lightest - darkest : 0,
+  };
 }

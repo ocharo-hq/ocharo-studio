@@ -25,7 +25,7 @@ export default defineConfig({
           env: { DB_CONNECTION: "Data Source=appdata/studio-browser-tests.db" },
         },
         {
-          command: "pnpm dev --host localhost",
+          command: "pnpm preview --host localhost --port 8262 --strictPort",
           env: { STUDIO_API_URL: "https://localhost:8260" },
           url: "https://localhost:8262",
           timeout: 30000,

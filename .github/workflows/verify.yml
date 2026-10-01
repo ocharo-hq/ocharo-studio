@@ -44,7 +44,8 @@ jobs:
   browser:
     name: Browser (${{ matrix.shard }}/3)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Browser dependency installation can take ten minutes; tests keep their own bounded timeouts.
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:

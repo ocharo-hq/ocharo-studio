@@ -17,6 +17,7 @@ test("studio render produces a print-size image on the model and downloads it", 
   page,
 }, testInfo) => {
   test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1280, height: 800 });
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/studio");

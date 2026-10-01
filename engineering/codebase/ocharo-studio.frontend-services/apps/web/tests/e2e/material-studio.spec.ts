@@ -24,6 +24,8 @@ const remote = readRemote;
 test("material scale updates saved looks atomically and preserves placement through reload", async ({
   page,
 }) => {
+  // Includes shared material saves, undo and a cold editor reload.
+  test.setTimeout(120_000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/studio");

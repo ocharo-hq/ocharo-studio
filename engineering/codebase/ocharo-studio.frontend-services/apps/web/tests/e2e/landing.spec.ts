@@ -108,6 +108,8 @@ test("landing and studio navigation preserve the latest draft and support histor
 test("focused look names survive browser history and reload", async ({
   page,
 }) => {
+  // History and reload each remount the lazy 3D editor.
+  test.setTimeout(120_000);
   await suppressOnboarding(page);
   await page.goto("/");
   await page
