@@ -4,3 +4,5 @@ packages:
 onlyBuiltDependencies:
   - esbuild
   - vue-demi
+patchedDependencies:
+  '@wow-two-beta/ui-vue@0.0.9': patches/@wow-two-beta__ui-vue@0.0.9.patch

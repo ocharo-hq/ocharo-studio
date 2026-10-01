@@ -1,0 +1,12 @@
+diff --git a/dist/chunks/ToastHost.vue_vue_type_script_setup_true_lang-CYgoTrs1.js b/dist/chunks/ToastHost.vue_vue_type_script_setup_true_lang-CYgoTrs1.js
+index d2a67f3bd6e13039371e06c0c15be2e5cc97fd93..ce5f515198e0d30a61cde75935afc56da7c643e0 100644
+--- a/dist/chunks/ToastHost.vue_vue_type_script_setup_true_lang-CYgoTrs1.js
++++ b/dist/chunks/ToastHost.vue_vue_type_script_setup_true_lang-CYgoTrs1.js
+@@ -725,6 +725,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
+         default: withCtx(() => [
+           rendered.value.length > 0 ? (openBlock(), createElementBlock("div", {
+             key: 0,
++            role: "region",
+             "aria-label": unref(locale).t("ToastHost.notifications", void 0, "Notifications"),
+             style: normalizeStyle(stackStyle.value),
+             class: normalizeClass(stackClasses.value),
