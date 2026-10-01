@@ -32,10 +32,16 @@ async function openStudio(page: Page): Promise<Locator> {
 
 async function hash(canvas: Locator): Promise<string> {
   return canvas.evaluate((node) => {
-    const data = (node as HTMLCanvasElement).toDataURL();
+    // Read the full view at thumbnail size; render tests cover full-size export.
+    const sample = document.createElement("canvas");
+    sample.width = 96;
+    sample.height = 96;
+    const context = sample.getContext("2d", { willReadFrequently: true });
+    if (!context) throw new Error("Canvas readback is unavailable.");
+    context.drawImage(node as HTMLCanvasElement, 0, 0, 96, 96);
+    const data = context.getImageData(0, 0, 96, 96).data;
     let value = 2166136261;
-    for (let index = 0; index < data.length; index += 1)
-      value = Math.imul(value ^ data.charCodeAt(index), 16777619);
+    for (const byte of data) value = Math.imul(value ^ byte, 16777619);
     return (value >>> 0).toString(16);
   });
 }
@@ -67,7 +73,9 @@ async function waitForChangedFrame(
 test("camera presets animate to a stable shortest-route view", async ({
   page,
 }) => {
-  // Advance animation time explicitly so slow GPU readback cannot skip the intermediate frame.
+  // Software-rendered clock steps include every frame on the CI runner.
+  test.setTimeout(90_000);
+  // Advance time explicitly so slow readback cannot skip the intermediate frame.
   const startedAt = Date.now();
   await page.clock.install({ time: startedAt });
   const canvas = await openStudio(page);

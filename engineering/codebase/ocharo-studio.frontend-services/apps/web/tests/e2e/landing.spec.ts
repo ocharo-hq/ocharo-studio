@@ -40,12 +40,12 @@ test("landing introduces the studio without starting editor resources", async ({
   await page
     .getByRole("link", { name: "Open the studio", exact: true })
     .click();
-  await expect(page).toHaveURL(/\/studio$/);
+  await expect(page).toHaveURL(/\/studio$/, { timeout: 20_000 });
   await expect(
     page.getByRole("dialog", { name: "Welcome to Ocharo Studio." }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 20_000 });
   await page.getByRole("button", { name: "Skip", exact: true }).click();
-  await expect(page.locator(".viewport canvas")).toBeVisible();
+  await waitForStudioReady(page);
   await expect(page.locator(".scene-title")).toHaveCount(0);
   await expect(page.getByText("Tradition, reimagined.")).toHaveCount(0);
 });
@@ -78,6 +78,8 @@ test("landing and studio navigation preserve the latest draft and support histor
     "Tradition",
   );
   await page.goBack();
+  await waitForStudioReady(page);
+  await waitForStudioStorage(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "A new beginning",
   );
@@ -91,8 +93,10 @@ test("landing and studio navigation preserve the latest draft and support histor
   await page
     .getByRole("link", { name: "Open the studio", exact: true })
     .click();
+  await waitForStudioReady(page);
   await page.reload();
   await waitForStudioReady(page);
+  await waitForStudioStorage(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "A new beginning",
   );
@@ -109,6 +113,7 @@ test("focused look names survive browser history and reload", async ({
   await page
     .getByRole("link", { name: "Open the studio", exact: true })
     .click();
+  await waitForStudioReady(page);
 
   const name = page.getByRole("textbox", { name: "Look name" });
   await name.fill("Focused history draft");
@@ -118,12 +123,15 @@ test("focused look names survive browser history and reload", async ({
   await page
     .getByRole("link", { name: "Open the studio", exact: true })
     .click();
+  await waitForStudioReady(page);
+  await waitForStudioStorage(page);
   await expect(name).toHaveValue("Focused history draft");
 
   await name.fill("Focused reload draft");
   await expect(name).toBeFocused();
   await page.reload();
   await waitForStudioReady(page);
+  await waitForStudioStorage(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "Focused reload draft",
   );
@@ -177,6 +185,8 @@ test("studio waits for an in-flight save before navigating home", async ({
   await page
     .getByRole("link", { name: "Open the studio", exact: true })
     .click();
+  await waitForStudioReady(page);
+  await waitForStudioStorage(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "Wait for this save",
   );
@@ -344,6 +354,7 @@ test("edits made during initial storage loading survive leaving and reopening", 
   await page
     .getByRole("link", { name: "Open the studio", exact: true })
     .click();
+  await waitForStudioReady(page);
   await waitForStudioStorage(page);
   await expect(page.locator(".save-status-button")).not.toContainText(
     "Resolve",
@@ -353,6 +364,7 @@ test("edits made during initial storage loading survive leaving and reopening", 
   );
   await page.reload();
   await waitForStudioReady(page);
+  await waitForStudioStorage(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "Named while loading",
   );
