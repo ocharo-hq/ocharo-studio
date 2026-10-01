@@ -118,12 +118,34 @@ test("offline edits retry without claiming an acknowledged save", async ({
   );
 });
 
+async function skipAcknowledgedInvitation(page: Page, invitations: number) {
+  const acknowledged = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/studio/state") &&
+      response.request().method() === "PUT" &&
+      response.ok() &&
+      response.request().postDataJSON()?.settings?.onboarding?.invitations ===
+        invitations,
+    { timeout: 20_000 },
+  );
+  await page.getByRole("button", { name: "Skip", exact: true }).click();
+  await acknowledged;
+}
+
 test("storybook invites twice then remains inside settings", async ({
   page,
 }) => {
+  const initialWrite = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/studio/state") &&
+      response.request().method() === "PUT" &&
+      response.ok(),
+    { timeout: 20_000 },
+  );
   await page.goto("/studio");
   await waitForStudioReady(page);
-  await page.getByRole("button", { name: "Skip", exact: true }).click();
+  await initialWrite;
+  await skipAcknowledgedInvitation(page, 1);
   await expect(
     page.getByRole("button", { name: "Open studio guide", exact: true }),
   ).toBeVisible();
@@ -135,9 +157,18 @@ test("storybook invites twice then remains inside settings", async ({
     Date.now() - 13 * 60 * 60 * 1000,
   ).toISOString();
   await writeRemote(page, saved);
+  const hydrated = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/studio/state") &&
+      response.request().method() === "GET" &&
+      response.ok(),
+    { timeout: 20_000 },
+  );
   await page.reload();
   await waitForStudioReady(page);
-  await page.getByRole("button", { name: "Skip", exact: true }).click();
+  await hydrated;
+  await waitForStudioStorage(page);
+  await skipAcknowledgedInvitation(page, 2);
   await expect(page.locator(".guide-launcher")).toHaveCount(0);
   await expect
     .poll(async () => (await remote(page)).settings.onboarding?.invitations)

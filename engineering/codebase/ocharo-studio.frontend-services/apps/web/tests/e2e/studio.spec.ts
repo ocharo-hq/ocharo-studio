@@ -388,6 +388,7 @@ async function stableCanvasHash(canvas: Locator): Promise<string> {
       {
         message:
           "The garment must be visible and stable across animation frames.",
+        timeout: process.env.CI ? 45_000 : 20_000,
       },
     )
     .toEqual({ visible: true, settled: true });
