@@ -153,6 +153,8 @@ test("storybook invites twice then remains inside settings", async ({
 test("material and garment anchors persist independently with rotation and scale", async ({
   page,
 }) => {
+  // Multiple material edits and a cold reload render each state on the CI software GPU.
+  test.setTimeout(120_000);
   await page.addInitScript(() =>
     localStorage.setItem(
       "ocharo-studio:settings",

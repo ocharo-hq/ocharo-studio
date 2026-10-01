@@ -267,8 +267,8 @@ test("keyboard navigation and automated accessibility checks pass", async ({
 test("canvas changes with materials and orbiting does not change selected parts", async ({
   page,
 }) => {
-  // Material loading, full-canvas readback and a multi-frame orbit use software rendering in CI.
-  test.setTimeout(90_000);
+  // Material loading and all 15 orbit steps render on the CI software GPU.
+  test.setTimeout(120_000);
   await page.goto("/studio");
   await waitForStudioReady(page);
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
