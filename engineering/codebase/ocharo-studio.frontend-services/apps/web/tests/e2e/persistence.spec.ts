@@ -1,4 +1,5 @@
 import {
+  expectStudioResponse,
   waitForStudioReady,
   waitForStudioStorage,
   readRemote,
@@ -119,32 +120,25 @@ test("offline edits retry without claiming an acknowledged save", async ({
 });
 
 async function skipAcknowledgedInvitation(page: Page, invitations: number) {
-  const acknowledged = page.waitForResponse(
+  await expectStudioResponse(
+    page,
+    "PUT",
+    async () => {
+      await page.getByRole("button", { name: "Skip", exact: true }).click();
+    },
     (response) =>
-      response.url().endsWith("/api/studio/state") &&
-      response.request().method() === "PUT" &&
-      response.ok() &&
       response.request().postDataJSON()?.settings?.onboarding?.invitations ===
-        invitations,
-    { timeout: 20_000 },
+      invitations,
   );
-  await page.getByRole("button", { name: "Skip", exact: true }).click();
-  await acknowledged;
 }
 
 test("storybook invites twice then remains inside settings", async ({
   page,
 }) => {
-  const initialWrite = page.waitForResponse(
-    (response) =>
-      response.url().endsWith("/api/studio/state") &&
-      response.request().method() === "PUT" &&
-      response.ok(),
-    { timeout: 20_000 },
-  );
-  await page.goto("/studio");
-  await waitForStudioReady(page);
-  await initialWrite;
+  await expectStudioResponse(page, "PUT", async () => {
+    await page.goto("/studio");
+    await waitForStudioReady(page);
+  });
   await skipAcknowledgedInvitation(page, 1);
   await expect(
     page.getByRole("button", { name: "Open studio guide", exact: true }),
@@ -157,16 +151,10 @@ test("storybook invites twice then remains inside settings", async ({
     Date.now() - 13 * 60 * 60 * 1000,
   ).toISOString();
   await writeRemote(page, saved);
-  const hydrated = page.waitForResponse(
-    (response) =>
-      response.url().endsWith("/api/studio/state") &&
-      response.request().method() === "GET" &&
-      response.ok(),
-    { timeout: 20_000 },
-  );
-  await page.reload();
-  await waitForStudioReady(page);
-  await hydrated;
+  await expectStudioResponse(page, "GET", async () => {
+    await page.reload();
+    await waitForStudioReady(page);
+  });
   await waitForStudioStorage(page);
   await skipAcknowledgedInvitation(page, 2);
   await expect(page.locator(".guide-launcher")).toHaveCount(0);

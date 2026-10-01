@@ -1,5 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { test as base, expect, type Page } from "@playwright/test";
+import {
+  test as base,
+  expect,
+  type Page,
+  type Response,
+} from "@playwright/test";
 
 export { expect };
 export type { Page, Locator } from "@playwright/test";
@@ -148,4 +153,35 @@ export async function waitForStudioStorage(page: Page): Promise<void> {
     "Saving",
     { timeout: 20_000 },
   );
+}
+
+/** Observe startup responses immediately; start the acknowledgment budget after the action is ready. */
+export async function expectStudioResponse(
+  page: Page,
+  method: "GET" | "PUT",
+  action: () => Promise<void>,
+  matches: (response: Response) => boolean = () => true,
+): Promise<void> {
+  let acknowledged = false;
+  const onResponse = (response: Response) => {
+    if (
+      new URL(response.url()).pathname === "/api/studio/state" &&
+      response.request().method() === method &&
+      response.ok() &&
+      matches(response)
+    )
+      acknowledged = true;
+  };
+  page.on("response", onResponse);
+  try {
+    await action();
+    await expect
+      .poll(() => acknowledged, {
+        timeout: 20_000,
+        message: `Expected a successful matching ${method} /api/studio/state response.`,
+      })
+      .toBe(true);
+  } finally {
+    page.off("response", onResponse);
+  }
 }

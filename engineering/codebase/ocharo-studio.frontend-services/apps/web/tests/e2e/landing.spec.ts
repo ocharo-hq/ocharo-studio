@@ -1,4 +1,5 @@
 import {
+  expectStudioResponse,
   waitForStudioReady,
   waitForStudioStorage,
   test,
@@ -56,17 +57,10 @@ test("landing and studio navigation preserve the latest draft and support histor
   // This roundtrip remounts the lazy editor several times on the software-rendered runner.
   test.setTimeout(120_000);
   await suppressOnboarding(page);
-  // A fresh workspace writes its initial draft after the lazy editor mounts.
-  const initialSave = page.waitForResponse(
-    (response) =>
-      new URL(response.url()).pathname === "/api/studio/state" &&
-      response.request().method() === "PUT" &&
-      response.ok(),
-    { timeout: 20_000 },
-  );
-  await page.goto("/studio");
-  await waitForStudioReady(page);
-  await initialSave;
+  await expectStudioResponse(page, "PUT", async () => {
+    await page.goto("/studio");
+    await waitForStudioReady(page);
+  });
   await waitForStudioStorage(page);
   await page.getByRole("slider", { name: "Rotation", exact: true }).fill("65");
   await page
@@ -143,17 +137,10 @@ test("studio waits for an in-flight save before navigating home", async ({
   page,
 }) => {
   await suppressOnboarding(page);
-  // A fresh workspace writes its initial draft after the lazy editor mounts.
-  const initialSave = page.waitForResponse(
-    (response) =>
-      new URL(response.url()).pathname === "/api/studio/state" &&
-      response.request().method() === "PUT" &&
-      response.ok(),
-    { timeout: 20_000 },
-  );
-  await page.goto("/studio");
-  await waitForStudioReady(page);
-  await initialSave;
+  await expectStudioResponse(page, "PUT", async () => {
+    await page.goto("/studio");
+    await waitForStudioReady(page);
+  });
   await waitForStudioStorage(page);
 
   let releaseWrite: (() => void) | undefined;
@@ -312,17 +299,10 @@ test("edits made during initial storage loading survive leaving and reopening", 
   // This roundtrip remounts the lazy editor several times on the software-rendered runner.
   test.setTimeout(120_000);
   await suppressOnboarding(page);
-  // A fresh workspace writes its initial draft after the lazy editor mounts.
-  const initialSave = page.waitForResponse(
-    (response) =>
-      new URL(response.url()).pathname === "/api/studio/state" &&
-      response.request().method() === "PUT" &&
-      response.ok(),
-    { timeout: 20_000 },
-  );
-  await page.goto("/studio");
-  await waitForStudioReady(page);
-  await initialSave;
+  await expectStudioResponse(page, "PUT", async () => {
+    await page.goto("/studio");
+    await waitForStudioReady(page);
+  });
   await waitForStudioStorage(page);
   await page.getByRole("link", { name: "Ocharo Studio home" }).click();
 
