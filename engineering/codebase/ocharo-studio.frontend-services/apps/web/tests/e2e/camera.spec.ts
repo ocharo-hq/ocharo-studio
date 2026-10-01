@@ -1,4 +1,5 @@
 import {
+  waitForStudioReady,
   expect,
   test,
   type Locator,
@@ -18,6 +19,7 @@ test.beforeEach(async ({ page }) => {
 
 async function openStudio(page: Page): Promise<Locator> {
   await page.goto("/studio");
+  await waitForStudioReady(page);
   const canvas = page.locator(".viewport canvas");
   await expect(canvas).toBeVisible({ timeout: 20_000 });
   // The lazy editor must mount before absence of its loading overlay means ready.
@@ -65,18 +67,23 @@ async function waitForChangedFrame(
 test("camera presets animate to a stable shortest-route view", async ({
   page,
 }) => {
+  // Advance animation time explicitly so slow GPU readback cannot skip the intermediate frame.
+  const startedAt = Date.now();
+  await page.clock.install({ time: startedAt });
   const canvas = await openStudio(page);
-  const front = await waitForStableFrame(canvas);
+  await waitForStableFrame(canvas);
+  await page.clock.pauseAt(startedAt + 60_000);
+  const front = await hash(canvas);
 
   await page.getByRole("button", { name: "back", exact: true }).click();
-  await page.waitForTimeout(120);
+  await page.clock.runFor(120);
   const middle = await hash(canvas);
   expect(middle).not.toBe(front);
 
-  await page.waitForTimeout(450);
-  const back = await waitForStableFrame(canvas);
+  await page.clock.runFor(450);
+  const back = await hash(canvas);
   expect(back).not.toBe(middle);
-  await page.waitForTimeout(150);
+  await page.clock.runFor(150);
   expect(await hash(canvas)).toBe(back);
 });
 

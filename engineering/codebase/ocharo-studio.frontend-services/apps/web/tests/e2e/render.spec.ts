@@ -1,6 +1,6 @@
+import { waitForStudioReady, expect, test } from "./fixtures/studioFixture";
 import { readFile } from "node:fs/promises";
 import { expectNeutralShadows } from "./fixtures/imageReview";
-import { expect, test } from "./fixtures/studioFixture";
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -20,6 +20,7 @@ test("studio render produces a print-size image on the model and downloads it", 
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
     timeout: 20_000,
   });

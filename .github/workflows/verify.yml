@@ -77,9 +77,9 @@ jobs:
         env:
           STUDIO_URL: https://localhost:8262
           SHARD: ${{ matrix.shard }}
-        # Each runner keeps a single browser worker for software rendering.
+        # Split isolated tests evenly; each runner keeps one software-rendering worker.
         # All shards are required; no retries or test exclusions mask failures.
-        run: pnpm --filter @ocharo-studio/web exec playwright test --workers=1 --shard="$SHARD/3"
+        run: pnpm --filter @ocharo-studio/web exec playwright test --fully-parallel --workers=1 --shard="$SHARD/3"
 
   verify:
     name: verify

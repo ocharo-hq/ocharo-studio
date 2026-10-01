@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures/studioFixture";
+import { waitForStudioReady, test, expect } from "./fixtures/studioFixture";
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -34,9 +34,12 @@ function partButton(
 test("designs remain independent, editable, saved and portable", async ({
   page,
 }) => {
+  // Includes a reload, garment replacement, editable-file roundtrip and full-size PNG export.
+  test.setTimeout(120_000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
     timeout: 20_000,
   });
@@ -88,6 +91,7 @@ test("designs remain independent, editable, saved and portable", async ({
   ).toBeVisible();
   await expect(page.locator(".save-status-button")).toContainText("Saved");
   await page.reload();
+  await waitForStudioReady(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "Indigo garden",
   );
@@ -134,6 +138,7 @@ for (const name of ["Nimcha", "Baska", "Kostyum", "Korset", "Abaya"]) {
         failedAssets.push(response.url());
     });
     await page.goto("/studio");
+    await waitForStudioReady(page);
     await page
       .getByRole("button", { name: new RegExp(`\\d+ ${name} The`) })
       .click();
@@ -176,6 +181,7 @@ test("responsive studio and dark theme keep controls reachable", async ({
   page,
 }) => {
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await setTheme(page, "dark");
   await expect(page.locator("html")).toHaveClass("dark");
   await page.evaluate(() =>
@@ -215,6 +221,7 @@ test("keyboard navigation and automated accessibility checks pass", async ({
 }) => {
   const { default: AxeBuilder } = await import("@axe-core/playwright");
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
     timeout: 20_000,
   });
@@ -263,6 +270,7 @@ test("canvas changes with materials and orbiting does not change selected parts"
   // Material loading, full-canvas readback and a multi-frame orbit use software rendering in CI.
   test.setTimeout(90_000);
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
     timeout: 20_000,
   });
@@ -305,9 +313,15 @@ test("canvas changes with materials and orbiting does not change selected parts"
 });
 
 function canvasHash(node: Element): string {
-  const data = (node as HTMLCanvasElement).toDataURL();
+  // Hash the full view at thumbnail size; full-resolution export is covered separately.
+  const sample = document.createElement("canvas");
+  sample.width = 96;
+  sample.height = 96;
+  const context = sample.getContext("2d", { willReadFrequently: true });
+  if (!context) throw new Error("Canvas readback is unavailable.");
+  context.drawImage(node as HTMLCanvasElement, 0, 0, 96, 96);
+  const data = context.getImageData(0, 0, 96, 96).data;
   let hash = 2166136261;
-  for (let i = 0; i < data.length; i++)
-    hash = Math.imul(hash ^ data.charCodeAt(i), 16777619);
+  for (const value of data) hash = Math.imul(hash ^ value, 16777619);
   return (hash >>> 0).toString(16);
 }

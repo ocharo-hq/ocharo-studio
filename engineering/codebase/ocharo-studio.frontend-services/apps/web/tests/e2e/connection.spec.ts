@@ -1,3 +1,4 @@
+import { waitForStudioReady } from "./fixtures/studioFixture";
 import { expectNeutralShadows } from "./fixtures/imageReview";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdir, readFile } from "node:fs/promises";
@@ -26,11 +27,13 @@ test("browser-only designs survive reload without requesting private storage", a
       storageRequests.push(request.url());
   });
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.locator(".viewport canvas")).toBeVisible();
   await page
     .getByRole("textbox", { name: "Look name" })
     .fill("Browser recovery review");
   await page.reload();
+  await waitForStudioReady(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "Browser recovery review",
   );
@@ -111,6 +114,7 @@ test("ticket fragment is cleared and expired access preserves browser recovery",
     issuer: process.env.VITE_OCHARO_PLATFORM_ORIGIN ?? "https://localhost:8264",
   });
   await page.goto(`/studio#${fragment}`);
+  await waitForStudioReady(page);
   await expect(page).toHaveURL(/\/studio$/);
   await expect.poll(() => writes).toBeGreaterThan(0);
   await page
@@ -135,6 +139,7 @@ test("ticket fragment is cleared and expired access preserves browser recovery",
     .fill("Recover after expired access");
   await expect(page.locator(".save-status-button")).toContainText("Offline");
   await page.reload();
+  await waitForStudioReady(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "Recover after expired access",
   );
@@ -154,6 +159,7 @@ test("review files preserve the rendered PNG hash and immutable source release",
       externalWrites.push(request.url());
   });
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
     timeout: 20_000,
   });

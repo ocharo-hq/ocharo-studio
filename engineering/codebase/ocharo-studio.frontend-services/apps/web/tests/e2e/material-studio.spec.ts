@@ -1,5 +1,11 @@
-import { readRemote } from "./fixtures/studioFixture";
-import { test, expect, type Page } from "./fixtures/studioFixture";
+import {
+  waitForStudioReady,
+  waitForStudioStorage,
+  readRemote,
+  test,
+  expect,
+  type Page,
+} from "./fixtures/studioFixture";
 import AxeBuilder from "@axe-core/playwright";
 
 test.beforeEach(async ({ page }) => {
@@ -21,7 +27,8 @@ test("material scale updates saved looks atomically and preserves placement thro
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/studio");
-  await expect(page.locator(".save-status-button")).not.toContainText("Saving");
+  await waitForStudioReady(page);
+  await waitForStudioStorage(page);
   await page.getByRole("textbox", { name: "Look name" }).fill("Shared atlas");
   await page.getByRole("slider", { name: "Rotation", exact: true }).fill("35");
   await page
@@ -82,6 +89,7 @@ test("material scale updates saved looks atomically and preserves placement thro
     .getByRole("button", { name: "Material Studio", exact: true })
     .click();
   await page.reload();
+  await waitForStudioReady(page);
   await expect(
     page.getByRole("slider", { name: "Material scale", exact: true }),
   ).toHaveValue("1.75");
@@ -97,7 +105,8 @@ test("material preview cancellation protects drafts across selection and browser
     await dialog.dismiss();
   });
   await page.goto("/studio");
-  await expect(page.locator(".save-status-button")).not.toContainText("Saving");
+  await waitForStudioReady(page);
+  await waitForStudioStorage(page);
   const before = await remote(page);
   await page
     .getByRole("button", { name: "Material Studio", exact: true })
@@ -141,6 +150,7 @@ test("Material Studio direct routes, solids, tablet and phone controls remain ac
   page,
 }) => {
   await page.goto("/materials");
+  await waitForStudioReady(page);
   await expect(page).toHaveURL(/\/studio\/materials$/);
   await expect(
     page.getByRole("heading", { name: "Material Studio", exact: true }),

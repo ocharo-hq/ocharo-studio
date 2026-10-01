@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures/studioFixture";
+import { waitForStudioReady, test, expect } from "./fixtures/studioFixture";
 
 for (const width of [1440, 390, 320]) {
   test(`interactive guide reaches real controls at ${width}px`, async ({
@@ -6,6 +6,7 @@ for (const width of [1440, 390, 320]) {
   }) => {
     await page.setViewportSize({ width, height: width === 1440 ? 1000 : 844 });
     await page.goto("/studio");
+    await waitForStudioReady(page);
     await page.getByRole("button", { name: "Start", exact: true }).click();
     let tour = page.getByRole("dialog", { name: "Start a new design" });
     await expect(tour).toBeVisible();
@@ -74,6 +75,7 @@ test("guide Escape restores editor access and can reopen from Settings", async (
   page,
 }) => {
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await expect(page.locator("[data-tour-popover]")).toBeVisible();
   await page.keyboard.press("Escape");
@@ -92,6 +94,7 @@ test("canvas tools, navigation hint and guide remain separate on small screens",
   page,
 }) => {
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await page.getByRole("button", { name: "Skip", exact: true }).click();
   for (const viewport of [
     { width: 820, height: 1024 },

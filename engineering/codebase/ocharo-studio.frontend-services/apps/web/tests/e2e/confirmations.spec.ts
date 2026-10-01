@@ -1,4 +1,4 @@
-import { expect, test } from "./fixtures/studioFixture";
+import { waitForStudioReady, expect, test } from "./fixtures/studioFixture";
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -18,6 +18,7 @@ test("SDK confirmation cancels safely, restores focus, and accepts deletion", as
   const nativeDialogs: string[] = [];
   page.on("dialog", (dialog) => nativeDialogs.push(dialog.type()));
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.locator(".viewport canvas")).toBeVisible();
   const save = page.locator(".save-status-button");
   await expect(save).toBeEnabled();

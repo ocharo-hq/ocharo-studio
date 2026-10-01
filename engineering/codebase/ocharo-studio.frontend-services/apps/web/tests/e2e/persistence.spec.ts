@@ -1,14 +1,22 @@
-import { readRemote, writeRemote } from "./fixtures/studioFixture";
-import { test, expect, type Page } from "./fixtures/studioFixture";
+import {
+  waitForStudioReady,
+  waitForStudioStorage,
+  readRemote,
+  writeRemote,
+  test,
+  expect,
+  type Page,
+} from "./fixtures/studioFixture";
 
 async function load(page: Page) {
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.locator(".viewport canvas")).toBeVisible({
     timeout: 20_000,
   });
   const skip = page.getByRole("button", { name: "Skip", exact: true });
   if (await skip.isVisible({ timeout: 2000 })) await skip.click();
-  await expect(page.locator(".save-status-button")).not.toContainText("Saving");
+  await waitForStudioStorage(page);
 }
 const remote = readRemote;
 
@@ -41,6 +49,7 @@ test("conflicted tabs keep separate recovery drafts across reloads", async ({
   await other.getByRole("slider", { name: "Rotation", exact: true }).fill("90");
   await expect(other.locator(".save-status-button")).toContainText("Resolve");
   await other.reload();
+  await waitForStudioReady(other);
   await expect(other.locator(".save-status-button")).toContainText("Resolve");
   await expect(
     other.getByRole("slider", { name: "Rotation", exact: true }),
@@ -92,6 +101,7 @@ test("offline edits retry without claiming an acknowledged save", async ({
   );
   const recoveryFailure = failedWrite();
   await page.reload();
+  await waitForStudioReady(page);
   await recoveryFailure;
   await expect(
     page.getByRole("slider", { name: "Rotation", exact: true }),
@@ -112,6 +122,7 @@ test("storybook invites twice then remains inside settings", async ({
   page,
 }) => {
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await page.getByRole("button", { name: "Skip", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Open studio guide", exact: true }),
@@ -125,12 +136,14 @@ test("storybook invites twice then remains inside settings", async ({
   ).toISOString();
   await writeRemote(page, saved);
   await page.reload();
+  await waitForStudioReady(page);
   await page.getByRole("button", { name: "Skip", exact: true }).click();
   await expect(page.locator(".guide-launcher")).toHaveCount(0);
   await expect
     .poll(async () => (await remote(page)).settings.onboarding?.invitations)
     .toBe(2);
   await page.reload();
+  await waitForStudioReady(page);
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await page.getByRole("button", { name: /Open studio guide/ }).click();
@@ -186,6 +199,7 @@ test("material and garment anchors persist independently with rotation and scale
   expect(placement.materialAnchorX).toBeGreaterThan(0.5);
   expect(placement.materialAnchorY).toBeGreaterThan(0.5);
   await page.reload();
+  await waitForStudioReady(page);
   await expect(
     page.getByRole("slider", { name: "Material scale", exact: true }),
   ).toHaveValue("1.5");

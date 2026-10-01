@@ -1,5 +1,10 @@
+import {
+  waitForStudioReady,
+  expect,
+  test,
+  type Page,
+} from "./fixtures/studioFixture";
 import { readFile } from "node:fs/promises";
-import { expect, test, type Page } from "./fixtures/studioFixture";
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -11,6 +16,7 @@ test.beforeEach(async ({ page }) => {
     );
   });
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
     timeout: 20_000,
   });

@@ -1,4 +1,9 @@
-import { test, expect } from "./fixtures/studioFixture";
+import {
+  waitForStudioReady,
+  waitForStudioStorage,
+  test,
+  expect,
+} from "./fixtures/studioFixture";
 import AxeBuilder from "@axe-core/playwright";
 
 async function suppressOnboarding(
@@ -48,6 +53,8 @@ test("landing introduces the studio without starting editor resources", async ({
 test("landing and studio navigation preserve the latest draft and support history", async ({
   page,
 }) => {
+  // This roundtrip remounts the lazy editor several times on the software-rendered runner.
+  test.setTimeout(120_000);
   await suppressOnboarding(page);
   // A fresh workspace writes its initial draft after the lazy editor mounts.
   const initialSave = page.waitForResponse(
@@ -58,8 +65,9 @@ test("landing and studio navigation preserve the latest draft and support histor
     { timeout: 20_000 },
   );
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await initialSave;
-  await expect(page.locator(".save-status-button")).not.toContainText("Saving");
+  await waitForStudioStorage(page);
   await page.getByRole("slider", { name: "Rotation", exact: true }).fill("65");
   await page
     .getByRole("textbox", { name: "Look name" })
@@ -84,6 +92,7 @@ test("landing and studio navigation preserve the latest draft and support histor
     .getByRole("link", { name: "Open the studio", exact: true })
     .click();
   await page.reload();
+  await waitForStudioReady(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "A new beginning",
   );
@@ -114,6 +123,7 @@ test("focused look names survive browser history and reload", async ({
   await name.fill("Focused reload draft");
   await expect(name).toBeFocused();
   await page.reload();
+  await waitForStudioReady(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "Focused reload draft",
   );
@@ -132,8 +142,9 @@ test("studio waits for an in-flight save before navigating home", async ({
     { timeout: 20_000 },
   );
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await initialSave;
-  await expect(page.locator(".save-status-button")).not.toContainText("Saving");
+  await waitForStudioStorage(page);
 
   let releaseWrite: (() => void) | undefined;
   const release = new Promise<void>((resolve) => {
@@ -272,6 +283,7 @@ test("direct editor routes, legacy URLs and missing pages remain distinct", asyn
   page,
 }) => {
   await page.goto("/editor");
+  await waitForStudioReady(page);
   await expect(page).toHaveURL(/\/studio$/);
   await expect(page.locator(".viewport canvas")).toBeVisible();
   await page.goto("/not-a-studio-page");
@@ -285,6 +297,8 @@ test("direct editor routes, legacy URLs and missing pages remain distinct", asyn
 test("edits made during initial storage loading survive leaving and reopening", async ({
   page,
 }) => {
+  // This roundtrip remounts the lazy editor several times on the software-rendered runner.
+  test.setTimeout(120_000);
   await suppressOnboarding(page);
   // A fresh workspace writes its initial draft after the lazy editor mounts.
   const initialSave = page.waitForResponse(
@@ -295,8 +309,9 @@ test("edits made during initial storage loading survive leaving and reopening", 
     { timeout: 20_000 },
   );
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await initialSave;
-  await expect(page.locator(".save-status-button")).not.toContainText("Saving");
+  await waitForStudioStorage(page);
   await page.getByRole("link", { name: "Ocharo Studio home" }).click();
 
   let releaseRead!: () => void;
@@ -329,7 +344,7 @@ test("edits made during initial storage loading survive leaving and reopening", 
   await page
     .getByRole("link", { name: "Open the studio", exact: true })
     .click();
-  await expect(page.locator(".save-status-button")).not.toContainText("Saving");
+  await waitForStudioStorage(page);
   await expect(page.locator(".save-status-button")).not.toContainText(
     "Resolve",
   );
@@ -337,6 +352,7 @@ test("edits made during initial storage loading survive leaving and reopening", 
     "Named while loading",
   );
   await page.reload();
+  await waitForStudioReady(page);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "Named while loading",
   );
@@ -358,6 +374,7 @@ test("failed lazy editor imports expose a recoverable route error", async ({
   );
   await page.unroute(editorModule);
   await page.getByRole("link", { name: "Open studio", exact: true }).click();
+  await waitForStudioReady(page);
   await expect(page).toHaveURL(/\/studio$/);
   await expect(page.locator(".viewport canvas")).toBeVisible();
 });

@@ -119,3 +119,32 @@ export async function writeRemote(page: Page, state: Record<string, unknown>) {
     return response.json();
   }, state);
 }
+
+/** A cold Vite entry or reload must mount the lazy editor before absence means ready. */
+export async function waitForStudioReady(page: Page): Promise<void> {
+  if (
+    ["/materials", "/studio/materials"].includes(new URL(page.url()).pathname)
+  ) {
+    await expect(
+      page.getByRole("heading", { name: "Material Studio", exact: true }),
+    ).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator(".material-model-preview canvas")).toBeVisible({
+      timeout: 20_000,
+    });
+    return;
+  }
+  await expect(page.locator(".viewport canvas")).toBeVisible({
+    timeout: 20_000,
+  });
+  await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
+    timeout: 20_000,
+  });
+}
+
+/** Wait for initial storage only; later edits use the default assertion budget. */
+export async function waitForStudioStorage(page: Page): Promise<void> {
+  await expect(page.locator(".save-status-button")).not.toContainText(
+    "Saving",
+    { timeout: 20_000 },
+  );
+}

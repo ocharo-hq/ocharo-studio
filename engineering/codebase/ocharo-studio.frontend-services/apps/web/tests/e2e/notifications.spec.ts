@@ -1,4 +1,4 @@
-import { expect, test } from "./fixtures/studioFixture";
+import { waitForStudioReady, expect, test } from "./fixtures/studioFixture";
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -15,6 +15,7 @@ test("route focus and notifications preserve the header separator", async ({
   page,
 }) => {
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.locator(".viewport canvas")).toBeVisible();
   await expect(page.locator(".workspace")).toBeFocused();
   await expect(page.locator(".workspace")).toHaveCSS("outline-style", "none");
@@ -39,6 +40,7 @@ test("phone header actions remain clear of the design name input", async ({
   page,
 }) => {
   await page.goto("/studio");
+  await waitForStudioReady(page);
   await expect(page.locator(".viewport canvas")).toBeVisible();
 
   const actionNames = [
