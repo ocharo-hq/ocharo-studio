@@ -115,7 +115,8 @@ test("group edits stay coherent and New preserves a meaningful draft", async ({
   await page.getByRole("textbox", { name: "Look name" }).fill("Grouped draft");
   const previousId = await exportedId(page);
   // Keep the notification lifetime independent of software-GPU wall time.
-  await page.clock.pauseAt(await page.evaluate(() => Date.now()));
+  // Exceed the remaining test budget so protocol latency cannot move the target into the past.
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 120_000));
   const preservationToast = page
     .locator(".studio-toasts")
     .getByText("Previous draft kept in My looks. New design ready.", {

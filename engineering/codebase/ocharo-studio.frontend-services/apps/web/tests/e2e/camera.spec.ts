@@ -80,7 +80,8 @@ test("camera presets animate to a stable shortest-route view", async ({
   await page.clock.install({ time: startedAt });
   const canvas = await openStudio(page);
   await waitForStableFrame(canvas);
-  await page.clock.pauseAt(startedAt + 60_000);
+  // Keep the pause target beyond the remaining test budget and protocol latency.
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 120_000));
   const front = await hash(canvas);
 
   await page.getByRole("button", { name: "back", exact: true }).click();
