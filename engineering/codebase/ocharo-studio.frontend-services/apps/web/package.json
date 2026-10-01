@@ -6,7 +6,6 @@
   "description": "Vue UI for Ocharo Studio, served from its .NET API host in production.",
   "scripts": {
     "dev": "vite",
-    "dev-http": "VITE_HTTPS=false vite",
     "typecheck": "vue-tsc -b && node scripts/check-sfc.mjs",
     "build": "pnpm typecheck && vite build",
     "preview": "vite preview",

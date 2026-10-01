@@ -4,8 +4,8 @@ export default defineConfig({
   timeout: 45_000,
   fullyParallel: false,
   use: {
-    baseURL: process.env.STUDIO_URL ?? "https://127.0.0.1:8262",
-    ignoreHTTPSErrors: true,
+    baseURL: process.env.STUDIO_URL ?? "https://localhost:8262",
+    ignoreHTTPSErrors: false,
     viewport: { width: 1440, height: 1000 },
     browserName: "chromium",
     launchOptions: {
@@ -19,15 +19,15 @@ export default defineConfig({
     ? [
         {
           command:
-            "dotnet run --project ../../../ocharo-studio.backend-services/OcharoStudio.Api --no-launch-profile -p:BuildSpa=false --urls http://127.0.0.1:8261",
-          url: "http://127.0.0.1:8261/health",
+            "dotnet run --project ../../../ocharo-studio.backend-services/OcharoStudio.Api --no-launch-profile -p:BuildSpa=false --urls https://localhost:8260",
+          url: "https://localhost:8260/health",
           timeout: 120000,
           env: { DB_CONNECTION: "Data Source=appdata/studio-browser-tests.db" },
         },
         {
-          command: "pnpm dev-http --host 127.0.0.1",
-          env: { STUDIO_API_URL: "http://127.0.0.1:8261" },
-          url: "http://127.0.0.1:8262",
+          command: "pnpm dev --host localhost",
+          env: { STUDIO_API_URL: "https://localhost:8260" },
+          url: "https://localhost:8262",
           timeout: 30000,
         },
       ]

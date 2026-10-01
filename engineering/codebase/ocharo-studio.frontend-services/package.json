@@ -10,7 +10,6 @@
   },
   "scripts": {
     "dev": "pnpm --filter @ocharo-studio/web dev",
-    "dev-http": "pnpm --filter @ocharo-studio/web dev-http",
     "typecheck": "pnpm --filter @ocharo-studio/web typecheck",
     "build": "pnpm --filter @ocharo-studio/web build && node scripts/deploy.mjs",
     "preview": "pnpm --filter @ocharo-studio/web preview",

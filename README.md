@@ -59,8 +59,8 @@ pnpm dev
 
 Normal development uses HTTPS at `https://localhost:8262` and proxies the API at `https://localhost:8260`.
 Open `/` for the landing page and `/studio` for the editor. The legacy `/editor` URL redirects to `/studio`.
-The backend also binds `http://localhost:8261`. Accept native certificate setup only through the user-controlled trust prompt.
-The explicit `pnpm dev-http` profile supports browser-only previews; connected state requires HTTPS.
+The backend binds only HTTPS. Accept native certificate setup only through the user-controlled trust prompt.
+Browser-only previews also use HTTPS; see the workspace certificate setup when the API proxy reports a trust error.
 The [operations guide](engineering/operations/operations.md) describes isolated review ports and trusted certificates.
 
 The browser suite uses an authenticated, isolated test transport for persistence and conflict workflows.

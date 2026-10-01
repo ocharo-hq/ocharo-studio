@@ -1,3 +1,4 @@
+import { Agent } from 'node:https';
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import mkcert from "vite-plugin-mkcert";
@@ -6,9 +7,14 @@ import { readFileSync } from "node:fs";
 
 // The SPA is served from the .NET host's wwwroot in production, so asset paths are
 // root-relative (base: '/') and API calls use same-origin "/api/..." URLs.
-// Normal development uses HTTPS; the explicit headless profile uses HTTP for previewing.
+/** Keeps development proxy overrides on verified HTTPS endpoints. */
+function httpsTarget(value: string): string {
+  if (new URL(value).protocol !== 'https:') throw new Error('The development API target must use HTTPS.');
+  return value;
+}
+
 export default defineConfig(({ command }) => {
-  const useHttps = command === "serve" && process.env.VITE_HTTPS !== "false";
+  const useHttps = command === "serve";
   const certFile = process.env.STUDIO_TLS_CERT;
   const keyFile = process.env.STUDIO_TLS_KEY;
   if (useHttps && Boolean(certFile) !== Boolean(keyFile))
@@ -34,9 +40,12 @@ export default defineConfig(({ command }) => {
       strictPort: true,
       proxy: {
         "/api": {
-          target: process.env.STUDIO_API_URL ?? "https://localhost:8260",
+          target: httpsTarget(process.env.STUDIO_API_URL ?? "https://localhost:8260"),
           changeOrigin: false,
           secure: true,
+          ...(command === 'serve' && process.env.VITE_API_CA_PATH
+            ? { agent: new Agent({ ca: readFileSync(process.env.VITE_API_CA_PATH) }) }
+            : {}),
         },
       },
     },
