@@ -1,7 +1,9 @@
 import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests/e2e",
-  timeout: 45_000,
+  // Software rendering makes multi-step browser flows slower on hosted Linux runners.
+  // The default five-second behavior assertion budget is unchanged.
+  timeout: process.env.CI ? 120_000 : 45_000,
   fullyParallel: false,
   use: {
     baseURL: process.env.STUDIO_URL ?? "https://localhost:8262",

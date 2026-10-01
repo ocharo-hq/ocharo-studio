@@ -136,8 +136,9 @@ export async function waitForStudioReady(page: Page): Promise<void> {
   await expect(page.locator(".viewport canvas")).toBeVisible({
     timeout: 20_000,
   });
+  // Cold model/shader preparation is slower on the CI software GPU.
   await expect(page.getByText("Preparing the studio…")).toHaveCount(0, {
-    timeout: 20_000,
+    timeout: process.env.CI ? 45_000 : 20_000,
   });
 }
 
