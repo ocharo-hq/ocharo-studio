@@ -42,6 +42,10 @@ export function useStudioPersistence(
       storage.read("ocharo-studio:settings") ??
       {},
   );
+  // Desired browser drafts remain recoverable; the library contains acknowledged reads only.
+  const confirmedLooks = shallowRef(recovery?.pending ? [] : state.value.looks);
+  const refreshingLooks = shallowRef(false);
+  let projectionRead = 0;
   const ready = shallowRef(false);
   const attempt = shallowRef(0);
   let queue: StudioSyncQueue | null = null;
@@ -95,6 +99,8 @@ export function useStudioPersistence(
       onCleanup(() => {
         active = false;
         abort.abort();
+        projectionRead += 1;
+        refreshingLooks.value = false;
         queue?.stop();
       });
       void server
@@ -119,6 +125,7 @@ export function useStudioPersistence(
             return;
           }
           boundWorkspace = incomingWorkspace ?? boundWorkspace;
+          confirmedLooks.value = result.looks;
           const editedDuringLoad = snapshot.value !== initial;
           const hasPending = metadata?.pending === true || editedDuringLoad;
           if (
@@ -179,20 +186,27 @@ export function useStudioPersistence(
                 state.value = {
                   ...state.value,
                   notice:
-                    error.message +
+                    "Studio changes could not sync. Your browser recovery is preserved; retry from Settings." +
                     (cacheError
                       ? " Browser recovery storage also failed; export your design now."
                       : ""),
                 };
-              if (
-                status === "synced" &&
-                caughtUp &&
-                state.value.notice === "Saving look…"
-              )
-                state.value = {
-                  ...state.value,
-                  notice: "Look saved to the studio.",
-                };
+              if (status === "synced" && caughtUp && acknowledged !== undefined) {
+                const request = ++projectionRead;
+                refreshingLooks.value = true;
+                void server.read(abort.signal).then(current => {
+                  if (!active || request !== projectionRead) return;
+                  if (current.revision < acknowledged) throw new Error("The saved library is not current.");
+                  confirmedLooks.value = current.looks;
+                  if (state.value.notice === "Saving look…")
+                    state.value = { ...state.value, notice: "Look saved to the studio." };
+                }).catch(() => {
+                  if (active && request === projectionRead)
+                    state.value = { ...state.value, notice: "The saved look library could not refresh. Your browser recovery is preserved; retry from Settings." };
+                }).finally(() => {
+                  if (active && request === projectionRead) refreshingLooks.value = false;
+                });
+              }
             },
           );
           ready.value = true;
@@ -204,14 +218,14 @@ export function useStudioPersistence(
             updateStatus("synced");
           }
         })
-        .catch((error: unknown) => {
+        .catch(() => {
           if (!active) return;
           updateStatus("offline");
           state.value = {
             ...state.value,
             notice:
               (recoveryError ? `${recoveryError} ` : "") +
-              (error instanceof Error ? `${error.message} ` : "") +
+
               "Studio storage is offline. Changes remain in this browser; retry from Settings." +
               (cacheError
                 ? " Browser recovery storage failed; export your design now."
@@ -329,6 +343,8 @@ export function useStudioPersistence(
 
   return {
     reconnect,
+    get looks() { return confirmedLooks.value; },
+    get refreshingLooks() { return refreshingLooks.value; },
     get revision() {
       return revision;
     },

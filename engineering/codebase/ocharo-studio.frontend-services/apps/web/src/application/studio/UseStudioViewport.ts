@@ -96,10 +96,10 @@ export function useStudioViewport(
           await instance.updateDocument(current.document);
           if (active && instance.ready) toValue(options).onReady?.(instance);
         })
-        .catch((cause) => {
+        .catch(() => {
           if (!active) return;
           loading.value = false;
-          error.value = `The 3D studio could not start: ${cause instanceof Error ? cause.message : String(cause)}`;
+          error.value = "The garment preview is unavailable. Retry when ready.";
         });
     },
     { flush: "post" },
@@ -120,10 +120,10 @@ export function useStudioViewport(
           if (current && scene === currentScene && currentScene.ready)
             toValue(options).onReady?.(currentScene);
         })
-        .catch((cause) => {
+        .catch(() => {
           if (!current || scene !== currentScene) return;
           loading.value = false;
-          error.value = `The 3D studio could not update: ${cause instanceof Error ? cause.message : String(cause)}`;
+          error.value = "The garment preview could not update. Your design is preserved; try again.";
         });
     },
   );

@@ -1,0 +1,3 @@
+html, body { background: #f1f0eb; color: #303b37; min-height: 100%; }
+body { margin: 0; }
+html.dark, html.dark body { background: #242b29; color: #eceee5; }

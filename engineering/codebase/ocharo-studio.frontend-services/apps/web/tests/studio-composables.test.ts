@@ -393,7 +393,7 @@ describe("Vue studio composition", () => {
       draft: { parts: { body: { placement: { scale: 2.5 } } } },
       looks: [{ document: { parts: { body: { placement: { scale: 2.5 } } } } }],
     });
-    expect(first.studio.looks[0]).not.toHaveProperty("thumbnail");
+    expect(first.studio.looks[0]?.thumbnail).toBe("stale");
     expect(first.studio.saveMaterialScale("atlas-rose", NaN)).toBe(false);
     expect(cache.values.get("ocharo-studio:studio:recovery")).toEqual(recovery);
     first.scope.stop();
@@ -403,7 +403,7 @@ describe("Vue studio composition", () => {
     await flush();
     expect(second.studio.materials["atlas-rose"].scale).toBe(2.5);
     expect(second.studio.document.parts.body!.placement.scale).toBe(2.5);
-    expect(second.studio.looks[0]).not.toHaveProperty("thumbnail");
+    expect(second.studio.looks[0]?.thumbnail).toBe("stale");
     expect(puts[0]).toMatchObject({
       materials: { "atlas-rose": { scale: 2.5 } },
     });
@@ -450,7 +450,8 @@ describe("Vue studio composition", () => {
     expect(studio.persistenceStatus).toBe("offline");
     expect(studio.document.garmentId).toBe("nimcha");
     expect(studio.materials).toEqual(materials);
-    expect(studio.notice).toContain("Incompatible");
+    expect(studio.notice).not.toContain("Incompatible");
+    expect(studio.notice).toContain("Changes remain in this browser");
     expect(repo.readRecovery()?.materials).toEqual(materials);
   });
 
@@ -490,5 +491,33 @@ describe("Vue studio composition", () => {
     expect(onboarding.isOpen).toBe(false);
     expect(record.value.invitations).toBe(2);
     expect(record.value.completedAt).toBeDefined();
+  });
+});
+
+
+describe("server-confirmed Studio look library", () => {
+  it("keeps the saved library unchanged until an acknowledged write and the independent GET", async () => {
+    let reads=0; let acknowledge!: (value:Response)=>void; let project!: (value:Response)=>void;
+    const initial=createDesignDocument();
+    const request=vi.fn((_url:string,options:RequestInit)=>{
+      if(options.method==="GET") { reads++; if(reads===1)return Promise.resolve(response(empty(1,initial)));return new Promise<Response>(resolve=>{project=resolve;}); }
+      return new Promise<Response>(resolve=>{acknowledge=resolve;});
+    });vi.stubGlobal("fetch",request);
+    const {studio}=setupStudio();await flush();studio.saveLook();
+    expect(studio.looks).toEqual([]);expect(studio.refreshingLooks).toBe(false);
+    await vi.advanceTimersByTimeAsync(400);expect(reads).toBe(1);expect(studio.looks).toEqual([]);
+    const submitted=JSON.parse(String(request.mock.calls.find(call=>call[1].method==="PUT")![1].body)) as StudioSnapshot;
+    acknowledge(response({...submitted,revision:2}));await flush();
+    expect(reads).toBe(2);expect(studio.looks).toEqual([]);expect(studio.refreshingLooks).toBe(true);
+    const authoritative={...submitted,revision:2,looks:submitted.looks.map(look=>({...look,document:{...look.document,name:"Read-confirmed look"}}))};
+    project(response(authoritative));await flush();expect(studio.refreshingLooks).toBe(false);expect(studio.looks[0]?.document.name).toBe("Read-confirmed look");
+  });
+  it("retains the saved library and recoverable local work after a failed write", async () => {
+    const document=createDesignDocument();const saved={...empty(3,document),looks:[{document,thumbnail:"confirmed"}]};
+    vi.stubGlobal("fetch",vi.fn(async(_url:string,options:RequestInit)=>options.method==="GET"?response(saved):new Response("private transport detail",{status:503})));
+    const {studio}=setupStudio();await flush();studio.deleteLook(document.id);
+    expect(studio.looks[0]?.thumbnail).toBe("confirmed");await vi.advanceTimersByTimeAsync(400);
+    expect(studio.looks[0]?.thumbnail).toBe("confirmed");expect(studio.persistenceStatus).toBe("offline");
+    expect(studio.notice).not.toContain("private transport detail");expect(createStudioRepository().readRecovery()?.looks).toEqual([]);
   });
 });

@@ -46,6 +46,7 @@ export interface StudioControls {
   setSelectedPartId(partId: PartId, additive?: boolean): void;
   newDesign(): void;
   looks: StudioState["looks"];
+  refreshingLooks: boolean;
   materials: StudioState["materials"];
   saveMaterialScale(materialId: string, scale: number): boolean;
   countMaterialUses(materialId: string): MaterialUseCount;
@@ -144,8 +145,9 @@ export function useStudio(
       setState((current) => selectPart(current, partId, additive)),
     newDesign: () => setState(newDesign),
     get looks() {
-      return state.value.looks;
+      return persistence.looks;
     },
+    get refreshingLooks() { return persistence.refreshingLooks; },
     get materials() {
       return state.value.materials;
     },

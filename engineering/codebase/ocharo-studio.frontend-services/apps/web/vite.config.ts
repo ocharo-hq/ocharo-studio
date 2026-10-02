@@ -1,3 +1,4 @@
+import { proxyUnavailable } from './dev/ProxyProblem';
 import { Agent } from "node:https";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
@@ -46,6 +47,7 @@ export default defineConfig(({ command }) => {
           ),
           changeOrigin: false,
           secure: true,
+          configure: (proxy) => { proxy.on('error', proxyUnavailable); },
           ...(command === "serve" && process.env.VITE_API_CA_PATH
             ? {
                 agent: new Agent({

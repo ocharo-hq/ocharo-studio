@@ -100,17 +100,10 @@ export function createServerRepository(
       );
     }
     if (response.status === 409) throw new StudioConflict();
-    if (response.status === 400) {
-      const detail = await readValidationProblem(response);
-      if (detail)
-        throw new Error(
-          `Studio data was rejected: ${detail} Your browser keeps a recovery copy.`,
-        );
-    }
+    if (response.status === 400 || response.status === 422)
+      throw new Error("Review your design settings. Your browser keeps a recovery copy.");
     if (!response.ok)
-      throw new Error(
-        `Studio storage is unavailable (${response.status}). Your browser keeps a recovery copy.`,
-      );
+      throw new Error("Studio storage is unavailable. Your browser keeps a recovery copy.");
     const value: unknown = await response.json();
     if (!value || typeof value !== "object")
       throw new Error("Invalid studio storage response.");
@@ -146,37 +139,6 @@ export function createServerRepository(
     read: (signal) => request("GET", undefined, signal),
     write: (snapshot, signal) => request("PUT", snapshot, signal),
   };
-}
-
-async function readValidationProblem(response: Response): Promise<string> {
-  try {
-    const value: unknown = await response.json();
-    if (!value || typeof value !== "object") return "";
-    const problem = value as Record<string, unknown>;
-    const errors =
-      problem.errors && typeof problem.errors === "object"
-        ? Object.values(problem.errors).flatMap((messages) =>
-            Array.isArray(messages)
-              ? messages.filter(
-                  (message): message is string =>
-                    typeof message === "string" && message.trim().length > 0,
-                )
-              : [],
-          )
-        : [];
-    const detail =
-      typeof problem.detail === "string"
-        ? problem.detail
-        : typeof problem.title === "string"
-          ? problem.title
-          : "";
-    return [...new Set(errors.length ? errors : [detail])]
-      .slice(0, 3)
-      .join(" ")
-      .slice(0, 1000);
-  } catch {
-    return "";
-  }
 }
 
 /** Binds the SDK's reusable revision queue to the studio API conflict type. */

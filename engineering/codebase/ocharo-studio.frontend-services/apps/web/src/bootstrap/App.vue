@@ -594,6 +594,7 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
         :on-garment="studio.chooseGarment"
         :on-material="studio.applyMaterial"
         :looks="studio.looks"
+        :loading-looks="studio.refreshingLooks"
         :on-open="studio.openLook"
         :on-delete="deleteLook"
         :on-save="save"
