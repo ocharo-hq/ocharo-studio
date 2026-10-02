@@ -19,6 +19,7 @@
   "dependencies": {
     "@lucide/vue": "1.48.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/vue-query": "5.102.8",
     "@wow-two-beta/ui-vue": "0.0.9",
     "tailwindcss": "^4.3.3",
     "three": "^0.186.1",

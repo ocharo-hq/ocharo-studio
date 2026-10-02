@@ -1,6 +1,9 @@
 import { shallowRef } from "vue";
 
-import { useStudioPersistence } from "./UseStudioPersistence";
+import {
+  useStudioPersistence,
+  type StudioLibraryStatus,
+} from "./UseStudioPersistence";
 import type { PersistenceStatus } from "../../integration/studio/serverRepository";
 import { serializeDocument } from "../../domain/studio/document";
 import {
@@ -46,7 +49,9 @@ export interface StudioControls {
   setSelectedPartId(partId: PartId, additive?: boolean): void;
   newDesign(): void;
   looks: StudioState["looks"];
+  looksStatus: StudioLibraryStatus;
   refreshingLooks: boolean;
+  refreshLooks(): Promise<void>;
   materials: StudioState["materials"];
   saveMaterialScale(materialId: string, scale: number): boolean;
   countMaterialUses(materialId: string): MaterialUseCount;
@@ -69,6 +74,8 @@ export interface StudioControls {
   saveLookAsCopy(thumbnail?: string): void;
   openLook(id: string): void;
   deleteLook(id: string): void;
+  deleteLookUnavailableReason(id: string): string | undefined;
+  exportRecovery(): string;
   importLook(json: string): void;
   exportLook(): string;
   isDirty: boolean;
@@ -118,6 +125,12 @@ export function useStudio(
     state.value = update(state.value);
   }
 
+  function deleteLookUnavailableReason(id: string): string | undefined {
+    return state.value.looks.some((look) => look.document.id === id)
+      ? undefined
+      : "This saved look isn't in your current work. Download recovery before reloading saved work to edit it.";
+  }
+
   return {
     get persistenceStatus() {
       return persistence.persistenceStatus;
@@ -147,9 +160,13 @@ export function useStudio(
     get looks() {
       return persistence.looks;
     },
+    get looksStatus() {
+      return persistence.looksStatus;
+    },
     get refreshingLooks() {
       return persistence.refreshingLooks;
     },
+    refreshLooks: persistence.refreshLooks,
     get materials() {
       return state.value.materials;
     },
@@ -199,8 +216,19 @@ export function useStudio(
           ? next
           : { ...next, notice: "Saving look…" };
       }),
-    openLook: (id) => setState((current) => openStudioLook(current, id)),
-    deleteLook: (id) => setState((current) => deleteStudioLook(current, id)),
+    openLook: (id) =>
+      setState((current) => ({
+        ...openStudioLook({ ...current, looks: persistence.looks }, id),
+        looks: current.looks,
+      })),
+    deleteLookUnavailableReason,
+    exportRecovery: persistence.exportRecovery,
+    deleteLook: (id) => {
+      const reason = deleteLookUnavailableReason(id);
+      setState((current) =>
+        reason ? { ...current, notice: reason } : deleteStudioLook(current, id),
+      );
+    },
     importLook: (json) =>
       setState((current) => importStudioLook(current, json)),
     exportLook: () =>

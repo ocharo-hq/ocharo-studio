@@ -10,9 +10,17 @@ import {
   FolderHeart,
   Palette,
   Plus,
+  RefreshCw,
   Shirt,
   Trash2,
 } from "@lucide/vue";
+import { Button } from "@wow-two-beta/ui-vue/presentation/actions";
+import {
+  SkeletonState,
+  SkeletonStateGroup,
+  SkeletonStateSlot,
+} from "@wow-two-beta/ui-vue/presentation/feedback";
+import type { StudioLibraryStatus } from "../../application/studio/UseStudioPersistence";
 import { GARMENTS, getGarment } from "../../domain/studio/catalog";
 import type {
   GarmentId,
@@ -42,10 +50,14 @@ const props = defineProps<{
   onGarment: (id: GarmentId) => void;
   onMaterial: (id: string) => void;
   looks: ReadonlyArray<SavedLook>;
-  loadingLooks?: boolean;
+  looksStatus: StudioLibraryStatus;
+  readingLooks: boolean;
+  refreshingLooks: boolean;
+  onRefresh: () => void;
   onOpen: (id: string) => void;
   onDelete: (id: string, name: string) => void;
-  onSave: () => void;
+  deleteUnavailableReason: (id: string) => string | undefined;
+  onExportRecovery: () => void;
   onSaveCopy: () => void;
   onImport: () => void;
 }>();
@@ -65,15 +77,21 @@ const heading = computed(() =>
       ? "Textiles"
       : "My looks",
 );
-const count = computed(() =>
-  String(
+const initialLoading = computed(
+  () =>
+    props.looksStatus === "loading" ||
+    (props.looksStatus !== "ready" && props.refreshingLooks),
+);
+const count = computed(() => {
+  if (props.tab === "looks" && props.looksStatus !== "ready") return "—";
+  return String(
     props.tab === "garments"
       ? GARMENTS.length
       : props.tab === "materials"
         ? props.materials.length
         : props.looks.length,
-  ).padStart(2, "0"),
-);
+  ).padStart(2, "0");
+});
 async function moveTab(key: string) {
   const direction = key === "ArrowRight" ? 1 : key === "ArrowLeft" ? -1 : 0;
   if (!direction) return;
@@ -113,6 +131,7 @@ async function moveTab(key: string) {
     <div
       id="library-panel"
       class="library-content"
+      :class="{ 'library-content--looks': tab === 'looks' }"
       role="tabpanel"
       :aria-labelledby="`tab-${tab}`"
     >
@@ -120,7 +139,27 @@ async function moveTab(key: string) {
         <div>
           <h2>{{ heading }}</h2>
         </div>
-        <span class="count-badge">{{ count }}</span>
+        <div class="library-heading-actions">
+          <Button
+            v-if="tab === 'looks'"
+            class="library-refresh"
+            variant="ghost"
+            size="sm"
+            :is-loading="initialLoading || refreshingLooks || readingLooks"
+            @click="onRefresh"
+          >
+            <template #leading><RefreshCw :size="15" /></template>
+            Refresh
+          </Button>
+          <SkeletonStateSlot
+            :is-loading="
+              tab === 'looks' &&
+              (initialLoading || (refreshingLooks && looks.length > 0))
+            "
+          >
+            <span class="count-badge">{{ count }}</span>
+          </SkeletonStateSlot>
+        </div>
       </div>
       <div v-if="tab === 'garments'" class="garment-list">
         <button
@@ -187,55 +226,95 @@ async function moveTab(key: string) {
         <button class="button copy-button secondary" @click="onSaveCopy">
           <Plus :size="16" />Save as a new look
         </button>
-        <div
-          v-if="loadingLooks"
-          aria-busy="true"
-          aria-label="Refreshing saved looks"
-          class="grid gap-3 p-4"
+        <SkeletonStateGroup
+          class="library-looks-region"
+          :is-loading="initialLoading || (refreshingLooks && looks.length > 0)"
+          label="Loading saved looks"
         >
-          <div
-            v-for="card in 3"
-            :key="card"
-            class="h-24 animate-pulse rounded-xl bg-muted"
-          />
-        </div>
-        <div v-if="!loadingLooks && looks.length === 0" class="empty-state">
-          <FolderHeart :size="34" />
-          <h3>No saved looks</h3>
-          <p>Save this look to add it here.</p>
-          <button class="button secondary" @click="onSave">
-            Save this look
-          </button>
-        </div>
-        <div v-show="!loadingLooks && looks.length > 0" class="saved-list">
-          <div
-            v-for="look in looks"
-            v-show="!loadingLooks"
-            :key="look.document.id"
-            class="saved-card"
-          >
-            <button
-              :aria-label="`Open ${look.document.name}`"
-              @click="onOpen(look.document.id)"
+          <Transition name="library-result" mode="out-in">
+            <div v-if="initialLoading" key="loading" class="saved-list">
+              <div
+                v-for="card in 3"
+                :key="card"
+                class="saved-card saved-card-skeleton"
+                aria-hidden="true"
+              >
+                <SkeletonState class="saved-preview" shape="rect" />
+                <SkeletonState class="saved-name-skeleton" />
+                <SkeletonState class="saved-garment-skeleton" />
+              </div>
+            </div>
+            <p
+              v-else-if="looksStatus === 'unavailable'"
+              key="unavailable"
+              class="library-result-label"
             >
-              <span class="saved-preview"
-                ><img
-                  v-if="look.thumbnail"
-                  :src="look.thumbnail"
-                  alt="" /><GarmentGlyph
-                  v-else
-                  :id="look.document.garmentId" /></span
-              ><strong>{{ look.document.name }}</strong
-              ><small>{{
-                getGarment(look.document.garmentId).name
-              }}</small></button
-            ><IconButton
-              :icon="Trash2"
-              :label="`Delete ${look.document.name}`"
-              :on-click="() => onDelete(look.document.id, look.document.name)"
-            />
-          </div>
-        </div>
+              Saved looks unavailable
+            </p>
+            <p
+              v-else-if="looks.length === 0"
+              key="empty"
+              class="library-result-label"
+            >
+              No saved looks
+            </p>
+            <div v-else key="looks" class="saved-list">
+              <div
+                v-for="look in looks"
+                :key="look.document.id"
+                class="saved-card"
+                :class="{
+                  'saved-card--restricted': deleteUnavailableReason(
+                    look.document.id,
+                  ),
+                }"
+              >
+                <button
+                  :aria-label="`Open ${look.document.name}`"
+                  @click="onOpen(look.document.id)"
+                >
+                  <SkeletonStateSlot is-block shape="rect">
+                    <span class="saved-preview"
+                      ><img
+                        v-if="look.thumbnail"
+                        :src="look.thumbnail"
+                        alt="" /><GarmentGlyph
+                        v-else
+                        :id="look.document.garmentId"
+                    /></span>
+                  </SkeletonStateSlot>
+                  <strong>{{ look.document.name }}</strong>
+                  <small>{{ getGarment(look.document.garmentId).name }}</small>
+                </button>
+                <IconButton
+                  :icon="Trash2"
+                  :label="`Delete ${look.document.name}`"
+                  :disabled="Boolean(deleteUnavailableReason(look.document.id))"
+                  :aria-describedby="
+                    deleteUnavailableReason(look.document.id)
+                      ? `look-delete-${look.document.id}`
+                      : undefined
+                  "
+                  :on-click="
+                    () => onDelete(look.document.id, look.document.name)
+                  "
+                />
+                <div
+                  v-if="deleteUnavailableReason(look.document.id)"
+                  class="saved-delete-recovery"
+                >
+                  <p :id="`look-delete-${look.document.id}`">
+                    {{ deleteUnavailableReason(look.document.id) }}
+                  </p>
+                  <Button variant="ghost" size="sm" @click="onExportRecovery">
+                    <template #leading><Download :size="14" /></template>
+                    Download recovery
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </SkeletonStateGroup>
       </template>
     </div>
   </aside>

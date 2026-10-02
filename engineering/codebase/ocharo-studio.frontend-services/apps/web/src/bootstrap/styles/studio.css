@@ -587,27 +587,57 @@ h2 {
   width: 100%;
   color: var(--muted);
 }
-.empty-state {
-  text-align: center;
-  padding: 65px 10px;
+.library-content--looks {
+  display: flex;
+  flex-direction: column;
+}
+.library-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.library-refresh {
+  font-size: 12px;
+}
+.library-looks-region {
+  flex: 1;
+  min-height: 193px;
+  margin-top: 15px;
+}
+.library-result-label {
+  display: grid;
+  place-content: center;
+  height: 100%;
+  min-height: inherit;
+  margin: 0;
   color: var(--muted);
+  font-size: 13px;
+  text-align: center;
 }
-.empty-state > svg {
-  margin: 0 auto 18px;
+.saved-name-skeleton {
+  width: 70%;
+  height: 18px;
+  margin: 10px 30px 5px 0;
 }
-.empty-state h3 {
-  font:
-    21px Georgia,
-    serif;
-  color: var(--ink);
+.saved-garment-skeleton {
+  width: 40%;
+  height: 15px;
 }
-.empty-state p {
-  font-size: 11px;
-  margin: 10px 0 20px;
-  line-height: 1.7;
+.library-result-enter-active,
+.library-result-leave-active {
+  transition: opacity 150ms ease;
+}
+.library-result-enter-from,
+.library-result-leave-to {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .library-result-enter-active,
+  .library-result-leave-active {
+    transition: none;
+  }
 }
 .saved-list {
-  margin-top: 15px;
   display: grid;
   gap: 12px;
 }
@@ -646,6 +676,19 @@ h2 {
   position: absolute;
   bottom: 9px;
   right: 4px;
+}
+.saved-card--restricted .icon-button {
+  top: 148px;
+  bottom: auto;
+}
+.saved-delete-recovery {
+  margin-top: 10px;
+}
+.saved-delete-recovery p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0 0 6px;
 }
 /* Toasts stack at the top right, just below the header. */
 .studio-toasts {

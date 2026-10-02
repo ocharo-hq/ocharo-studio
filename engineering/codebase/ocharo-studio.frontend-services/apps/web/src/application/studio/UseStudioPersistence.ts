@@ -23,6 +23,8 @@ import {
 const CACHE_META = studioCacheKey("ocharo-studio:sync");
 const SETTINGS_KEY = studioCacheKey("ocharo-studio:settings");
 const storage = createLocalJsonStorage();
+export type StudioLibraryStatus = "loading" | "ready" | "unavailable";
+
 interface SyncMetadata {
   revision: number;
   pending: boolean;
@@ -44,7 +46,9 @@ export function useStudioPersistence(
   );
   // Desired browser drafts remain recoverable; the library contains acknowledged reads only.
   const confirmedLooks = shallowRef(recovery?.pending ? [] : state.value.looks);
+  const looksStatus = shallowRef<StudioLibraryStatus>("loading");
   const refreshingLooks = shallowRef(false);
+  let readLooks: (() => Promise<void>) | undefined;
   let projectionRead = 0;
   const ready = shallowRef(false);
   const attempt = shallowRef(0);
@@ -94,6 +98,9 @@ export function useStudioPersistence(
       const metadata = { revision, pending };
       updateStatus("loading");
       ready.value = false;
+      looksStatus.value = "loading";
+      let readAbort: AbortController | undefined;
+      readLooks = () => refreshLibrary();
       queue?.stop();
       queue = null;
       onCleanup(() => {
@@ -101,8 +108,49 @@ export function useStudioPersistence(
         abort.abort();
         projectionRead += 1;
         refreshingLooks.value = false;
+        readLooks = undefined;
         queue?.stop();
       });
+      async function refreshLibrary(minimumRevision = revision): Promise<void> {
+        const request = ++projectionRead;
+        readAbort?.abort();
+        readAbort = new AbortController();
+        refreshingLooks.value = true;
+        if (looksStatus.value !== "ready") looksStatus.value = "loading";
+        try {
+          const current = await server.read(
+            AbortSignal.any([
+              abort.signal,
+              readAbort.signal,
+              AbortSignal.timeout(15000),
+            ]),
+          );
+          if (!active || request !== projectionRead) return;
+          if (boundWorkspace && server.workspaceId !== boundWorkspace)
+            throw new Error("The saved library belongs to another workspace.");
+          if (current.revision < Math.max(minimumRevision, revision))
+            throw new Error("The saved library is not current.");
+          confirmedLooks.value = current.looks;
+          looksStatus.value = "ready";
+          if (state.value.notice === "Saving look…")
+            state.value = {
+              ...state.value,
+              notice: "Look saved to the studio.",
+            };
+        } catch {
+          if (!active || request !== projectionRead) return;
+          if (looksStatus.value !== "ready") looksStatus.value = "unavailable";
+          state.value = {
+            ...state.value,
+            notice:
+              "The saved look library could not refresh. Your browser recovery is preserved; refresh My looks when ready.",
+          };
+        } finally {
+          if (active && request === projectionRead)
+            refreshingLooks.value = false;
+        }
+      }
+
       void server
         .read(AbortSignal.any([abort.signal, AbortSignal.timeout(15000)]))
         .then((result) => {
@@ -116,6 +164,7 @@ export function useStudioPersistence(
           );
           cacheBlocked = false;
           if (workspaceChanged) {
+            looksStatus.value = "unavailable";
             updateStatus("conflict");
             state.value = {
               ...state.value,
@@ -126,6 +175,7 @@ export function useStudioPersistence(
           }
           boundWorkspace = incomingWorkspace ?? boundWorkspace;
           confirmedLooks.value = result.looks;
+          looksStatus.value = "ready";
           const editedDuringLoad = snapshot.value !== initial;
           const hasPending = metadata?.pending === true || editedDuringLoad;
           if (
@@ -196,33 +246,7 @@ export function useStudioPersistence(
                 caughtUp &&
                 acknowledged !== undefined
               ) {
-                const request = ++projectionRead;
-                refreshingLooks.value = true;
-                void server
-                  .read(abort.signal)
-                  .then((current) => {
-                    if (!active || request !== projectionRead) return;
-                    if (current.revision < acknowledged)
-                      throw new Error("The saved library is not current.");
-                    confirmedLooks.value = current.looks;
-                    if (state.value.notice === "Saving look…")
-                      state.value = {
-                        ...state.value,
-                        notice: "Look saved to the studio.",
-                      };
-                  })
-                  .catch(() => {
-                    if (active && request === projectionRead)
-                      state.value = {
-                        ...state.value,
-                        notice:
-                          "The saved look library could not refresh. Your browser recovery is preserved; retry from Settings.",
-                      };
-                  })
-                  .finally(() => {
-                    if (active && request === projectionRead)
-                      refreshingLooks.value = false;
-                  });
+                void refreshLibrary(acknowledged);
               }
             },
           );
@@ -238,6 +262,7 @@ export function useStudioPersistence(
         .catch(() => {
           if (!active) return;
           updateStatus("offline");
+          looksStatus.value = "unavailable";
           state.value = {
             ...state.value,
             notice:
@@ -359,6 +384,23 @@ export function useStudioPersistence(
 
   return {
     reconnect,
+    refreshLooks: () => readLooks?.() ?? Promise.resolve(),
+    exportRecovery: () =>
+      JSON.stringify(
+        {
+          schemaVersion: 1,
+          ...snapshot.value,
+          ...(boundWorkspace ? { workspaceId: boundWorkspace } : {}),
+          materials: snapshot.value.materials ?? {},
+          revision,
+          pending,
+        },
+        null,
+        2,
+      ),
+    get looksStatus() {
+      return looksStatus.value;
+    },
     get looks() {
       return confirmedLooks.value;
     },

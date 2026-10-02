@@ -8,6 +8,7 @@ import {
   watch,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useRefresh } from "@wow-two-beta/ui-vue/query";
 import { useNavigationBlocker } from "@wow-two-beta/ui-vue/router";
 import { usePersistentState } from "@wow-two-beta/ui-vue/foundation/storage";
 import {
@@ -71,6 +72,9 @@ defineOptions({ name: "StudioApp" });
 const connectionError = acceptTicketFragment();
 const deskConnected = ref(Boolean(getIntegrationTicket()));
 const studio = useStudio();
+const { refresh: refreshLooks, refreshing: refreshingLooks } = useRefresh(
+  studio.refreshLooks,
+);
 function connectDesk(ticket: string | null): void {
   try {
     setIntegrationTicket(ticket);
@@ -597,10 +601,17 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
         :on-garment="studio.chooseGarment"
         :on-material="studio.applyMaterial"
         :looks="studio.looks"
-        :loading-looks="studio.refreshingLooks"
+        :looks-status="studio.looksStatus"
+        :reading-looks="studio.refreshingLooks"
+        :refreshing-looks="refreshingLooks"
+        :on-refresh="refreshLooks"
         :on-open="studio.openLook"
         :on-delete="deleteLook"
-        :on-save="save"
+        :delete-unavailable-reason="studio.deleteLookUnavailableReason"
+        :on-export-recovery="
+          () =>
+            downloadText(studio.exportRecovery(), 'ocharo-studio-recovery.json')
+        "
         :on-save-copy="saveCopy"
         :on-import="() => fileInput?.click()"
       />

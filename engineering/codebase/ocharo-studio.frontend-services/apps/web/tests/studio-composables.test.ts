@@ -495,6 +495,271 @@ describe("Vue studio composition", () => {
 });
 
 describe("server-confirmed Studio look library", () => {
+  it("distinguishes an initial read from a confirmed empty library", async () => {
+    let finish!: (value: Response) => void;
+    const request = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    vi.stubGlobal("fetch", request);
+    const { studio } = setupStudio();
+    await flush();
+    expect(studio.looksStatus).toBe("loading");
+    expect(studio.looks).toEqual([]);
+    finish(response(empty(1)));
+    await flush();
+    expect(studio.looksStatus).toBe("ready");
+    expect(studio.looks).toEqual([]);
+    expect(request).toHaveBeenCalledTimes(1);
+  });
+
+  it("recovers only the library after an unavailable initial read", async () => {
+    const saved = { ...createDesignDocument(), name: "Server look" };
+    let unavailable = true;
+    const request = vi.fn(async (_url: string, _options: RequestInit) =>
+      unavailable
+        ? new Response("private transport detail", { status: 503 })
+        : response({ ...empty(1), looks: [{ document: saved }] }),
+    );
+    vi.stubGlobal("fetch", request);
+    const { studio } = setupStudio();
+    await flush();
+    studio.rename("Recoverable local draft");
+    await flush();
+    expect(studio.looksStatus).toBe("unavailable");
+    expect(studio.persistenceStatus).toBe("offline");
+    unavailable = false;
+    await studio.refreshLooks();
+    await vi.advanceTimersByTimeAsync(400);
+    expect(studio.looksStatus).toBe("ready");
+    expect(studio.looks[0]?.document.name).toBe("Server look");
+    expect(studio.persistenceStatus).toBe("offline");
+    expect(studio.document.name).toBe("Recoverable local draft");
+    expect(createStudioRepository().readRecovery()?.draft?.name).toBe(
+      "Recoverable local draft",
+    );
+    expect(request.mock.calls.every((call) => call[1]?.method === "GET")).toBe(
+      true,
+    );
+  });
+
+  it.each([false, true])(
+    "keeps the last confirmed result when a refresh fails (populated=%s)",
+    async (populated) => {
+      const document = createDesignDocument();
+      const saved = {
+        ...empty(3, document),
+        looks: populated ? [{ document, thumbnail: "confirmed" }] : [],
+      };
+      let finish!: (value: Response) => void;
+      let reads = 0;
+      const request = vi.fn((_url: string, options: RequestInit) => {
+        expect(options.method).toBe("GET");
+        if (++reads === 1) return Promise.resolve(response(saved));
+        return new Promise<Response>((resolve) => {
+          finish = resolve;
+        });
+      });
+      vi.stubGlobal("fetch", request);
+      const { studio } = setupStudio();
+      await flush();
+      const confirmed = studio.looks;
+      const refreshing = studio.refreshLooks();
+      await flush();
+      expect(studio.refreshingLooks).toBe(true);
+      expect(studio.looksStatus).toBe("ready");
+      expect(studio.looks).toBe(confirmed);
+      finish(new Response("private transport detail", { status: 503 }));
+      await refreshing;
+      expect(studio.refreshingLooks).toBe(false);
+      expect(studio.looksStatus).toBe("ready");
+      expect(studio.looks).toBe(confirmed);
+      expect(studio.notice).not.toContain("private transport detail");
+    },
+  );
+
+  it("does not retry a queued mutation when refreshing the library", async () => {
+    const document = createDesignDocument();
+    const saved = { ...empty(3, document), looks: [{ document }] };
+    const request = vi.fn(async (_url: string, options: RequestInit) =>
+      options.method === "GET"
+        ? response(saved)
+        : new Response(null, { status: 503 }),
+    );
+    vi.stubGlobal("fetch", request);
+    const { studio } = setupStudio();
+    await flush();
+    studio.rename("Unsynced local draft");
+    await vi.advanceTimersByTimeAsync(400);
+    expect(studio.persistenceStatus).toBe("offline");
+    const writes = request.mock.calls.filter(
+      (call) => call[1].method === "PUT",
+    ).length;
+    expect(writes).toBeGreaterThan(0);
+    await studio.refreshLooks();
+    await vi.advanceTimersByTimeAsync(400);
+    expect(
+      request.mock.calls.filter((call) => call[1].method === "PUT"),
+    ).toHaveLength(writes);
+    expect(studio.document.name).toBe("Unsynced local draft");
+    expect(studio.persistenceStatus).toBe("offline");
+  });
+
+  it("rejects late and stale reads after a newer acknowledged revision", async () => {
+    const document = createDesignDocument();
+    const initial = { ...empty(3, document), looks: [{ document }] };
+    const latest = {
+      ...initial,
+      revision: 4,
+      looks: [{ document: { ...document, name: "Latest confirmed name" } }],
+    };
+    let finishOld!: (value: Response) => void;
+    let reads = 0;
+    const request = vi.fn((_url: string, options: RequestInit) => {
+      if (options.method === "PUT") {
+        const submitted = JSON.parse(String(options.body)) as StudioSnapshot;
+        return Promise.resolve(response({ ...submitted, revision: 4 }));
+      }
+      reads++;
+      if (reads === 2)
+        return new Promise<Response>((resolve) => {
+          finishOld = resolve;
+        });
+      return Promise.resolve(response(reads === 3 ? latest : initial));
+    });
+    vi.stubGlobal("fetch", request);
+    const { studio } = setupStudio();
+    await flush();
+    const oldRead = studio.refreshLooks();
+    await flush();
+    studio.rename("Recoverable edit");
+    await vi.advanceTimersByTimeAsync(400);
+    expect(studio.revision).toBe(4);
+    expect(studio.looks[0]?.document.name).toBe("Latest confirmed name");
+    finishOld(response(initial));
+    await oldRead;
+    expect(studio.looks[0]?.document.name).toBe("Latest confirmed name");
+    await studio.refreshLooks();
+    expect(studio.looks[0]?.document.name).toBe("Latest confirmed name");
+    expect(studio.document.name).toBe("Recoverable edit");
+  });
+
+  it("rejects a held manual read after an uncaught-up write acknowledges a newer revision", async () => {
+    const document = { ...createDesignDocument(), name: "Confirmed name" };
+    const initial = { ...empty(3, document), looks: [{ document }] };
+    let finishRead!: (value: Response) => void;
+    let acknowledge!: (value: Response) => void;
+    let submitted!: StudioSnapshot;
+    let reads = 0;
+    const request = vi.fn((_url: string, options: RequestInit) => {
+      if (options.method === "PUT") {
+        submitted = JSON.parse(String(options.body)) as StudioSnapshot;
+        return new Promise<Response>((resolve) => {
+          acknowledge = resolve;
+        });
+      }
+      if (++reads === 1) return Promise.resolve(response(initial));
+      return new Promise<Response>((resolve) => {
+        finishRead = resolve;
+      });
+    });
+    vi.stubGlobal("fetch", request);
+    const { studio } = setupStudio();
+    await flush();
+    const refreshing = studio.refreshLooks();
+    await flush();
+    studio.rename("First submitted edit");
+    await vi.advanceTimersByTimeAsync(400);
+    expect(submitted.draft?.name).toBe("First submitted edit");
+    studio.rename("Newer pending edit");
+    await flush();
+    acknowledge(response({ ...submitted, revision: 4 }));
+    await flush();
+    expect(studio.revision).toBe(4);
+    expect(studio.persistenceStatus).toBe("saving");
+    expect(reads).toBe(2);
+    finishRead(
+      response({
+        ...initial,
+        looks: [{ document: { ...document, name: "Stale manual read" } }],
+      }),
+    );
+    await refreshing;
+    expect(studio.looks[0]?.document.name).toBe("Confirmed name");
+    expect(studio.document.name).toBe("Newer pending edit");
+    expect(createStudioRepository().readRecovery()).toMatchObject({
+      revision: 4,
+      pending: true,
+      draft: { name: "Newer pending edit" },
+    });
+    expect(
+      request.mock.calls.filter((call) => call[1].method === "PUT"),
+    ).toHaveLength(1);
+  });
+
+  it("opens a newly read look without replacing pending collection edits", async () => {
+    const document = createDesignDocument();
+    const refreshed = { ...createDesignDocument(), name: "New remote look" };
+    let reads = 0;
+    const request = vi.fn(async (_url: string, options: RequestInit) => {
+      if (options.method === "PUT") return new Response(null, { status: 503 });
+      return response({
+        ...empty(3, document),
+        looks: [{ document: ++reads === 1 ? document : refreshed }],
+      });
+    });
+    vi.stubGlobal("fetch", request);
+    const { studio } = setupStudio();
+    await flush();
+    studio.deleteLook(document.id);
+    await vi.advanceTimersByTimeAsync(400);
+    expect(studio.persistenceStatus).toBe("offline");
+    expect(createStudioRepository().readRecovery()?.looks).toEqual([]);
+    expect(studio.deleteLookUnavailableReason(document.id)).toContain(
+      "Download recovery",
+    );
+    const writes = request.mock.calls.filter(
+      (call) => call[1].method === "PUT",
+    ).length;
+    await studio.refreshLooks();
+    expect(studio.looks[0]?.document.id).toBe(refreshed.id);
+    expect(studio.deleteLookUnavailableReason(refreshed.id)).toContain(
+      "reloading saved work",
+    );
+    studio.deleteLook(refreshed.id);
+    await vi.advanceTimersByTimeAsync(400);
+    expect(studio.notice).toBe(
+      studio.deleteLookUnavailableReason(refreshed.id),
+    );
+    expect(
+      request.mock.calls.filter((call) => call[1].method === "PUT"),
+    ).toHaveLength(writes);
+    const exported = JSON.parse(studio.exportRecovery());
+    expect(exported).toMatchObject({
+      schemaVersion: 1,
+      workspaceId: "d0a8c678-c27f-478f-b4e8-c9928bf88c21",
+      revision: 3,
+      pending: true,
+      draft: { id: document.id },
+      looks: [],
+      materials: {},
+      settings: {},
+    });
+    expect(exported).not.toHaveProperty("ticket");
+    studio.openLook(refreshed.id);
+    await flush();
+    expect(studio.document.id).toBe(refreshed.id);
+    expect(studio.document.name).toBe("New remote look");
+    expect(studio.persistenceStatus).toBe("offline");
+    expect(createStudioRepository().readRecovery()).toMatchObject({
+      pending: true,
+      draft: { id: refreshed.id, name: "New remote look" },
+      looks: [],
+    });
+  });
+
   it("keeps the saved library unchanged until an acknowledged write and the independent GET", async () => {
     let reads = 0;
     let acknowledge!: (value: Response) => void;
@@ -560,8 +825,12 @@ describe("server-confirmed Studio look library", () => {
     );
     const { studio } = setupStudio();
     await flush();
+    expect(studio.deleteLookUnavailableReason(document.id)).toBeUndefined();
     studio.deleteLook(document.id);
     expect(studio.looks[0]?.thumbnail).toBe("confirmed");
+    expect(studio.deleteLookUnavailableReason(document.id)).toContain(
+      "Download recovery",
+    );
     await vi.advanceTimersByTimeAsync(400);
     expect(studio.looks[0]?.thumbnail).toBe("confirmed");
     expect(studio.persistenceStatus).toBe("offline");
