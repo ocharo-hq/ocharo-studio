@@ -29,4 +29,7 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
 
+  <!-- Opt-in local SDK verification; absent from clean checkouts and CI. -->
+  <Import Project="$(MSBuildThisFileDirectory).local/backend-sdk.props"
+          Condition="Exists('$(MSBuildThisFileDirectory).local/backend-sdk.props')" />
 </Project>
