@@ -3,6 +3,7 @@ import {
   test as base,
   expect,
   type Page,
+  type Request,
   type Response,
 } from "@playwright/test";
 
@@ -163,16 +164,30 @@ export async function expectStudioResponse(
   matches: (response: Response) => boolean = () => true,
 ): Promise<void> {
   let acknowledged = false;
+  const transport: string[] = [];
   const onResponse = (response: Response) => {
+    const pathname = new URL(response.url()).pathname;
+    if (["/api/studio/session", "/api/studio/state"].includes(pathname))
+      transport.push(
+        `${response.request().method()} ${pathname}: ${response.status()}`,
+      );
     if (
-      new URL(response.url()).pathname === "/api/studio/state" &&
+      pathname === "/api/studio/state" &&
       response.request().method() === method &&
       response.ok() &&
       matches(response)
     )
       acknowledged = true;
   };
+  const onRequestFailed = (request: Request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (["/api/studio/session", "/api/studio/state"].includes(pathname))
+      transport.push(
+        `${request.method()} ${pathname}: ${request.failure()?.errorText ?? "failed"}`,
+      );
+  };
   page.on("response", onResponse);
+  page.on("requestfailed", onRequestFailed);
   try {
     await action();
     await expect
@@ -181,7 +196,16 @@ export async function expectStudioResponse(
         message: `Expected a successful matching ${method} /api/studio/state response.`,
       })
       .toBe(true);
+  } catch (error) {
+    if (error instanceof Error)
+      error.message += `\nStudio transport: ${transport.join("; ") || "no session/state responses"}`;
+    throw error;
   } finally {
     page.off("response", onResponse);
+    page.off("requestfailed", onRequestFailed);
+    await test.info().attach("studio-transport", {
+      body: JSON.stringify(transport, null, 2),
+      contentType: "application/json",
+    });
   }
 }

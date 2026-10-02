@@ -81,6 +81,14 @@ jobs:
         # Split isolated tests evenly; each runner keeps one software-rendering worker.
         # All shards are required; no retries or test exclusions mask failures.
         run: pnpm --filter @ocharo-studio/web exec playwright test --fully-parallel --workers=1 --shard="$SHARD/3"
+      - name: Retain failed browser evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: studio-browser-failure-${{ matrix.shard }}
+          path: engineering/codebase/ocharo-studio.frontend-services/apps/web/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
 
   verify:
     name: verify
