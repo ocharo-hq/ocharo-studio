@@ -568,6 +568,9 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
         <div class="viewport">
           <StudioViewport
             :document="studio.document"
+            :initialization-ready="
+              !['loading', 'saving'].includes(studio.persistenceStatus)
+            "
             :selected-part-id="part.id"
             :selected-part-ids="studio.selectedPartIds"
             :on-select-part="studio.setSelectedPartId"

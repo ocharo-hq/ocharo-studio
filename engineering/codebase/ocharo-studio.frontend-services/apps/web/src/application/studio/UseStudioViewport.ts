@@ -26,6 +26,7 @@ interface StudioViewportOptions {
   onSelectPart(id: PartId, additive?: boolean): void;
   onReady?(api: StudioViewportApi): void;
   dark: boolean;
+  initializationReady?: boolean;
   placementMode?: boolean;
   onPlaceAnchor?(x: number, y: number): void;
   onPlacementStart?(): void;
@@ -48,6 +49,7 @@ export function useStudioViewport(
   const error = shallowRef<string | null>(null);
   const retryKey = shallowRef(0);
   const mounted = shallowRef(false);
+  const initializationReady = shallowRef(false);
   let scene: StudioScene | null = null;
   let disposeScene = () => {};
 
@@ -57,10 +59,20 @@ export function useStudioViewport(
   onBeforeUnmount(() => disposeScene());
   onScopeDispose(() => disposeScene());
 
+  // Cold shader preparation must not starve the initial storage acknowledgment.
+  // Readiness stays latched so later saves keep the existing scene alive.
   watch(
-    [mounted, canvasRef, retryKey],
-    ([isMounted, canvas], _previous, onCleanup) => {
-      if (!isMounted || canvas === null) return;
+    () => toValue(options).initializationReady ?? true,
+    (isReady) => {
+      if (isReady) initializationReady.value = true;
+    },
+    { immediate: true },
+  );
+
+  watch(
+    [mounted, canvasRef, retryKey, initializationReady],
+    ([isMounted, canvas, _retryKey, canInitialize], _previous, onCleanup) => {
+      if (!isMounted || canvas === null || !canInitialize) return;
       let active = true;
       let instance: StudioScene | null = null;
       disposeScene = () => {

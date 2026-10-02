@@ -11,6 +11,7 @@ export interface StudioViewportProps {
   readonly onSelectPart: (id: PartId, additive?: boolean) => void;
   readonly onReady?: (api: StudioViewportApi) => void;
   readonly dark: boolean;
+  readonly initializationReady?: boolean;
   readonly placementMode?: boolean;
   readonly onPlaceAnchor?: (x: number, y: number) => void;
   readonly onPlacementStart?: () => void;

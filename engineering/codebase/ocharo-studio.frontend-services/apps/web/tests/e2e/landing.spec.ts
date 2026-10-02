@@ -51,6 +51,65 @@ test("landing introduces the studio without starting editor resources", async ({
   await expect(page.getByText("Tradition, reimagined.")).toHaveCount(0);
 });
 
+test("initial storage is acknowledged before cold WebGL preparation", async ({
+  page,
+}) => {
+  await suppressOnboarding(page);
+  await page.addInitScript(() => {
+    const startup: string[] = [];
+    Object.assign(window, { studioStartupEvents: startup });
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      const request = new Request(...args);
+      if (
+        new URL(request.url).pathname === "/api/studio/state" &&
+        request.method === "PUT" &&
+        response.ok
+      ) {
+        const readBody = response.json.bind(response);
+        response.json = async () => {
+          const body = await readBody();
+          startup.push("storage-acknowledged");
+          return body;
+        };
+      }
+      return response;
+    };
+    const originalContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (...args) {
+      if (args[0].startsWith("webgl")) startup.push("webgl");
+      return originalContext.apply(this, args);
+    } as typeof HTMLCanvasElement.prototype.getContext;
+  });
+  await expectStudioResponse(page, "PUT", async () => {
+    await page.goto("/studio");
+    await waitForStudioReady(page);
+  });
+  const startup = await page.evaluate(
+    () =>
+      (window as Window & { studioStartupEvents: string[] })
+        .studioStartupEvents,
+  );
+  expect(startup).toContain("webgl");
+  expect(startup[0]).toBe("storage-acknowledged");
+  const contexts = startup.filter((event) => event === "webgl").length;
+  await expectStudioResponse(page, "PUT", async () => {
+    await page
+      .getByRole("textbox", { name: "Look name" })
+      .fill("Settled startup");
+  });
+  await waitForStudioStorage(page);
+  expect(
+    await page.evaluate(
+      () =>
+        (
+          window as Window & { studioStartupEvents: string[] }
+        ).studioStartupEvents.filter((event) => event === "webgl").length,
+    ),
+  ).toBe(contexts);
+});
+
 test("landing and studio navigation preserve the latest draft and support history", async ({
   page,
 }) => {
