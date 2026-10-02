@@ -187,7 +187,18 @@ async function moveTab(key: string) {
         <button class="button copy-button secondary" @click="onSaveCopy">
           <Plus :size="16" />Save as a new look
         </button>
-        <div v-if="loadingLooks" aria-busy="true" aria-label="Refreshing saved looks" class="grid gap-3 p-4"><div v-for="card in 3" :key="card" class="h-24 animate-pulse rounded-xl bg-muted" /></div>
+        <div
+          v-if="loadingLooks"
+          aria-busy="true"
+          aria-label="Refreshing saved looks"
+          class="grid gap-3 p-4"
+        >
+          <div
+            v-for="card in 3"
+            :key="card"
+            class="h-24 animate-pulse rounded-xl bg-muted"
+          />
+        </div>
         <div v-if="!loadingLooks && looks.length === 0" class="empty-state">
           <FolderHeart :size="34" />
           <h3>No saved looks</h3>
@@ -197,7 +208,12 @@ async function moveTab(key: string) {
           </button>
         </div>
         <div v-show="!loadingLooks && looks.length > 0" class="saved-list">
-      <div v-for="look in looks" v-show="!loadingLooks" :key="look.document.id" class="saved-card">
+          <div
+            v-for="look in looks"
+            v-show="!loadingLooks"
+            :key="look.document.id"
+            class="saved-card"
+          >
             <button
               :aria-label="`Open ${look.document.name}`"
               @click="onOpen(look.document.id)"

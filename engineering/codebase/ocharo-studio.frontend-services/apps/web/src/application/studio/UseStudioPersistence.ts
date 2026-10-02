@@ -191,21 +191,38 @@ export function useStudioPersistence(
                       ? " Browser recovery storage also failed; export your design now."
                       : ""),
                 };
-              if (status === "synced" && caughtUp && acknowledged !== undefined) {
+              if (
+                status === "synced" &&
+                caughtUp &&
+                acknowledged !== undefined
+              ) {
                 const request = ++projectionRead;
                 refreshingLooks.value = true;
-                void server.read(abort.signal).then(current => {
-                  if (!active || request !== projectionRead) return;
-                  if (current.revision < acknowledged) throw new Error("The saved library is not current.");
-                  confirmedLooks.value = current.looks;
-                  if (state.value.notice === "Saving look…")
-                    state.value = { ...state.value, notice: "Look saved to the studio." };
-                }).catch(() => {
-                  if (active && request === projectionRead)
-                    state.value = { ...state.value, notice: "The saved look library could not refresh. Your browser recovery is preserved; retry from Settings." };
-                }).finally(() => {
-                  if (active && request === projectionRead) refreshingLooks.value = false;
-                });
+                void server
+                  .read(abort.signal)
+                  .then((current) => {
+                    if (!active || request !== projectionRead) return;
+                    if (current.revision < acknowledged)
+                      throw new Error("The saved library is not current.");
+                    confirmedLooks.value = current.looks;
+                    if (state.value.notice === "Saving look…")
+                      state.value = {
+                        ...state.value,
+                        notice: "Look saved to the studio.",
+                      };
+                  })
+                  .catch(() => {
+                    if (active && request === projectionRead)
+                      state.value = {
+                        ...state.value,
+                        notice:
+                          "The saved look library could not refresh. Your browser recovery is preserved; retry from Settings.",
+                      };
+                  })
+                  .finally(() => {
+                    if (active && request === projectionRead)
+                      refreshingLooks.value = false;
+                  });
               }
             },
           );
@@ -225,7 +242,6 @@ export function useStudioPersistence(
             ...state.value,
             notice:
               (recoveryError ? `${recoveryError} ` : "") +
-
               "Studio storage is offline. Changes remain in this browser; retry from Settings." +
               (cacheError
                 ? " Browser recovery storage failed; export your design now."
@@ -343,8 +359,12 @@ export function useStudioPersistence(
 
   return {
     reconnect,
-    get looks() { return confirmedLooks.value; },
-    get refreshingLooks() { return refreshingLooks.value; },
+    get looks() {
+      return confirmedLooks.value;
+    },
+    get refreshingLooks() {
+      return refreshingLooks.value;
+    },
     get revision() {
       return revision;
     },

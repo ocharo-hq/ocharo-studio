@@ -123,7 +123,8 @@ export function useStudioViewport(
         .catch(() => {
           if (!current || scene !== currentScene) return;
           loading.value = false;
-          error.value = "The garment preview could not update. Your design is preserved; try again.";
+          error.value =
+            "The garment preview could not update. Your design is preserved; try again.";
         });
     },
   );

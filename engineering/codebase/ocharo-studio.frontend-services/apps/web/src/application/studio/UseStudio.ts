@@ -147,7 +147,9 @@ export function useStudio(
     get looks() {
       return persistence.looks;
     },
-    get refreshingLooks() { return persistence.refreshingLooks; },
+    get refreshingLooks() {
+      return persistence.refreshingLooks;
+    },
     get materials() {
       return state.value.materials;
     },

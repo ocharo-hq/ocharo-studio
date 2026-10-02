@@ -101,9 +101,13 @@ export function createServerRepository(
     }
     if (response.status === 409) throw new StudioConflict();
     if (response.status === 400 || response.status === 422)
-      throw new Error("Review your design settings. Your browser keeps a recovery copy.");
+      throw new Error(
+        "Review your design settings. Your browser keeps a recovery copy.",
+      );
     if (!response.ok)
-      throw new Error("Studio storage is unavailable. Your browser keeps a recovery copy.");
+      throw new Error(
+        "Studio storage is unavailable. Your browser keeps a recovery copy.",
+      );
     const value: unknown = await response.json();
     if (!value || typeof value !== "object")
       throw new Error("Invalid studio storage response.");

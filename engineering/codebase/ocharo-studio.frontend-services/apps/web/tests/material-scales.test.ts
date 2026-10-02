@@ -351,7 +351,9 @@ describe("material library recovery and transport", () => {
         }),
     );
     const repo = createServerRepository(fetcher, () => "fixture-ticket");
-    await expect(repo.read()).rejects.toThrow("Review your design settings. Your browser keeps a recovery copy.");
+    await expect(repo.read()).rejects.toThrow(
+      "Review your design settings. Your browser keeps a recovery copy.",
+    );
     fetcher.mockImplementation(
       async () => new Response("Bad request", { status: 400 }),
     );
