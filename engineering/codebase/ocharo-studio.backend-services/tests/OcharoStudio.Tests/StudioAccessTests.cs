@@ -101,6 +101,32 @@ public sealed class StudioAccessTests : IDisposable
         Assert.NotEqual(first, StudioIntegrationAuthenticationHandler.WorkspaceFor(Guid.NewGuid(), "a"));
     }
 
+
+    [Theory]
+    [InlineData(null, "GET", "/api/studio/state", null, null, 401)]
+    [InlineData("viewer", "PUT", "/api/studio/state", "application/json", "{}", 403)]
+    [InlineData("editor", "GET", "/api/missing-contract-route", null, null, 404)]
+    [InlineData("editor", "PUT", "/api/studio/state", "application/json", "{", 400)]
+    [InlineData("editor", "PUT", "/api/studio/state", "text/plain", "invalid", 415)]
+    public async Task ErrorsRemainProblemJsonWhenHtmlIsRequested(string? ticket, string method, string path, string? contentType, string? body, int expected)
+    {
+        using var client = Client(ticket);
+        using var request = new HttpRequestMessage(new HttpMethod(method), path);
+        request.Headers.Accept.ParseAdd("text/html");
+        if (body is not null) request.Content = new StringContent(body, System.Text.Encoding.UTF8, contentType!);
+        using var response = await client.SendAsync(request);
+        Assert.Equal(expected, (int)response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        Assert.True(response.Headers.CacheControl?.NoStore);
+        var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        Assert.Equal(expected, problem.GetProperty("status").GetInt32());
+        Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("type").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("title").GetString()));
+        Assert.Equal(path, problem.GetProperty("instance").GetString());
+        Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("traceId").GetString()));
+        Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("requestId").GetString()));
+    }
+
     private static object EmptyState() => new { revision = 0, draft = (object?)null, looks = Array.Empty<object>(), settings = new { }, materials = new { } };
 
     public void Dispose()

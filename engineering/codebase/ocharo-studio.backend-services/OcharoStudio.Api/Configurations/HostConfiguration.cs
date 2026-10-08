@@ -1,4 +1,5 @@
 using OcharoStudio.Persistence;
+using WoW.Two.Sdk.Backend.Beta.Web.ProblemDetails;
 
 namespace OcharoStudio.Api.Configurations;
 
@@ -20,6 +21,7 @@ public static partial class HostConfiguration
     {
         await app.Services.InitializeStudioDatabaseAsync(app.Lifetime.ApplicationStopping);
 
+        app.UseHttpProblemDetails();
 
         return app
             .UseApiDocumentation()

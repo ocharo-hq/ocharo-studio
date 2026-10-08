@@ -11,13 +11,13 @@
 
   <ItemGroup>
     <!-- wow-two backend SDK (kit): mediator, Result/DomainError, IKeyedEntity, web/problem-details. On nuget.org. -->
-    <PackageVersion Include="WoW2.Sdk.Backend.Beta" Version="10.0.58-beta" />
+    <PackageVersion Include="WoW2.Sdk.Backend.Beta" Version="10.0.64-beta" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- ASP.NET Core (.NET 10). Floor satisfies the kit's transitive minimum. -->
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.8" />
   </ItemGroup>
 

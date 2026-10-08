@@ -67,17 +67,17 @@ public sealed class StudioController(
 
         var errors = stateValidator.Validate(request);
         if (errors.Count > 0)
-            return BadRequest(new ValidationProblemDetails(
-                new Dictionary<string, string[]> { ["state"] = [.. errors] }));
+            return ValidationProblem(new ValidationProblemDetails(
+                new Dictionary<string, string[]> { ["state"] = [.. errors] }) { Status = StatusCodes.Status400BadRequest });
 
         var result = await stateService.PutAsync(workspaceId, request, ct);
         if (result.Failure == StudioStateWriteFailure.MaterialsRequired)
-            return BadRequest(new ValidationProblemDetails(
+            return ValidationProblem(new ValidationProblemDetails(
                 new Dictionary<string, string[]>
                 {
                     ["materials"] =
                     ["Material metadata is required. Reload or upgrade the studio before saving."]
-                }));
+                }) { Status = StatusCodes.Status400BadRequest });
         if (result.State is null)
             return Problem(statusCode: StatusCodes.Status409Conflict, title: "Revision conflict");
 

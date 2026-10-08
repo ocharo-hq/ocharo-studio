@@ -5,6 +5,7 @@ using OcharoStudio.Application;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
 using WoW.Two.Sdk.Backend.Beta.Mediator;
+using WoW.Two.Sdk.Backend.Beta.Web.ProblemDetails;
 
 namespace OcharoStudio.Api.Configurations;
 
@@ -49,6 +50,7 @@ public static partial class HostConfiguration
     /// <summary>Registers the HTTP boundary, controllers and OpenAPI documentation.</summary>
     private static WebApplicationBuilder AddControllers(this WebApplicationBuilder builder)
     {
+        builder.Services.AddHttpProblemDetails();
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
         return builder;
