@@ -60,36 +60,32 @@ describe("shared Ocharo session", () => {
       "https://desk.test/?secret=x",
     ]) {
       const session = await initializeSso(
-        vi
-          .fn()
-          .mockResolvedValue(
-            response({
-              data: {
-                enabled: true,
-                authenticated: true,
-                csrfToken,
-                accountUrl,
-              },
-            }),
-          ),
+        vi.fn().mockResolvedValue(
+          response({
+            data: {
+              enabled: true,
+              authenticated: true,
+              csrfToken,
+              accountUrl,
+            },
+          }),
+        ),
       );
       expect(session.accountUrl).toBeUndefined();
     }
     expect(
       (
         await initializeSso(
-          vi
-            .fn()
-            .mockResolvedValue(
-              response({
-                data: {
-                  enabled: true,
-                  authenticated: true,
-                  csrfToken,
-                  accountUrl: "https://desk.test",
-                },
-              }),
-            ),
+          vi.fn().mockResolvedValue(
+            response({
+              data: {
+                enabled: true,
+                authenticated: true,
+                csrfToken,
+                accountUrl: "https://desk.test",
+              },
+            }),
+          ),
         )
       ).accountUrl,
     ).toBe("https://desk.test");
