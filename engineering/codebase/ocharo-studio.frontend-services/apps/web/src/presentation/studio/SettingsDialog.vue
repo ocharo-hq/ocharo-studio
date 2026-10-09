@@ -15,6 +15,10 @@ defineOptions({ name: "SettingsDialog" });
 defineProps<{
   dark: boolean;
   deskConnected?: boolean;
+  ssoEnabled?: boolean;
+  accountUrl?: string;
+  authUnavailable?: boolean;
+  onSignIn?: () => void;
   connectionError?: string;
   onConnect?: (ticket: string | null) => void;
   persistenceStatus: "loading" | "saving" | "synced" | "offline" | "conflict";
@@ -40,38 +44,55 @@ const ticket = ref("");
               ? "Connected through Ocharo Desk"
               : "Designs stay in this browser"
           }}</strong>
-          <p>
-            Open Studio from your Desk workspace to save securely. A connection
-            expires after five minutes.
+          <p v-if="ssoEnabled">
+            Your Ocharo account connects this workspace. Manage your account and
+            sign out in Ocharo Desk.
           </p>
+          <a
+            v-if="ssoEnabled && accountUrl"
+            :href="accountUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="button secondary"
+            >Ocharo account</a
+          >
+          <button v-if="ssoEnabled" class="button secondary" @click="onSignIn">
+            Reconnect with Ocharo
+          </button>
           <p v-if="connectionError" role="alert">{{ connectionError }}</p>
-          <label for="desk-ticket">Desk connection ticket</label>
-          <input
-            id="desk-ticket"
-            v-model="ticket"
-            type="password"
-            autocomplete="off"
-            placeholder="Paste a short-lived ticket"
-          />
-          <button
-            class="button secondary"
-            :disabled="!ticket.trim()"
-            @click="
-              () => {
-                onConnect?.(ticket);
-                ticket = '';
-              }
-            "
-          >
-            Connect and sync this design
-          </button>
-          <button
-            v-if="deskConnected"
-            class="button secondary"
-            @click="onConnect?.(null)"
-          >
-            Use browser only
-          </button>
+          <template v-if="!ssoEnabled && !authUnavailable">
+            <p>
+              Open Studio from your Desk workspace to save securely. A
+              connection expires after five minutes.
+            </p>
+            <label for="desk-ticket">Desk connection ticket</label>
+            <input
+              id="desk-ticket"
+              v-model="ticket"
+              type="password"
+              autocomplete="off"
+              placeholder="Paste a short-lived ticket"
+            />
+            <button
+              class="button secondary"
+              :disabled="!ticket.trim()"
+              @click="
+                () => {
+                  onConnect?.(ticket);
+                  ticket = '';
+                }
+              "
+            >
+              Connect and sync this design
+            </button>
+            <button
+              v-if="deskConnected"
+              class="button secondary"
+              @click="onConnect?.(null)"
+            >
+              Use browser only
+            </button>
+          </template>
         </div>
       </section>
       <div

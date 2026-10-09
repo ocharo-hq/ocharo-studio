@@ -1,3 +1,4 @@
+using Ocharo.Sso;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -125,6 +126,29 @@ public sealed class StudioAccessTests : IDisposable
         Assert.Equal(path, problem.GetProperty("instance").GetString());
         Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("traceId").GetString()));
         Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("requestId").GetString()));
+    }
+
+    [Fact]
+    public async Task EnabledSso_ShouldPreserveWorkspaceIsolationAndLiveRevocation()
+    {
+        await using var factory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string,string?> {
+                ["Identity:Sso:Enabled"] = "true", ["Identity:Sso:DeskOrigin"] = "https://desk.test",
+                ["Identity:Sso:ClientOrigin"] = "https://studio.test", ["Identity:Sso:ClientId"] = "studio",
+                ["Identity:Sso:ClientSecret"] = new string('s', 32) }));
+            builder.ConfigureServices(services => services.AddHttpClient<SsoBackchannel>().ConfigurePrimaryHttpMessageHandler(() => _desk));
+        });
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://studio.test"), AllowAutoRedirect = false });
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/studio/state")).StatusCode);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "editor");
+        var session = await client.GetFromJsonAsync<JsonElement>("/api/studio/session");
+        Assert.Equal(StudioIntegrationAuthenticationHandler.WorkspaceFor(Guid.Parse("f74556b7-caf8-41db-a25c-030d1f7d7987"), "member-a").ToString("D"), session.GetProperty("workspaceId").GetString());
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/studio/state")).StatusCode);
+        client.DefaultRequestHeaders.Add("X-Studio-Workspace", Guid.NewGuid().ToString());
+        Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync("/api/studio/state")).StatusCode);
+        _desk.Revoked = true;
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/studio/state")).StatusCode);
     }
 
     private static object EmptyState() => new { revision = 0, draft = (object?)null, looks = Array.Empty<object>(), settings = new { }, materials = new { } };

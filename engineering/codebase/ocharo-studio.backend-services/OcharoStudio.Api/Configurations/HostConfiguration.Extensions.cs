@@ -1,3 +1,4 @@
+using Ocharo.Sso;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.StaticFiles;
 using OcharoStudio.Api.Studio.Access;
@@ -44,6 +45,7 @@ public static partial class HostConfiguration
             .AddScheme<AuthenticationSchemeOptions, StudioIntegrationAuthenticationHandler>(
                 StudioIntegrationAuthenticationHandler.SchemeName, _ => { });
         builder.Services.AddAuthorization();
+        builder.Services.AddOcharoSso(builder.Configuration, "studio", "ocharo-studio");
         return builder;
     }
 
@@ -79,6 +81,7 @@ public static partial class HostConfiguration
     private static WebApplication UseStudioAccess(this WebApplication app)
     {
         app.UseAuthentication();
+        app.UseOcharoSso(http => http.Request.Path == "/health" || http.Request.Path == "/api/system/version");
         app.UseAuthorization();
         return app;
     }

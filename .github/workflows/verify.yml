@@ -38,6 +38,7 @@ jobs:
       - name: Verify host
         working-directory: engineering/codebase/ocharo-studio.backend-services
         run: |
+          python3 shared/sync-sso.py --check
           dotnet build OcharoStudio.BackendServices.slnx -p:BuildSpa=false
           dotnet test OcharoStudio.BackendServices.slnx --no-build
 

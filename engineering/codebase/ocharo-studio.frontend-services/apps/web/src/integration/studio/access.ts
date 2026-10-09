@@ -1,3 +1,4 @@
+import { getSsoSession, ssoUnavailable } from "./SsoAccess";
 const TICKET_KEY = "ocharo-studio:integration-ticket";
 export const DESK_ORIGIN =
   import.meta.env.VITE_OCHARO_PLATFORM_ORIGIN ?? "https://localhost:8264";
@@ -22,6 +23,8 @@ export function getIntegrationTicket(): string | null {
 export function setIntegrationTicket(ticket: string | null): void {
   if (ticket !== null && (!ticket.trim() || ticket.length > 8192))
     throw new Error("Enter a valid Desk connection ticket.");
+  if (getSsoSession().enabled || ssoUnavailable())
+    throw new Error("Use your Ocharo account to connect this app.");
   connectedSession = undefined;
   if (ticket === null) sessionStorage.removeItem(TICKET_KEY);
   else sessionStorage.setItem(TICKET_KEY, ticket.trim());
@@ -53,6 +56,7 @@ export function acceptTicketFragment(): string | undefined {
     "",
     window.location.pathname + window.location.search,
   );
+  if (getSsoSession().enabled || ssoUnavailable()) return undefined;
   try {
     const ticket = parseTicketFragment(fragment);
     if (ticket) setIntegrationTicket(ticket);
@@ -65,12 +69,13 @@ export function acceptTicketFragment(): string | undefined {
 }
 export async function loadStudioSession(
   fetcher: typeof fetch,
-  ticket: string,
+  ticket: string | null,
   signal?: AbortSignal,
 ): Promise<StudioSession> {
+  const sso = getSsoSession();
   const response = await fetcher("/api/studio/session", {
-    headers: { Authorization: `Bearer ${ticket}` },
-    credentials: "omit",
+    headers: sso.enabled ? {} : { Authorization: `Bearer ${ticket}` },
+    credentials: sso.enabled ? "same-origin" : "omit",
     signal,
   });
   if (!response.ok)

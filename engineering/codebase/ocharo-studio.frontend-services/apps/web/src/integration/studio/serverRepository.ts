@@ -1,3 +1,4 @@
+import { getSsoSession, ssoUnavailable } from "./SsoAccess";
 import {
   getIntegrationTicket,
   loadStudioSession,
@@ -68,14 +69,22 @@ export function createServerRepository(
   ): Promise<StudioSnapshot> {
     if (snapshot && !migrateMaterialScales(snapshot.materials))
       throw new Error("Invalid material scale library.");
-    const ticket = readTicket();
-    if (!ticket)
+    const sso = getSsoSession();
+    if (ssoUnavailable())
+      throw new Error(
+        "The account session could not be checked. Refresh to reconnect.",
+      );
+    const ticket = sso.enabled ? null : readTicket();
+    if (sso.enabled && !sso.authenticated)
+      throw new Error("Sign in through Ocharo Desk to sync this workspace.");
+    if (!sso.enabled && !ticket)
       throw new Error(
         "Browser-only mode. Connect from Ocharo Desk to save to your workspace.",
       );
-    if (!session || connectedTicket !== ticket) {
+    const connectionKey = sso.enabled ? "cookie" : ticket!;
+    if (!session || connectedTicket !== connectionKey) {
       session = await loadStudioSession(fetcher, ticket, signal);
-      connectedTicket = ticket;
+      connectedTicket = connectionKey;
     }
     signal?.throwIfAborted();
     if (method === "PUT" && !session.canEdit)
@@ -84,11 +93,15 @@ export function createServerRepository(
       );
     const response = await fetcher("/api/studio/state", {
       method,
-      credentials: "omit",
+      credentials: sso.enabled ? "same-origin" : "omit",
       headers: {
         "Content-Type": "application/json",
         "X-Studio-Workspace": session.workspaceId,
-        Authorization: `Bearer ${ticket}`,
+        ...(sso.enabled
+          ? method === "PUT"
+            ? { "X-CSRF-Token": sso.csrfToken! }
+            : {}
+          : { Authorization: `Bearer ${ticket}` }),
       },
       ...(snapshot ? { body: JSON.stringify(snapshot) } : {}),
       signal: signal ?? AbortSignal.timeout(15000),

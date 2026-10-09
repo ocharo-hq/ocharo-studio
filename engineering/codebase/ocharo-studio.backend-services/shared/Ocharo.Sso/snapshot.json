@@ -1,0 +1,12 @@
+{
+  "source": "ocharo-platform/engineering/codebase/ocharo-sso/Ocharo.Sso",
+  "generated": true,
+  "files": {
+    "Ocharo.Sso.csproj": "de0b19c9909eccc084b2a7777137280c034806dc190b52780f59d61046c1f191",
+    "SsoBackchannel.cs": "5382ab371d24275e5b3c310ab2fb7fcebb7574237e55c4c7efeb8e89404daee3",
+    "SsoMiddleware.cs": "e032d4fd829b699358f7a210f967f12c6276efe767e2a296189c02d37b96d9bd",
+    "SsoOptions.cs": "30eba43bdd913f893053cfc3f3bd60317842968a5fef228016c29c444d26d7d2",
+    "SsoRegistration.cs": "b206b22bb62a6f8eb52b09f8607fc050ff3d33d43ca605b6c19d3ec0d65afffe",
+    "SsoSessionStore.cs": "d8ac60ba4047e11bab0d77415f2fc46a663937ddc7966453bfc2f6771972bf33"
+  }
+}

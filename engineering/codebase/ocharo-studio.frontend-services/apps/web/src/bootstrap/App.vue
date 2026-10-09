@@ -36,6 +36,11 @@ import {
 } from "../domain/studio/catalog";
 import type { TexturePlacement } from "../domain/studio/types";
 import {
+  getSsoSession,
+  ssoUnavailable,
+  ssoLoginUrl,
+} from "../integration/studio/SsoAccess";
+import {
   acceptTicketFragment,
   getIntegrationTicket,
   setIntegrationTicket,
@@ -69,12 +74,28 @@ import { useStudioConfirmation } from "../presentation/studio/UseStudioConfirmat
 /** Composes the garment editor, presentation controls, and persistence-aware user actions. */
 defineOptions({ name: "StudioApp" });
 
-const connectionError = acceptTicketFragment();
-const deskConnected = ref(Boolean(getIntegrationTicket()));
+const ssoSession = getSsoSession();
+const connectionError = ssoUnavailable()
+  ? "The account session could not be checked. Refresh to reconnect."
+  : acceptTicketFragment();
+const deskConnected = ref(
+  ssoSession.enabled
+    ? ssoSession.authenticated
+    : Boolean(getIntegrationTicket()),
+);
 const studio = useStudio();
 const { refresh: refreshLooks, refreshing: refreshingLooks } = useRefresh(
   studio.refreshLooks,
 );
+function signIn(): void {
+  if (materialDirty.value || studio.persistenceStatus === "saving") {
+    notify("Finish saving your work before reconnecting.");
+    return;
+  }
+  window.location.assign(
+    ssoLoginUrl(window.location.pathname + window.location.search),
+  );
+}
 function connectDesk(ticket: string | null): void {
   try {
     setIntegrationTicket(ticket);
@@ -730,6 +751,10 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
       v-if="dialog === 'settings'"
       :dark="dark"
       :desk-connected="deskConnected"
+      :sso-enabled="ssoSession.enabled"
+      :account-url="ssoSession.accountUrl"
+      :auth-unavailable="ssoUnavailable()"
+      :on-sign-in="signIn"
       :connection-error="connectionError"
       :on-connect="connectDesk"
       :persistence-status="studio.persistenceStatus"

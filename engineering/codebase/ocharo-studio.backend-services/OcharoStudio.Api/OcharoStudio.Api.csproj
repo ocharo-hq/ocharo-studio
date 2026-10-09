@@ -7,6 +7,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../shared/Ocharo.Sso/Ocharo.Sso.csproj" />
     <ProjectReference Include="..\OcharoStudio.Application\OcharoStudio.Application.csproj" />
     <ProjectReference Include="..\OcharoStudio.Persistence\OcharoStudio.Persistence.csproj" />
   </ItemGroup>
