@@ -1,0 +1,6 @@
+{
+  "$schema": "../../../../../../conventions/design/identity/product.schema.json",
+  "manifest": 1,
+  "name": "Ocharo Studio",
+  "description": "A browser-based 3D studio for composing Uzbek garment looks with per-part textile placement on a mannequin."
+}

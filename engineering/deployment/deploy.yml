@@ -1,3 +1,9 @@
+# yaml-language-server: $schema=../../../../../../../conventions/deployment/descriptor/deploy.schema.json
+# What this product deploys: its services, how each builds, what changes it and which sites it serves.
+# Format and rules: wow-two-ws/conventions/deployment/descriptor/deploy-descriptor.md. Hostnames, secrets and
+# environments live in Wheelhouse targets, never here. Paths are relative to engineering/.
+#
+# Ocharo Studio is one image: the .NET API serving the Vue 3D editor, with its SQLite state on the data volume.
 descriptor: 1
 product: ocharo-studio
 services:
