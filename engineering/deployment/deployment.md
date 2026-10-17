@@ -27,9 +27,6 @@ frontend and backend locally; it did not rebuild or publish a Docker image.
 
 `deploy.yml` lists the one `studio` service; Wheelhouse deploys its bundle. Before a usable deployment:
 
-- The shared `publish.yml@v0.2.0` checks out without Git LFS, so the GLB models and PNG textures ship as pointer files.
-  Move to a pipelines tag that hydrates LFS before relying on a release.
-- The shared workflow passes `APP_VERSION` only; `VCS_REF` stays empty, so builds report no commit.
 - Studio's `/health` is hand-mapped, not the SDK boot bundle's endpoint.
 - Integration tickets and SSO require HTTPS requests, but Studio has no trusted-proxy support behind a TLS-terminating ingress.
 
