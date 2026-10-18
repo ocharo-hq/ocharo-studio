@@ -1,7 +1,7 @@
 import {
   useConfirmation,
   type ConfirmationController,
-} from "@wow-two-beta/ui-vue/foundation/hooks";
+} from "@wow-two-beta/fe/foundation/hooks";
 
 /** The content shown by the studio confirmation modal. */
 export interface StudioConfirmationRequest {

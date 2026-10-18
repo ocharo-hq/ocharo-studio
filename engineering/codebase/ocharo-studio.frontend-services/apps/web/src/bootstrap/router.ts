@@ -1,4 +1,4 @@
-import { createAppRouter, lazyRoute } from "@wow-two-beta/ui-vue/router";
+import { createAppRouter, lazyRoute } from "@wow-two-beta/fe/router";
 import RouteMessage from "./RouteMessage.vue";
 
 export const router = createAppRouter(

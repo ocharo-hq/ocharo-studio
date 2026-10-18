@@ -14,12 +14,12 @@ import {
   Shirt,
   Trash2,
 } from "@lucide/vue";
-import { Button } from "@wow-two-beta/ui-vue/presentation/actions";
+import { Button } from "@wow-two-beta/fe/presentation/actions";
 import {
   SkeletonState,
   SkeletonStateGroup,
   SkeletonStateSlot,
-} from "@wow-two-beta/ui-vue/presentation/feedback";
+} from "@wow-two-beta/fe/presentation/feedback";
 import type { StudioLibraryStatus } from "../../application/studio/UseStudioPersistence";
 import { GARMENTS, getGarment } from "../../domain/studio/catalog";
 import type {

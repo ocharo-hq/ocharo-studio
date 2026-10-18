@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  '@wow-two-beta/ui-vue@0.0.9':
-    hash: 0ff6751cdfa0e565dd6777a5797627d0b39616689f485f6827a83b0593ad9968
-    path: patches/@wow-two-beta__ui-vue@0.0.9.patch
-
 importers:
 
   .: {}
@@ -24,9 +19,9 @@ importers:
       '@tanstack/vue-query':
         specifier: 5.102.8
         version: 5.102.8(vue@3.5.41(typescript@5.9.3))
-      '@wow-two-beta/ui-vue':
-        specifier: 0.0.9
-        version: 0.0.9(patch_hash=0ff6751cdfa0e565dd6777a5797627d0b39616689f485f6827a83b0593ad9968)(@tanstack/vue-query@5.102.8(vue@3.5.41(typescript@5.9.3)))(tailwindcss@4.3.3)(vue-router@4.6.4(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))
+      '@wow-two-beta/fe':
+        specifier: 0.0.22
+        version: 0.0.22(@tanstack/vue-query@5.102.8(vue@3.5.41(typescript@5.9.3)))(tailwindcss@4.3.3)(vue-router@4.6.4(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -645,8 +640,8 @@ packages:
   '@vue/shared@3.5.41':
     resolution: {integrity: sha512-IOnwSCma8j+9xJT6b8H0dEYidC80NsYmNMlZxRsukYcSoGaDBohog5hDxzeUXdFeGWFA++vWvxqOmrr96VlqMA==}
 
-  '@wow-two-beta/ui-vue@0.0.9':
-    resolution: {integrity: sha512-R8ooh0fkCcuP7ktcveNOmJrEfzYg+OijawZlVq+aA99NTVd5GzGaVAAag+TDciwh6K/1SRkrqFuUGn49aUm94A==}
+  '@wow-two-beta/fe@0.0.22':
+    resolution: {integrity: sha512-q/vg7MY/VMK6PvATPPSPzKdBVZguWKdbmVDS0zSwp0ha1BKssL5wpnp8Z2CbSAfWktg63JACwQf/EjvEMvh2sA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@tanstack/vue-form': ^1.0.0
@@ -1552,7 +1547,7 @@ snapshots:
 
   '@vue/shared@3.5.41': {}
 
-  '@wow-two-beta/ui-vue@0.0.9(patch_hash=0ff6751cdfa0e565dd6777a5797627d0b39616689f485f6827a83b0593ad9968)(@tanstack/vue-query@5.102.8(vue@3.5.41(typescript@5.9.3)))(tailwindcss@4.3.3)(vue-router@4.6.4(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))':
+  '@wow-two-beta/fe@0.0.22(@tanstack/vue-query@5.102.8(vue@3.5.41(typescript@5.9.3)))(tailwindcss@4.3.3)(vue-router@4.6.4(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))':
     dependencies:
       '@floating-ui/vue': 1.1.11(vue@3.5.41(typescript@5.9.3))
       bignumber.js: 11.1.5

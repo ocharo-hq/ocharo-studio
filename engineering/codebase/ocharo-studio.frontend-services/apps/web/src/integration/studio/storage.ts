@@ -2,7 +2,7 @@ import {
   localStorageStorageBroker,
   memoryStorageBroker,
   type StorageBroker,
-} from "@wow-two-beta/ui-vue/foundation/storage";
+} from "@wow-two-beta/fe/foundation/storage";
 
 export type JsonStorage = StorageBroker;
 

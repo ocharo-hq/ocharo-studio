@@ -2,7 +2,7 @@
 import { watch } from "vue";
 import { RouterLink } from "vue-router";
 import { ArrowRight, Move, Palette, Save } from "@lucide/vue";
-import { usePersistentState } from "@wow-two-beta/ui-vue/foundation/storage";
+import { usePersistentState } from "@wow-two-beta/fe/foundation/storage";
 import { GARMENTS, MATERIALS } from "../../../domain/studio/catalog";
 import StudioBrand from "../../common/StudioBrand.vue";
 import GarmentGlyph from "../GarmentGlyph.vue";

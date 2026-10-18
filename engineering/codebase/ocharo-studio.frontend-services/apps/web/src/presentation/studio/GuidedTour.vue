@@ -3,7 +3,7 @@ import type { LibraryTab } from "./StudioLibrary.vue";
 import type {
   Placement,
   TourPopoverStep,
-} from "@wow-two-beta/ui-vue/presentation/overlays/tour-popover";
+} from "@wow-two-beta/fe/presentation/overlays/tour-popover";
 
 export interface GuidedTourStep extends TourPopoverStep {
   readonly id: string;
@@ -15,7 +15,7 @@ export interface GuidedTourStep extends TourPopoverStep {
 
 <script setup lang="ts">
 import { watch } from "vue";
-import { TourPopover } from "@wow-two-beta/ui-vue/presentation/overlays/tour-popover";
+import { TourPopover } from "@wow-two-beta/fe/presentation/overlays/tour-popover";
 
 /** Product tour content adapter over the reusable SDK spotlight behavior. */
 defineOptions({ name: "GuidedTour" });

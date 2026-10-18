@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Modal, ModalContent, ModalTitle } from "@wow-two-beta/ui-vue";
+import { Modal, ModalContent, ModalTitle } from "@wow-two-beta/fe";
 import { X } from "@lucide/vue";
 import IconButton from "./IconButton.vue";
 
@@ -11,11 +11,11 @@ defineProps<{ title: string; onClose: () => void }>();
 <template>
   <Modal
     :open="true"
-    :dismiss-on-outside-click="true"
-    :dismiss-on-escape="true"
+    :can-dismiss-on-outside-click="true"
+    :can-dismiss-on-escape="true"
     @update:open="(open) => !open && onClose()"
   >
-    <ModalContent class="studio-dialog" :is-blurred="true">
+    <ModalContent class="studio-dialog" :is-blurred="true" phone-layout="card">
       <div class="dialog-title">
         <ModalTitle>{{ title }}</ModalTitle>
         <IconButton :icon="X" label="Close dialog" :on-click="onClose" />

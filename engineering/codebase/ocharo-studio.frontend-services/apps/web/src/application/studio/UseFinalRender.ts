@@ -1,5 +1,5 @@
 import { onScopeDispose, shallowRef, type ShallowRef } from "vue";
-import { downloadBlob } from "@wow-two-beta/ui-vue/foundation/files";
+import { downloadBlob } from "@wow-two-beta/fe/foundation/files";
 import type { DesignDocument } from "../../domain/studio/types";
 import type { FinalRenderOptions } from "../../integration/studio/render/RenderFraming";
 

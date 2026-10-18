@@ -4,7 +4,7 @@ import {
   loadStudioSession,
   type StudioSession,
 } from "./access";
-import { LatestRevisionQueue } from "@wow-two-beta/ui-vue/foundation/sync";
+import { LatestRevisionQueue } from "@wow-two-beta/fe/foundation/sync";
 import { migrateDocument } from "../../domain/studio/document";
 import { migrateMaterialScales } from "../../domain/studio/materials";
 import type {

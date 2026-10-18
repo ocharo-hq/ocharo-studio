@@ -11,7 +11,7 @@ import {
   RotateCw,
   SlidersHorizontal,
 } from "@lucide/vue";
-import { PointControl } from "@wow-two-beta/ui-vue/presentation/forms/point-control";
+import { PointControl } from "@wow-two-beta/fe/presentation/forms/point-control";
 import type {
   GarmentDefinition,
   MaterialDefinition,

@@ -1,6 +1,6 @@
 @import "tailwindcss" source(none);
-@import "@wow-two-beta/ui-vue/presentation/forms/point-control/styles.css";
-@import "@wow-two-beta/ui-vue/presentation/feedback/toast-host/styles.css";
+@import "@wow-two-beta/fe/presentation/forms/point-control/styles.css";
+@import "@wow-two-beta/fe/presentation/feedback/toast-host/styles.css";
 @source "../../";
 
 @theme inline {

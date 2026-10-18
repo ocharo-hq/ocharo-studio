@@ -1,5 +1,5 @@
-@import "@wow-two-beta/ui-vue/presentation/overlays/tour-popover/styles.css";
-@import "@wow-two-beta/ui-vue/presentation/overlays/modal/styles.css";
+@import "@wow-two-beta/fe/presentation/overlays/tour-popover/styles.css";
+@import "@wow-two-beta/fe/presentation/overlays/modal/styles.css";
 
 .app-header {
   position: relative;

@@ -7,7 +7,7 @@ import {
   ModalDescription,
   ModalFooter,
   ModalTitle,
-} from "@wow-two-beta/ui-vue";
+} from "@wow-two-beta/fe";
 
 import type { StudioConfirmationRequest } from "./UseStudioConfirmation";
 
@@ -23,7 +23,7 @@ defineProps<{
 <template>
   <AlertModal
     :open="request !== null"
-    :dismiss-on-escape="true"
+    :can-dismiss-on-escape="true"
     @update:open="(open) => !open && onCancel()"
   >
     <AlertModalContent
@@ -33,6 +33,7 @@ defineProps<{
       radius="lg"
       padding="xl"
       :elevation="4"
+      phone-layout="card"
     >
       <ModalTitle class="studio-confirmation-title">
         {{ request.title }}

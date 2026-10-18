@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
-import { AppErrorBoundary, RouteAnnouncer } from "@wow-two-beta/ui-vue/router";
+import { AppErrorBoundary, RouteAnnouncer } from "@wow-two-beta/fe/router";
 import RouteMessage from "./RouteMessage.vue";
 
 /** Composes shared route recovery, initial loading, and accessible route announcements. */

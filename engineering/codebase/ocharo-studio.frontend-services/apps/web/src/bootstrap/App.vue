@@ -8,17 +8,14 @@ import {
   watch,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useRefresh } from "@wow-two-beta/ui-vue/query";
-import { useNavigationBlocker } from "@wow-two-beta/ui-vue/router";
-import { usePersistentState } from "@wow-two-beta/ui-vue/foundation/storage";
-import {
-  downloadBlob,
-  downloadText,
-} from "@wow-two-beta/ui-vue/foundation/files";
+import { useRefresh } from "@wow-two-beta/fe/query";
+import { useNavigationBlocker } from "@wow-two-beta/fe/router";
+import { usePersistentState } from "@wow-two-beta/fe/foundation/storage";
+import { downloadBlob, downloadText } from "@wow-two-beta/fe/foundation/files";
 import {
   ToastHost,
   useToastHost,
-} from "@wow-two-beta/ui-vue/presentation/feedback/toast-host";
+} from "@wow-two-beta/fe/presentation/feedback/toast-host";
 import { CircleHelp, MousePointer2 } from "@lucide/vue";
 
 import {
@@ -716,12 +713,7 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
       aria-label="Import design file"
       @change="importFile"
     />
-    <ToastHost
-      class="studio-toasts"
-      position="top-right"
-      :default-duration="4500"
-      show-progress
-    />
+    <ToastHost class="studio-toasts" :default-duration="4500" timer="bar" />
     <ExportDialog
       v-if="dialog === 'export'"
       :ready="ready"

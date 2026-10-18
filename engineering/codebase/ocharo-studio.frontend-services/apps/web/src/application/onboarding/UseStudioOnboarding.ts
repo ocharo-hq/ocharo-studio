@@ -8,7 +8,7 @@ import {
 import {
   isVisitInvitationDue,
   useVisitInvitation,
-} from "@wow-two-beta/ui-vue/foundation/hooks";
+} from "@wow-two-beta/fe/foundation/hooks";
 
 const TWELVE_HOURS = 12 * 60 * 60 * 1000;
 const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
