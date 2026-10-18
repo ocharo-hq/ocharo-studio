@@ -1,6 +1,6 @@
 # Ocharo Studio
 
-*Last updated: 2026-09-29*
+*Last updated: 2026-10-18*
 
 A 3D creative studio for exploring Uzbek clothing on a mannequin with selectable garment parts and editable fabric placement.
 
@@ -45,7 +45,7 @@ dotnet run --project engineering/codebase/ocharo-studio.backend-services/OcharoS
 ```
 
 The backend build installs the locked frontend dependencies and builds the SPA into its generated `wwwroot/`.
-The lockfile resolves published `@wow-two-beta/ui-vue@0.0.9`; the older vendor archive is preserved as source history.
+The lockfile resolves published `@wow-two-beta/fe@0.0.22`; the backend pins `WoW2.Sdk.Beta.Be` `10.0.68-beta`.
 
 For frontend work, run these commands from `engineering/codebase/ocharo-studio.frontend-services/`:
 

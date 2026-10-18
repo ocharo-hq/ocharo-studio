@@ -1,6 +1,6 @@
 # Operations
 
-*Last updated: 2026-09-29*
+*Last updated: 2026-10-18*
 
 ## Isolated review
 
@@ -16,7 +16,7 @@ Required runtimes belong in managed terminals. Existing databases and runtime pr
 - `STUDIO_TLS_CERT` and `STUDIO_TLS_KEY` reuse an existing trusted certificate pair and skip mkcert.
 - `NODE_EXTRA_CA_CERTS` can supply the existing local CA to Node; never disable TLS verification.
 - Use the declared Node `24` and pnpm `10` versions; a login shell can otherwise select older system Node.
-- The frontend consumes published `@wow-two-beta/ui-vue@0.0.9`; the earlier vendor archive remains preserved.
+- The frontend consumes published `@wow-two-beta/fe@0.0.22`.
 
 ## Storage and connection
 

@@ -25,7 +25,7 @@ A 3D creative studio for fixed-size Uzbek garments and per-part textile placemen
 - `engineering/architecture/`: implementation contracts.
 - `engineering/planning/`: implementation prompt, status, and verification.
 
-The frontend framework is Vue 3 with TypeScript and the Vue SDK (`@wow-two-beta/ui-vue`).
+The frontend framework is Vue 3 with TypeScript and the Vue SDK (`@wow-two-beta/fe`).
 The Three.js renderer stays framework-independent.
 
 Workspace guidance: [Ocharo](../../CLAUDE.md) and [WoW2](../../../../../CLAUDE.md).

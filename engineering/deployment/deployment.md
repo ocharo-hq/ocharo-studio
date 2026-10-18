@@ -1,6 +1,6 @@
 # Deployment
 
-*Last updated: 2026-10-17*
+*Last updated: 2026-10-18*
 
 The Dockerfile packages the Vue SPA and .NET API into one image.
 Its build context is `engineering/codebase/`. Compose mounts the named `ocharo-studio-data` volume at
@@ -18,7 +18,7 @@ and then the shared `publish.yml` of `wow-two-platform.pipelines`, which builds 
 A `main` build releases `vX.Y.Z` with `ocharo-studio-release.tar.gz`; other builds are candidates.
 It uses the repository's own GitHub identity; no owner, remote, or registry credentials are hardcoded.
 
-The frontend lockfile consumes published `@wow-two-beta/ui-vue@0.0.9`. The older vendor archive remains preserved.
+The frontend lockfile consumes published `@wow-two-beta/fe@0.0.22`.
 The connected build requires HTTPS and a trusted Platform introspection origin. The plain HTTP Compose preview
 supports browser-only editing; it cannot accept protected-state bearer tickets. This integration pass built the
 frontend and backend locally; it did not rebuild or publish a Docker image.
