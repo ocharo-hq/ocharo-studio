@@ -4,7 +4,7 @@ using OcharoStudio.Api.Studio.Access;
 using Microsoft.AspNetCore.Mvc;
 using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
 using OcharoStudio.Application.Studio.State;
-using WoW.Two.Sdk.Backend.Beta.Mediator;
+using WoW.Two.Sdk.Beta.Be.Mediator;
 
 namespace OcharoStudio.Api.Controllers;
 

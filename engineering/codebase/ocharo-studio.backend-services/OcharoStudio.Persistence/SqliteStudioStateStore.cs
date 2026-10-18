@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using OcharoStudio.Application.Studio.State;
-using WoW.Two.Sdk.Backend.Beta.Foundation.Serialization;
+using WoW.Two.Sdk.Beta.Be.Foundation.Serialization;
 
 namespace OcharoStudio.Persistence;
 

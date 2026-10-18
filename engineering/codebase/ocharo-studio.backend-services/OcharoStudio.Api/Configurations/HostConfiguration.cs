@@ -1,5 +1,5 @@
 using OcharoStudio.Persistence;
-using WoW.Two.Sdk.Backend.Beta.Web.ProblemDetails;
+using WoW.Two.Sdk.Beta.Be.Web.ProblemDetails;
 
 namespace OcharoStudio.Api.Configurations;
 

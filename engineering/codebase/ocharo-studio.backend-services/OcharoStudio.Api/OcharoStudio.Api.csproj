@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <!-- Kit: mediator (ISender), Result/DomainError, web/problem-details. -->
-    <PackageReference Include="WoW2.Sdk.Backend.Beta" />
+    <PackageReference Include="WoW2.Sdk.Beta.Be" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
   </ItemGroup>
 

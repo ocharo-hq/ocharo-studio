@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <!-- Kit: mediator (IRequest/IRequestHandler), Result/DomainError. -->
-    <PackageReference Include="WoW2.Sdk.Backend.Beta" />
+    <PackageReference Include="WoW2.Sdk.Beta.Be" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
 

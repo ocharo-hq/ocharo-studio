@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
-using WoW.Two.Sdk.Backend.Beta.Mediator;
+using WoW.Two.Sdk.Beta.Be.Mediator;
 using Xunit;
 
 namespace OcharoStudio.Tests;

@@ -1,4 +1,4 @@
-using WoW.Two.Sdk.Backend.Beta.Mediator;
+using WoW.Two.Sdk.Beta.Be.Mediator;
 
 namespace OcharoStudio.Application.Studio.Queries.GetStudioInfo;
 

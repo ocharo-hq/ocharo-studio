@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <!-- wow-two backend SDK (kit): mediator, Result/DomainError, IKeyedEntity, web/problem-details. On nuget.org. -->
-    <PackageVersion Include="WoW2.Sdk.Backend.Beta" Version="10.0.64-beta" />
+    <PackageVersion Include="WoW2.Sdk.Beta.Be" Version="10.0.68-beta" />
   </ItemGroup>
 
   <ItemGroup>
