@@ -33,7 +33,7 @@ concurrency:
 
 jobs:
   delivery:
-    uses: wow-two-platform/wow-two-platform.pipelines/.github/workflows/delivery.yml@v0.9.0
+    uses: wow-two-platform/wow-two-platform.pipelines/.github/workflows/delivery.yml@v0.9.1
     with:
       commit: ${{ inputs.commit }}
       backends: |
