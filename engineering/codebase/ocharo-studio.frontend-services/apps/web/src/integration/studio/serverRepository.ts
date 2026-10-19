@@ -1,6 +1,7 @@
 import { getSsoSession, ssoUnavailable } from "./SsoAccess";
 import {
   getIntegrationTicket,
+  handleUnauthorized,
   loadStudioSession,
   type StudioSession,
 } from "./access";
@@ -106,10 +107,14 @@ export function createServerRepository(
       ...(snapshot ? { body: JSON.stringify(snapshot) } : {}),
       signal: signal ?? AbortSignal.timeout(15000),
     });
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401) {
+      session = undefined;
+      throw handleUnauthorized();
+    }
+    if (response.status === 403) {
       session = undefined;
       throw new Error(
-        "Your Desk connection expired or access changed. Reconnect; your browser recovery is preserved.",
+        "Your Desk access changed. Reconnect; your browser recovery is preserved.",
       );
     }
     if (response.status === 409) throw new StudioConflict();

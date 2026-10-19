@@ -19,6 +19,7 @@ import {
   type PersistenceStatus,
   type StudioSnapshot,
 } from "../../integration/studio/serverRepository";
+import { StudioSessionExpired } from "../../integration/studio/access";
 
 const CACHE_META = studioCacheKey("ocharo-studio:sync");
 const SETTINGS_KEY = studioCacheKey("ocharo-studio:settings");
@@ -137,14 +138,15 @@ export function useStudioPersistence(
               ...state.value,
               notice: "Look saved to the studio.",
             };
-        } catch {
+        } catch (error) {
           if (!active || request !== projectionRead) return;
           if (looksStatus.value !== "ready") looksStatus.value = "unavailable";
-          state.value = {
-            ...state.value,
-            notice:
-              "The saved look library could not refresh. Your browser recovery is preserved; refresh My looks when ready.",
-          };
+          if (!(error instanceof StudioSessionExpired))
+            state.value = {
+              ...state.value,
+              notice:
+                "The saved look library could not refresh. Your browser recovery is preserved; refresh My looks when ready.",
+            };
         } finally {
           if (active && request === projectionRead)
             refreshingLooks.value = false;
@@ -232,7 +234,8 @@ export function useStudioPersistence(
                   studioCacheKey("ocharo-studio:conflict-recovery"),
                   snapshot.value,
                 );
-              if (error)
+              // An ended session is the bridge's one neutral notice, never a sync warning.
+              if (error && !(error instanceof StudioSessionExpired))
                 state.value = {
                   ...state.value,
                   notice:
@@ -259,19 +262,21 @@ export function useStudioPersistence(
             updateStatus("synced");
           }
         })
-        .catch(() => {
+        .catch((error: unknown) => {
           if (!active) return;
           updateStatus("offline");
           looksStatus.value = "unavailable";
-          state.value = {
-            ...state.value,
-            notice:
-              (recoveryError ? `${recoveryError} ` : "") +
-              "Studio storage is offline. Changes remain in this browser; retry from Settings." +
-              (cacheError
-                ? " Browser recovery storage failed; export your design now."
-                : ""),
-          };
+          const cacheNotice = cacheError
+            ? "Browser recovery storage failed; export your design now."
+            : "";
+          // A 401 settles the session through the bridge; only recovery problems still need a notice.
+          const notice =
+            error instanceof StudioSessionExpired
+              ? [recoveryError, cacheNotice].filter(Boolean).join(" ")
+              : (recoveryError ? `${recoveryError} ` : "") +
+                "Studio storage is offline. Changes remain in this browser; retry from Settings." +
+                (cacheNotice ? ` ${cacheNotice}` : "");
+          if (notice) state.value = { ...state.value, notice };
           writeCache(snapshot.value, true);
         });
     },

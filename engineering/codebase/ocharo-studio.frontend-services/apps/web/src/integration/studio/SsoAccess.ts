@@ -13,6 +13,15 @@ export function getSsoSession(): StudioSsoSession {
 export function ssoUnavailable(): boolean {
   return unavailable;
 }
+/** Settles the cached account state signed out after its session expired; the HttpOnly cookie stays server-owned. */
+export function expireSsoSession(): void {
+  if (!session.enabled || !session.authenticated) return;
+  session = {
+    ...(session.accountUrl ? { accountUrl: session.accountUrl } : {}),
+    enabled: true,
+    authenticated: false,
+  };
+}
 export function ssoLoginUrl(path: string): string {
   const safe =
     path.startsWith("/") &&

@@ -12,10 +12,13 @@ import { useRefresh } from "@wow-two-beta/fe/query";
 import { useNavigationBlocker } from "@wow-two-beta/fe/router";
 import { usePersistentState } from "@wow-two-beta/fe/foundation/storage";
 import { downloadBlob, downloadText } from "@wow-two-beta/fe/foundation/files";
+import { useToastHost } from "@wow-two-beta/fe/presentation/feedback/toast-host";
+import { FeedbackToastHost } from "@wow-two-beta/fe/presentation/feedback";
 import {
-  ToastHost,
-  useToastHost,
-} from "@wow-two-beta/fe/presentation/feedback/toast-host";
+  feedbackBus,
+  feedbackSessionExpiry,
+  SessionExpiredNotice,
+} from "@wow-two-beta/fe/feedback";
 import { CircleHelp, MousePointer2 } from "@lucide/vue";
 
 import {
@@ -41,6 +44,7 @@ import {
   acceptTicketFragment,
   getIntegrationTicket,
   setIntegrationTicket,
+  studioAuth,
 } from "../integration/studio/access";
 import {
   createCreativeHandoff,
@@ -80,6 +84,21 @@ const deskConnected = ref(
     ? ssoSession.authenticated
     : Boolean(getIntegrationTicket()),
 );
+// A 401 settles the Desk session anonymous; an expiry publishes one neutral notice and keeps local work in place.
+const stopUnauthorized = studioAuth.subscribeUnauthorized(() => {
+  deskConnected.value = false;
+});
+const stopExpired = studioAuth.subscribeExpired(
+  feedbackSessionExpiry(feedbackBus, {
+    ...SessionExpiredNotice,
+    description:
+      "Your designs stay in this browser. Reconnect from Ocharo Desk to sync them.",
+  }),
+);
+onScopeDispose(() => {
+  stopUnauthorized();
+  stopExpired();
+});
 const studio = useStudio();
 const { refresh: refreshLooks, refreshing: refreshingLooks } = useRefresh(
   studio.refreshLooks,
@@ -713,7 +732,11 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
       aria-label="Import design file"
       @change="importFile"
     />
-    <ToastHost class="studio-toasts" :default-duration="4500" timer="bar" />
+    <FeedbackToastHost
+      class="studio-toasts"
+      :default-duration="4500"
+      timer="bar"
+    />
     <ExportDialog
       v-if="dialog === 'export'"
       :ready="ready"

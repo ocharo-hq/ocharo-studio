@@ -1,4 +1,5 @@
-import { getSsoSession, ssoUnavailable } from "./SsoAccess";
+import { AuthStatus, createAuthBridge } from "@wow-two-beta/fe/auth";
+import { expireSsoSession, getSsoSession, ssoUnavailable } from "./SsoAccess";
 const TICKET_KEY = "ocharo-studio:integration-ticket";
 export const DESK_ORIGIN =
   import.meta.env.VITE_OCHARO_PLATFORM_ORIGIN ?? "https://localhost:8264";
@@ -10,6 +11,37 @@ export interface StudioSession {
   expiresAt: string;
 }
 let connectedSession: StudioSession | undefined;
+/** The app's one session bridge: a connected Desk session expires once, on its first current 401. */
+export const studioAuth = createAuthBridge<StudioSession>({
+  getIdentity: (session) => `${session.organizationId}\n${session.userId}`,
+});
+// A 401 clears the ended credential and settles anonymous; browser recovery and local edits stay untouched.
+studioAuth.subscribeUnauthorized(() => {
+  connectedSession = undefined;
+  try {
+    sessionStorage.removeItem(TICKET_KEY);
+  } catch {
+    /* Storage is optional. */
+  }
+  expireSsoSession();
+  if (studioAuth.getSession().status !== AuthStatus.Anonymous)
+    studioAuth.publishSession({ status: AuthStatus.Anonymous, user: null });
+});
+/** A Studio 401: the bridge signed the session out and owns its one neutral notice, so callers never warn about it. */
+export class StudioSessionExpired extends Error {
+  constructor() {
+    super(
+      "Your Desk connection ended. Reconnect; your browser recovery is preserved.",
+    );
+    this.name = "StudioSessionExpired";
+  }
+}
+/** Routes a Studio 401 through the bridge and returns the error its request rejects with. */
+export function handleUnauthorized(): StudioSessionExpired {
+  const error = new StudioSessionExpired();
+  studioAuth.onUnauthorized(error);
+  return error;
+}
 export function getConnectedSession(): StudioSession | undefined {
   return connectedSession;
 }
@@ -26,8 +58,10 @@ export function setIntegrationTicket(ticket: string | null): void {
   if (getSsoSession().enabled || ssoUnavailable())
     throw new Error("Use your Ocharo account to connect this app.");
   connectedSession = undefined;
-  if (ticket === null) sessionStorage.removeItem(TICKET_KEY);
-  else sessionStorage.setItem(TICKET_KEY, ticket.trim());
+  if (ticket === null) {
+    sessionStorage.removeItem(TICKET_KEY);
+    studioAuth.publishSession({ status: AuthStatus.Anonymous, user: null });
+  } else sessionStorage.setItem(TICKET_KEY, ticket.trim());
 }
 /** Removes credentials before validation; only Desk's configured origin and Studio audience are accepted. */
 export function parseTicketFragment(
@@ -78,6 +112,7 @@ export async function loadStudioSession(
     credentials: sso.enabled ? "same-origin" : "omit",
     signal,
   });
+  if (response.status === 401) throw handleUnauthorized();
   if (!response.ok)
     throw new Error(
       "Reconnect from Ocharo Desk. Your designs remain in this browser.",
@@ -97,5 +132,6 @@ export async function loadStudioSession(
   )
     throw new Error("Invalid Desk session response.");
   connectedSession = value;
+  studioAuth.publishSession({ status: AuthStatus.Authenticated, user: value });
   return value;
 }

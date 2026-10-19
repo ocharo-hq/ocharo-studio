@@ -1,4 +1,7 @@
-vi.mock("../src/integration/studio/access", () => ({
+vi.mock("../src/integration/studio/access", async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import("../src/integration/studio/access")
+  >()),
   getIntegrationTicket: () => "fixture-ticket",
   loadStudioSession: async () => ({
     workspaceId: "d0a8c678-c27f-478f-b4e8-c9928bf88c21",
@@ -184,6 +187,31 @@ describe("Vue studio composition", () => {
     expect(name.value).toBe("Server name");
     studio.redo();
     expect(name.value).toBe("Spring atlas");
+  });
+
+  it("keeps local work offline without a sync warning when the Desk session ends", async () => {
+    const saved = { ...createDesignDocument(), name: "Server name" };
+    const request = vi.fn(async (_url: string, options: RequestInit) =>
+      options.method === "GET"
+        ? response(empty(2, saved))
+        : new Response("{}", { status: 401 }),
+    );
+    vi.stubGlobal("fetch", request);
+    const { studio } = setupStudio();
+    await flush();
+    studio.clearNotice();
+    studio.rename("Unsynced local rename");
+    await vi.advanceTimersByTimeAsync(400);
+    await flush();
+
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(studio.persistenceStatus).toBe("offline");
+    expect(studio.notice).toBeFalsy();
+    expect(studio.document.name).toBe("Unsynced local rename");
+    expect(createStudioRepository().readRecovery()).toMatchObject({
+      pending: true,
+      draft: { name: "Unsynced local rename" },
+    });
   });
 
   it("retains edits made while the initial server read is pending", async () => {

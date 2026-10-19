@@ -178,9 +178,11 @@ describe("shared Ocharo session", () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 
-  it("keeps reader work local and never retries a revoked write", async () => {
-    const { initializeSso } =
+  it("keeps reader work local and signs an ended account session out once", async () => {
+    const { getSsoSession, initializeSso } =
       await import("../src/integration/studio/SsoAccess");
+    const { StudioSessionExpired, studioAuth } =
+      await import("../src/integration/studio/access");
     const { createServerRepository } =
       await import("../src/integration/studio/serverRepository");
     await initializeSso(
@@ -197,14 +199,22 @@ describe("shared Ocharo session", () => {
       createServerRepository(readerFetch).write(snapshot),
     ).rejects.toThrow(/viewing only/);
     expect(readerFetch).toHaveBeenCalledTimes(1);
+    const expired = vi.fn();
+    studioAuth.subscribeExpired(expired);
     const writerFetch = vi
       .fn()
       .mockResolvedValueOnce(response(studio))
       .mockResolvedValueOnce(response({}, 401));
-    await expect(
-      createServerRepository(writerFetch).write(snapshot),
-    ).rejects.toThrow(/access changed/);
+    const writer = createServerRepository(writerFetch);
+    await expect(writer.write(snapshot)).rejects.toBeInstanceOf(
+      StudioSessionExpired,
+    );
     expect(writerFetch).toHaveBeenCalledTimes(2);
+    expect(expired).toHaveBeenCalledTimes(1);
+    expect(getSsoSession()).toEqual({ enabled: true, authenticated: false });
+    await expect(writer.write(snapshot)).rejects.toThrow(/Sign in/);
+    expect(writerFetch).toHaveBeenCalledTimes(2);
+    expect(expired).toHaveBeenCalledTimes(1);
   });
 
   it("returns only local destinations to the backend redirect handler", async () => {
