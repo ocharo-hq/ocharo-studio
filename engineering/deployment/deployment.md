@@ -13,9 +13,10 @@ docker build -f engineering/deployment/Dockerfile -t ocharo-studio:local enginee
 ```
 
 The local compose endpoint uses `127.0.0.1:18260`.
-`publish-docker-image.yml` is the Wheelhouse marker: each push, and each dispatched `commit`, runs `verify.yml`
-and then the shared `publish.yml` of `wow-two-platform.pipelines` `v0.7.0`, which builds
-`ghcr.io/ocharo-hq/ocharo-studio/studio`. Work lands on `main` only: a `main` build releases `vX.Y.Z` with
+`publish-docker-image.yml` is the Wheelhouse marker and the only CI file: it calls the shared `delivery.yml` of
+`wow-two-platform.pipelines` `v0.9.0`. A docs-only push builds nothing; a backend change runs the host checks; a
+frontend or test change runs the frontend checks and the full three-shard browser suite; a shared file runs all.
+Publication then builds `ghcr.io/ocharo-hq/ocharo-studio/studio`. Work lands on `main` only: a `main` build releases `vX.Y.Z` with
 `ocharo-studio-release.tar.gz`; Wheelhouse deploys it to dev automatically and promotes that same release to prod
 by digest. A short-lived branch or dispatched commit builds a candidate that reaches dev only by hand; there is
 no dev or test branch.
