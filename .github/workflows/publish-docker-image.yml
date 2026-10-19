@@ -1,14 +1,19 @@
-# Builds and publishes Ocharo Studio like every product, through the shared workflow in wow-two-platform.pipelines:
+# Verifies, builds and publishes Ocharo Studio like every product, through the shared delivery workflow in
+# wow-two-platform.pipelines (current → plan → ci → publish):
 #   main          → release vX.Y.Z (X.Y from the newest version-track folder), bundle on the GitHub release
 #   other branches → candidate sha-<commit>, bundle as an Actions artifact
 #   workflow_dispatch → a candidate for one commit that has no build yet (Wheelhouse's Build action)
+#   pull request  → ci only
 # Image: ghcr.io/ocharo-hq/ocharo-studio/studio, the one service in engineering/deployment/deploy.yml.
-# One push event tests/builds its final SHA once, regardless of its commit count. Wheelhouse deploys the bundle.
+# The full browser suite runs on every frontend or test change (tests live in the frontend workspace), and on any
+# change no check owns, such as a workflow; a backend-only change runs the host checks; a docs-only push runs nothing.
+# Wheelhouse deploys the bundle.
 name: publish-docker-image
 
 on:
   push:
-    branches: ['**']
+    branches: ['**', '!renovate/**']
+  pull_request:
   workflow_dispatch:
     inputs:
       commit:
@@ -22,43 +27,39 @@ permissions:
 
 concurrency:
   group: delivery-${{ github.repository }}-${{ inputs.commit || github.ref }}
-  cancel-in-progress: false
+  # main queues, so each release reads the tag the previous one created; other refs cancel a superseded run.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main') }}
   queue: max
 
 jobs:
-  verify:
-    uses: ./.github/workflows/verify.yml
-    with:
-      commit: ${{ inputs.commit || github.sha }}
-
-  current:
-    needs: verify
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    outputs:
-      eligible: ${{ steps.head.outputs.eligible }}
-    steps:
-      - name: Skip superseded main pushes and old reruns
-        id: head
-        env:
-          GH_TOKEN: ${{ github.token }}
-          EVENT: ${{ github.event_name }}
-          REF: ${{ github.ref }}
-          COMMIT: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          eligible=true
-          if [ "$EVENT" = push ] && [ "$REF" = refs/heads/main ]; then
-            head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
-            [ "$COMMIT" = "$head" ] || eligible=false
-          fi
-          echo "eligible=$eligible" >> "$GITHUB_OUTPUT"
-          [ "$eligible" = true ] || echo 'Superseded main push: publication skipped.' >> "$GITHUB_STEP_SUMMARY"
-
-  publish:
-    needs: current
-    if: needs.current.outputs.eligible == 'true'
-    uses: wow-two-platform/wow-two-platform.pipelines/.github/workflows/publish.yml@v0.8.1
+  delivery:
+    uses: wow-two-platform/wow-two-platform.pipelines/.github/workflows/delivery.yml@v0.9.0
     with:
       commit: ${{ inputs.commit }}
+      backends: |
+        [{"name": "Host", "dir": "engineering/codebase/ocharo-studio.backend-services", "dotnet": "10.0.x",
+          "timeout": 20,
+          "run": ["python3 shared/sync-sso.py --check",
+                  "dotnet build OcharoStudio.BackendServices.slnx -p:BuildSpa=false",
+                  "dotnet test OcharoStudio.BackendServices.slnx --no-build"],
+          "paths": ["engineering/codebase/ocharo-studio.backend-services/**"]}]
+      frontends: |
+        [{"name": "Frontend", "dir": "engineering/codebase/ocharo-studio.frontend-services", "node": ".nvmrc",
+          "lfs": "engineering/codebase/**", "scripts": ["lint", "format:check", "typecheck", "test", "build"],
+          "paths": ["engineering/codebase/ocharo-studio.frontend-services/**"]}]
+      # Split isolated tests evenly; each runner keeps one software-rendering worker. All shards are required; no
+      # retries or exclusions mask failures. The API compiles in the background while the SPA builds and Chromium
+      # installs, so Playwright's `dotnet run` starts from an up-to-date build; the Frontend check type-checks, and the
+      # tests reach the API through the Vite preview, so the SPA is built without either and never copied into wwwroot.
+      browser: |
+        {"name": "Browser", "dir": "engineering/codebase/ocharo-studio.frontend-services", "shards": 3,
+         "dotnet": "10.0.x", "node": ".nvmrc", "lfs": "engineering/codebase/**", "timeout": 30,
+         "setup": ["dotnet build ../ocharo-studio.backend-services/OcharoStudio.Api -p:BuildSpa=false > \"$RUNNER_TEMP/api-build.log\" 2>&1 &",
+                   "api=$!",
+                   "pnpm --filter @ocharo-studio/web exec vite build",
+                   "pnpm --filter @ocharo-studio/web exec playwright install --with-deps chromium",
+                   "bash scripts/prepare-ci-https.sh",
+                   "wait \"$api\" || { cat \"$RUNNER_TEMP/api-build.log\"; exit 1; }"],
+         "run": "pnpm --filter @ocharo-studio/web exec playwright test --fully-parallel --workers=1 --shard=\"$SHARD/$SHARDS\"",
+         "artifact": "engineering/codebase/ocharo-studio.frontend-services/apps/web/test-results/",
+         "paths": ["engineering/codebase/ocharo-studio.frontend-services/**"]}
