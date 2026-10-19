@@ -1,6 +1,6 @@
 # Architecture
 
-*Last updated: 2026-09-29*
+*Last updated: 2026-10-19*
 
 ## Runtime
 
@@ -74,6 +74,13 @@ Desk issues five-minute tickets for the `ocharo-studio` audience. Studio accepts
 rechecks ticket expiry, current membership, and write rights through Platform introspection on every protected request.
 `X-Studio-Workspace` can select only the authenticated workspace; a UUID alone grants no access. The frontend sends
 an explicit bearer header with ambient cookies omitted. Studio owns no account/password database.
+Behind the ingress, TLS ends at Traefik: forwarded scheme and host apply only from `Deployment:TrustedProxies`, so
+the HTTPS-only ticket and account checks see the public origin and no other sender can claim it.
+
+The browser routes every Studio 401 through one fe sdk auth bridge. The first current 401 of a connected session
+expires it once: the ticket or cached account state clears, one neutral notice appears and browser recovery stays.
+Studio deliberately stays on the page instead of redirecting to sign-in, because it remains usable signed out and
+unsaved material edits would not survive navigation.
 
 An exact configured Desk issuer and Studio audience guard the connection fragment, which is removed before its
 credential enters tab-scoped session storage. Browser-only designs remain usable without a ticket. Recovery binds

@@ -1,6 +1,6 @@
 # Ocharo Studio — Backlog
 
-*Last updated: 2026-10-01*
+*Last updated: 2026-10-19*
 
 ## Features
 
@@ -22,3 +22,7 @@
 | Normalized storage | engineering | Design entity APIs before changing existing SQLite snapshots. |
 | Garment extensions | feature | Sizing, length, decorations and outfit composition need authored support. |
 | Production rollout | engineering | Validate actual authenticated deployment and restore procedures. |
+| Session-expiry redirect | engineering | Expiry shows one neutral notice and stays on the page; Studio works signed out. Redirect to sign-in once unsaved material edits survive navigation. |
+| fe sdk: cancelled revision writes | sdk gap | `LatestRevisionQueue` has no request scope or cancelled outcome, so an ended session settles it `offline` with an error; Studio filters `StudioSessionExpired`. |
+| be sdk: proxy trust from settings | sdk gap | `TrustProxiesFrom` binds only `ApiDefaultsOptions`; a host on `AddProxyAwareHosting` reads `Deployment:TrustedProxies` itself. |
+| Startup boot floor | engineering | Move the host onto `AddApiDefaults`/`UseApiDefaults` and the SDK `/health`; it composes SDK parts today. |

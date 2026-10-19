@@ -1,6 +1,6 @@
 # Ocharo Studio
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*
 
 A 3D creative studio for exploring Uzbek clothing on a mannequin with selectable garment parts and editable fabric placement.
 
@@ -45,7 +45,18 @@ dotnet run --project engineering/codebase/ocharo-studio.backend-services/OcharoS
 ```
 
 The backend build installs the locked frontend dependencies and builds the SPA into its generated `wwwroot/`.
-The lockfile resolves published `@wow-two-beta/fe@0.0.22`; the backend pins `WoW2.Sdk.Beta.Be` `10.0.68-beta`.
+The lockfile resolves published `@wow-two-beta/fe@0.0.23`; the backend pins `WoW2.Sdk.Beta.Be` `10.0.71-beta`.
+
+The `https` launch profile sets `LOCAL_SETTINGS=true`, so only that run reads the gitignored
+`OcharoStudio.Api/appsettings.Local.json`. It holds this machine's Desk introspection origin, which
+`appsettings.Development.json` no longer carries because deployed dev reads that file too:
+
+```json
+{ "OcharoPlatform": { "BaseUrl": "https://localhost:8264" } }
+```
+
+Without it, a local run rejects Desk tickets and browser-only editing still works. OpenAPI (`/openapi/v1.json`)
+is mapped on a local run only, never on a deployed host.
 
 For frontend work, run these commands from `engineering/codebase/ocharo-studio.frontend-services/`:
 

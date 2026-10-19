@@ -1,6 +1,6 @@
 # Operations
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*
 
 ## Isolated review
 
@@ -16,7 +16,9 @@ Required runtimes belong in managed terminals. Existing databases and runtime pr
 - `STUDIO_TLS_CERT` and `STUDIO_TLS_KEY` reuse an existing trusted certificate pair and skip mkcert.
 - `NODE_EXTRA_CA_CERTS` can supply the existing local CA to Node; never disable TLS verification.
 - Use the declared Node `24` and pnpm `10` versions; a login shell can otherwise select older system Node.
-- The frontend consumes published `@wow-two-beta/fe@0.0.22`.
+- The frontend consumes published `@wow-two-beta/fe@0.0.23`; the host pins `WoW2.Sdk.Beta.Be` `10.0.71-beta`.
+- The review launcher passes these values explicitly and sets no `LOCAL_SETTINGS`, so it never reads the IDE run's
+  `appsettings.Local.json`; only the `https` launch profile reads that file.
 
 ## Storage and connection
 
@@ -24,6 +26,10 @@ Required runtimes belong in managed terminals. Existing databases and runtime pr
 `ocharo-studio` ticket. The server checks current Platform membership on every request. Only editors can write.
 Workspace UUIDs route the authenticated organization/member collection and never grant access by themselves.
 State and session responses carry `Cache-Control: no-store`; requests use explicit bearer headers without cookies.
+A `401` ends the connection once through the fe sdk's auth bridge: Studio clears the ended ticket (or the cached
+account state), shows one neutral `Signed out — sign in again` notice and keeps browser recovery and local edits.
+Later `401`s stay silent, and a stale ticket at load settles browser-only without a notice. A `403` still warns that
+access changed. Studio does not redirect on expiry; the Settings reconnect or account sign-in returns to the page.
 
 `PUT` preserves atomic optimistic revisions and returns `409` for stale writes. Browser recovery binds to its
 workspace, remains available after expiry, and stops automatic upload when another member or organization connects.

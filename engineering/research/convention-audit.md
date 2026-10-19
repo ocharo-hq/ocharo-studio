@@ -1,5 +1,22 @@
 # Studio convention audit
 
+*Last updated: 2026-10-19*
+
+## 2026-10-19 — SDK, settings files and ingress
+
+- be sdk `WoW2.Sdk.Beta.Be` `10.0.71-beta`; fe sdk `@wow-two-beta/fe` `0.0.23`; publishing on pipelines `v0.7.0`.
+- The host reads `appsettings.Target.json` and, on a local run whose `https` profile sets `LOCAL_SETTINGS=true`,
+  `appsettings.Local.json` through `AddSettingsFiles`; the product-local Local loader is gone. OpenAPI keys on
+  `IsLocalRun`. The Desk origin left `appsettings.Development.json` for the gitignored Local file.
+- Forwarded headers apply only from loopback and `Deployment:TrustedProxies` (`AddProxyAwareHosting`); the descriptor
+  requires that key and `OcharoPlatform:BaseUrl`. `dotnetEnvironment` stays off, so deployed hosts run as Production.
+- A 401 expires the Desk session once through the fe sdk auth bridge with one neutral notice
+  (`feedbackSessionExpiry` on `FeedbackToastHost`); local 401 sync warnings are gone and recovery is unchanged.
+- Checks: backend build 0 warnings and 43 tests; frontend lint, format, typecheck, 125 unit tests and production
+  build. Playwright, Docker image builds and a live deploy were not run in this pass.
+
+The 2026-10-01 record follows; its publisher gaps closed when Studio moved to the shared pipelines workflow.
+
 *Reviewed: 2026-10-01*
 
 ## Changes
