@@ -2,7 +2,7 @@
 
 > Preserved pre-consolidation evidence; not an active plan. Current work belongs to the canonical version track and backlog. Historical permissions and runtime observations are not current authorization.
 
-*Last updated: 2026-09-29*
+*Last updated: 2026-10-19*
 
 ## Current build — 2026-09-29
 
@@ -230,13 +230,13 @@ The earlier [garment anchor](../studio-orb-preview.png) capture illustrates plac
 Local remote update, run by the user:
 
 ```sh
-git -C /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/ocharo-hq/ocharo-ws/workbench/ventures.ocharo-studio remote set-url origin https://github.com/sulton-max/ventures.ocharo-studio.git
+git -C /Users/max/Projects/10x-ws/workbench/career/engineering/wow-two/wow-two-ws/workbench/mfts-projects/ventures/ocharo-hq/ocharo-ws/workbench/ventures.ocharo-studio remote set-url origin https://github.com/sulton-max/ventures.ocharo-studio.git
 ```
 
 Ordinary commits require a genuine standalone user message containing:
 
 ```text
-~commit_on workbench/ocharo-hq/ocharo-ws/workbench/ventures.ocharo-studio
+~commit_on workbench/mfts-projects/ventures/ocharo-hq/ocharo-ws/workbench/ventures.ocharo-studio
 ```
 
 ### Reproduce

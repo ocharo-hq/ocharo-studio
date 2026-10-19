@@ -1,6 +1,6 @@
 # Garment authoring
 
-*Last updated: 2026-09-29*
+*Last updated: 2026-10-19*
 
 ## Source of the assets
 
@@ -12,7 +12,7 @@ manifest, and review renders. Studio consumes copies of the GLBs.
 To update the studio after a library rebuild, from `engineering/codebase/ocharo-studio.frontend-services`:
 
 ```sh
-pnpm assets:sync -- --from ../../../../ocharo-assets/engineering/codebase/ocharo-assets.library/garments
+pnpm assets:sync -- --from ../../../ocharo-assets/engineering/codebase/ocharo-assets.library/garments
 ```
 
 `scripts/sync-garments.mjs` verifies each GLB against the library manifest hash, checks the binary structure, part

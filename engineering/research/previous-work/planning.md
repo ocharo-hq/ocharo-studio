@@ -2,7 +2,7 @@
 
 > Preserved pre-consolidation evidence; not an active plan. Current work belongs to the canonical version track and backlog. Historical permissions and runtime observations are not current authorization.
 
-*Last updated: 2026-09-26*
+*Last updated: 2026-10-19*
 
 ## Current state
 
@@ -12,7 +12,7 @@ SQLite-backed workspace state, per-tab browser recovery, save-copy, JSON import/
 controls.
 
 The developer's initial commit is `323b2ed`. The persistent commit switch is currently OFF, so no new commit is
-authorized until the user explicitly sends `~commit_on workbench/ocharo-hq/ocharo-ws/workbench/ventures.ocharo-studio`. No push is
+authorized until the user explicitly sends `~commit_on workbench/mfts-projects/ventures/ocharo-hq/ocharo-ws/workbench/ventures.ocharo-studio`. No push is
 authorized.
 
 ## Remaining sequence

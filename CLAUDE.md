@@ -28,8 +28,8 @@ A 3D creative studio for fixed-size Uzbek garments and per-part textile placemen
 The frontend framework is Vue 3 with TypeScript and the Vue SDK (`@wow-two-beta/fe`).
 The Three.js renderer stays framework-independent.
 
-Workspace guidance: [Ocharo](../../CLAUDE.md) and [WoW2](../../../../../CLAUDE.md).
-Conventions: [WoW2 convention index](../../../../../conventions/conventions.md).
+Workspace guidance: [Ocharo](../../CLAUDE.md) and [WoW2](../../../../../../../CLAUDE.md).
+Conventions: [WoW2 convention index](../../../../../../../conventions/conventions.md).
 
 ## Canonical planning
 
