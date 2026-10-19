@@ -5,7 +5,9 @@ using OcharoStudio.Api.Studio.Access;
 using OcharoStudio.Application;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
+using WoW.Two.Sdk.Beta.Be.Foundation.Configuration;
 using WoW.Two.Sdk.Beta.Be.Mediator;
+using WoW.Two.Sdk.Beta.Be.Web.Hosting;
 using WoW.Two.Sdk.Beta.Be.Web.ProblemDetails;
 
 namespace OcharoStudio.Api.Configurations;
@@ -13,10 +15,16 @@ namespace OcharoStudio.Api.Configurations;
 /// <summary>Extends the host builder and the web application for startup wiring.</summary>
 public static partial class HostConfiguration
 {
-    /// <summary>Configures optional local settings before registering product concerns.</summary>
-    private static WebApplicationBuilder AddConfiguration(this WebApplicationBuilder builder)
+    /// <summary>Registers proxy-aware hosting: forwarded headers apply only from loopback and the ingress addresses listed
+    /// under <c>Deployment:TrustedProxies</c>, which a deployed target supplies; the checked-in default trusts no proxy.</summary>
+    private static WebApplicationBuilder AddIngress(this WebApplicationBuilder builder)
     {
-        builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false);
+        var proxies = builder.Configuration.GetSection("Deployment:TrustedProxies").Get<string[]>() ?? [];
+        builder.Services.AddProxyAwareHosting(o =>
+        {
+            foreach (var proxy in proxies)
+                o.TrustedProxies.Add(proxy);
+        });
         return builder;
     }
 
@@ -58,10 +66,17 @@ public static partial class HostConfiguration
         return builder;
     }
 
-    /// <summary>Configures development-only API documentation.</summary>
+    /// <summary>Configures forwarded headers before Studio access reads the effective scheme and host.</summary>
+    private static WebApplication UseIngress(this WebApplication app)
+    {
+        app.UseProxyAwareHosting();
+        return app;
+    }
+
+    /// <summary>Configures API documentation on a local run only.</summary>
     private static WebApplication UseApiDocumentation(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
+        if (app.Environment.IsLocalRun(app.Configuration))
             app.MapOpenApi();
         return app;
     }

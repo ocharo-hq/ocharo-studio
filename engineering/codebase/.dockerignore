@@ -27,6 +27,8 @@ ocharo-studio.backend-services/OcharoStudio.Api/wwwroot/
 
 # Environment-owned configuration and credentials never enter image layers.
 **/appsettings.Local.json
+**/appsettings.Target.json
+**/appsettings.Machine.json
 **/.env
 **/.env.*
 **/*.pfx

@@ -9,8 +9,13 @@ node_modules/
 *.db
 *.db-shm
 *.db-wal
-**/appsettings.Local.json
 .env
+
+# Settings files that never reach git: this machine's (read by the https launch profile's run only),
+# a deployed target's (mounted at deploy) and the machine file's retired name.
+**/appsettings.Local.json
+**/appsettings.Target.json
+**/appsettings.Machine.json
 
 # IDE / OS
 .idea/

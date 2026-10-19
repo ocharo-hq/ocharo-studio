@@ -1,4 +1,5 @@
 using OcharoStudio.Persistence;
+using WoW.Two.Sdk.Beta.Be.Foundation.Configuration;
 using WoW.Two.Sdk.Beta.Be.Web.ProblemDetails;
 
 namespace OcharoStudio.Api.Configurations;
@@ -10,7 +11,8 @@ public static partial class HostConfiguration
     public static WebApplicationBuilder Configure(this WebApplicationBuilder builder)
     {
         return builder
-            .AddConfiguration()
+            .AddSettingsFiles()
+            .AddIngress()
             .AddStudio()
             .AddStudioAccess()
             .AddControllers();
@@ -24,6 +26,7 @@ public static partial class HostConfiguration
         app.UseHttpProblemDetails();
 
         return app
+            .UseIngress()
             .UseApiDocumentation()
             .UseStudioAssets()
             .UseStudioAccess()
