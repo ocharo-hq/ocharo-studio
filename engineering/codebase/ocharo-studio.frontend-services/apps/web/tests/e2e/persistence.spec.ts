@@ -1,5 +1,6 @@
 import {
   expectStudioResponse,
+  openStudioSettings,
   waitForStudioReady,
   waitForStudioStorage,
   readRemote,
@@ -56,7 +57,7 @@ test("conflicted tabs keep separate recovery drafts across reloads", async ({
     other.getByRole("slider", { name: "Rotation", exact: true }),
   ).toHaveValue("90");
   expect((await remote(page)).draft.parts.body.placement.rotation).toBe(40);
-  await other.getByRole("button", { name: "Settings", exact: true }).click();
+  await openStudioSettings(other);
   await other
     .getByRole("button", { name: "Load server version", exact: true })
     .click();
@@ -109,7 +110,7 @@ test("offline edits retry without claiming an acknowledged save", async ({
   ).toHaveValue("67");
   await expect(page.locator(".save-status-button")).toContainText("Offline");
   await page.unroute("**/api/studio/state");
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await openStudioSettings(page);
   await page.getByRole("button", { name: "Retry", exact: true }).click();
   await expect
     .poll(async () => (await remote(page)).draft.parts.body.placement.rotation)
@@ -164,7 +165,7 @@ test("storybook invites twice then remains inside settings", async ({
   await page.reload();
   await waitForStudioReady(page);
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await openStudioSettings(page);
   await page.getByRole("button", { name: /Open studio guide/ }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
 });

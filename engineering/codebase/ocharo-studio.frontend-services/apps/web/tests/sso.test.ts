@@ -217,6 +217,73 @@ describe("shared Ocharo session", () => {
     expect(expired).toHaveBeenCalledTimes(1);
   });
 
+  it("signs this app out with the session's CSRF token and tells every subscriber", async () => {
+    const { getSsoSession, initializeSso, signOutSso, subscribeSsoSession } =
+      await import("../src/integration/studio/SsoAccess");
+    await initializeSso(
+      vi.fn().mockResolvedValue(
+        response({
+          data: {
+            enabled: true,
+            authenticated: true,
+            csrfToken,
+            accountUrl: "https://desk.test",
+          },
+        }),
+      ),
+    );
+    const seen = vi.fn();
+    const stop = subscribeSsoSession(seen);
+    const logout = vi
+      .fn()
+      .mockResolvedValue(new Response(null, { status: 204 }));
+
+    expect(await signOutSso(logout)).toBe(true);
+
+    expect(logout).toHaveBeenCalledWith(
+      "/api/sso/logout",
+      expect.objectContaining({
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "X-CSRF-Token": csrfToken },
+      }),
+    );
+    const signedOut = {
+      accountUrl: "https://desk.test",
+      enabled: true,
+      authenticated: false,
+    };
+    expect(getSsoSession()).toEqual(signedOut);
+    expect(seen).toHaveBeenCalledWith(signedOut);
+    stop();
+    // Signed out, there is nothing left to end.
+    expect(await signOutSso(logout)).toBe(false);
+    expect(logout).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the session when the account service refuses or cannot be reached", async () => {
+    const { getSsoSession, initializeSso, signOutSso } =
+      await import("../src/integration/studio/SsoAccess");
+    await initializeSso(
+      vi
+        .fn()
+        .mockResolvedValue(
+          response({ data: { enabled: true, authenticated: true, csrfToken } }),
+        ),
+    );
+    expect(await signOutSso(vi.fn().mockResolvedValue(response({}, 503)))).toBe(
+      false,
+    );
+    expect(
+      await signOutSso(vi.fn().mockRejectedValue(new TypeError("offline"))),
+    ).toBe(false);
+    expect(getSsoSession()).toEqual({
+      enabled: true,
+      authenticated: true,
+      csrfToken,
+    });
+  });
+
   it("returns only local destinations to the backend redirect handler", async () => {
     const { ssoLoginUrl } = await import("../src/integration/studio/SsoAccess");
     expect(ssoLoginUrl("/studio/materials?tab=fabric")).toBe(

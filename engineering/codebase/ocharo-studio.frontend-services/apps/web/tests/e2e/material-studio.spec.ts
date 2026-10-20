@@ -69,9 +69,11 @@ test("material scale updates saved looks atomically and preserves placement thro
     scale: 1.75,
   });
   expect(after.looks[0].thumbnail).toBeUndefined();
-  await page
-    .getByRole("button", { name: "Garment studio", exact: true })
-    .click();
+  // The frame's sidebar replaces the page's own way back.
+  await expect(
+    page.getByRole("button", { name: "Garment studio", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("link", { name: "Designer", exact: true }).click();
   await expect(page).toHaveURL(/\/studio$/);
   expect(await canvasHandle!.evaluate((node) => node.isConnected)).toBe(true);
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
@@ -87,9 +89,8 @@ test("material scale updates saved looks atomically and preserves placement thro
     .poll(async () => (await remote(page)).draft.parts.body.placement.rotation)
     .toBe(35);
   expect((await remote(page)).draft.parts.body.placement.scale).toBe(1.75);
-  await page
-    .getByRole("button", { name: "Material Studio", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Materials", exact: true }).click();
+  await expect(page).toHaveURL(/\/studio\/materials$/);
   await page.reload();
   await waitForStudioReady(page);
   await expect(
@@ -110,15 +111,11 @@ test("material preview cancellation protects drafts across selection and browser
   await waitForStudioReady(page);
   await waitForStudioStorage(page);
   const before = await remote(page);
-  await page
-    .getByRole("button", { name: "Material Studio", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Materials", exact: true }).click();
   await page
     .getByRole("slider", { name: "Material scale", exact: true })
     .fill("2");
-  await page
-    .getByRole("button", { name: "Garment studio", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Designer", exact: true }).click();
   let dialog = page.getByRole("alertdialog", {
     name: "Discard material changes?",
   });
@@ -128,6 +125,11 @@ test("material preview cancellation protects drafts across selection and browser
   await expect(
     page.getByRole("slider", { name: "Material scale" }),
   ).toHaveValue("2");
+  await expect(
+    page
+      .getByRole("navigation", { name: "Studio sections" })
+      .getByRole("link", { name: "Materials" }),
+  ).toHaveAttribute("aria-current", "page");
   await page
     .locator(".material-browser-item")
     .filter({ hasText: "Indigo adras" })

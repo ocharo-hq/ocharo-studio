@@ -57,7 +57,7 @@
 .landing-kicker {
   display: block;
   margin-bottom: 18px;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.22em;
@@ -70,7 +70,7 @@
   letter-spacing: -0.065em;
 }
 .landing-hero h1 em {
-  color: var(--accent);
+  color: var(--accent-ink);
   font-weight: 400;
 }
 .landing-hero-copy > p {
@@ -299,7 +299,7 @@
     serif;
 }
 .landing-form-grid article > span:not(.landing-form-index) {
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: 10px;
 }
 .landing-form-grid p {
@@ -527,8 +527,17 @@
 }
 .landing-nav-cta:hover,
 .landing-primary:hover {
+  color: var(--on-accent) !important;
   background: var(--accent);
 }
 .landing-page section[id] {
   scroll-margin-top: 32px;
+}
+
+/* The wordmark and the build identity sit together at the start of the landing header. */
+.landing-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }

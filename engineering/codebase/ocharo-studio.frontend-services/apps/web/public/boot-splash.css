@@ -1,3 +1,15 @@
-html, body { background: #f1f0eb; color: #303b37; min-height: 100%; }
-body { margin: 0; }
-html.dark, html.dark body { background: #242b29; color: #eceee5; }
+/* First-paint colours of the SDK Ocharo theme, before the application bundle loads. */
+html,
+body {
+  background: #f5f6fa;
+  color: #181b25;
+  min-height: 100%;
+}
+html.dark,
+html.dark body {
+  background: #141416;
+  color: #f4f2f5;
+}
+body {
+  margin: 0;
+}

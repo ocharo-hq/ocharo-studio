@@ -108,6 +108,43 @@ describe("Desk session expiry", () => {
     expect(studio.getIntegrationTicket()).toBe("ticket");
   });
 
+  it("settles an Ocharo sign-out anonymous without an expiry notice", async () => {
+    const { initializeSso, getSsoSession } =
+      await import("../src/integration/studio/SsoAccess");
+    const access = await import("../src/integration/studio/access");
+    await initializeSso(
+      vi.fn().mockResolvedValue(
+        json({
+          data: {
+            enabled: true,
+            authenticated: true,
+            csrfToken: "verified-server-csrf-token-123456",
+          },
+        }),
+      ),
+    );
+    const expired = vi.fn();
+    access.studioAuth.subscribeExpired(expired);
+    await access.loadStudioSession(
+      vi.fn().mockResolvedValue(json(session)),
+      null,
+    );
+    expect(access.studioAuth.getSession().status).toBe(
+      AuthStatus.Authenticated,
+    );
+
+    expect(
+      await access.signOutStudio(
+        vi.fn().mockResolvedValue(new Response(null, { status: 204 })),
+      ),
+    ).toBe(true);
+
+    expect(access.studioAuth.getSession().status).toBe(AuthStatus.Anonymous);
+    expect(access.getConnectedSession()).toBeUndefined();
+    expect(getSsoSession().authenticated).toBe(false);
+    expect(expired).not.toHaveBeenCalled();
+  });
+
   it("signs out without an expiry when the member disconnects", async () => {
     const studio = await connect("ticket");
     await studio.createServerRepository(desk(200)).read();

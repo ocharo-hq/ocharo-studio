@@ -1,4 +1,7 @@
-import { waitForStudioReady } from "./fixtures/studioFixture";
+import {
+  openStudioSettings,
+  waitForStudioReady,
+} from "./fixtures/studioFixture";
 import { expectNeutralShadows } from "./fixtures/imageReview";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdir, readFile } from "node:fs/promises";
@@ -37,7 +40,7 @@ test("browser-only designs survive reload without requesting private storage", a
   await expect(page.getByRole("textbox", { name: "Look name" })).toHaveValue(
     "Browser recovery review",
   );
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await openStudioSettings(page);
   await expect(
     page.getByText("Designs stay in this browser", { exact: true }),
   ).toBeVisible();

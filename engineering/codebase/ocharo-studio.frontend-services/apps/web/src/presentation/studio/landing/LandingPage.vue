@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { watch } from "vue";
 import { RouterLink } from "vue-router";
 import { ArrowRight, Move, Palette, Save } from "@lucide/vue";
-import { usePersistentState } from "@wow-two-beta/fe/foundation/storage";
 import { GARMENTS, MATERIALS } from "../../../domain/studio/catalog";
+import BuildIdentity from "../../common/BuildIdentity.vue";
 import StudioBrand from "../../common/StudioBrand.vue";
 import GarmentGlyph from "../GarmentGlyph.vue";
 import "./LandingPage.css";
 
-/** Static, accessible introduction to the Ocharo design workflow. */
+/** Static, accessible introduction to the Ocharo design workflow, outside the operator frame, on the Ocharo theme. */
 defineOptions({ name: "LandingPage" });
 
 const featuredIds = new Set([
@@ -22,22 +21,13 @@ const featuredIds = new Set([
 const featuredMaterials = MATERIALS.filter((material) =>
   featuredIds.has(material.id),
 );
-const { value: dark } = usePersistentState<boolean>(
-  "ocharo-studio.theme",
-  false,
-);
-watch(
-  dark,
-  (enabled) => document.documentElement.classList.toggle("dark", enabled),
-  { immediate: true },
-);
 </script>
 
 <template>
   <div class="landing-page">
     <a class="landing-skip" href="#landing-main">Skip to content</a>
     <header class="landing-header">
-      <StudioBrand href="/" />
+      <div class="landing-brand"><StudioBrand href="/" /><BuildIdentity /></div>
       <nav aria-label="Landing page">
         <a href="#how-it-works">How it works</a><a href="#forms">Forms</a
         ><RouterLink class="landing-nav-cta" to="/studio"

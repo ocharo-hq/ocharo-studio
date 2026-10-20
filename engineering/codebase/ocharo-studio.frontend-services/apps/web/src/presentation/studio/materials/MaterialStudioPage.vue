@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef, watch } from "vue";
-import {
-  ArrowLeft,
-  Check,
-  Grid2X2,
-  RotateCcw,
-  Scaling,
-  Search,
-} from "@lucide/vue";
+import { Check, Grid2X2, RotateCcw, Scaling, Search } from "@lucide/vue";
 import { MATERIALS, getGarment } from "../../../domain/studio/catalog";
 import type {
   DesignDocument,
@@ -32,7 +25,6 @@ const props = defineProps<{
   persistenceStatus: "loading" | "saving" | "synced" | "offline" | "conflict";
   onSelect: (id: string) => void;
   onSave: (id: string, scale: number) => boolean;
-  onBack: () => void;
   onDirtyChange: (dirty: boolean) => void;
   confirmDiscard: () => Promise<boolean>;
 }>();
@@ -89,13 +81,12 @@ defineExpose({ save });
 </script>
 
 <template>
-  <main class="material-studio" aria-label="Material Studio">
+  <section class="material-studio" aria-labelledby="material-studio-heading">
     <header class="material-studio-heading">
       <div>
-        <button class="text-button material-back" @click="onBack">
-          <ArrowLeft :size="16" /> Garment studio
-        </button>
-        <h1 ref="heading" tabindex="-1">Material Studio</h1>
+        <h1 id="material-studio-heading" ref="heading" tabindex="-1">
+          Material Studio
+        </h1>
         <p>One material. The same scale across your pieces.</p>
         <p class="material-storage-status" role="status">{{ storageLabel }}</p>
       </div>
@@ -282,5 +273,5 @@ defineExpose({ save });
         </div>
       </aside>
     </div>
-  </main>
+  </section>
 </template>

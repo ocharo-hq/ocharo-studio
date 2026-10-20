@@ -10,8 +10,15 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import { useRefresh } from "@wow-two-beta/fe/query";
 import { useNavigationBlocker } from "@wow-two-beta/fe/router";
-import { usePersistentState } from "@wow-two-beta/fe/foundation/storage";
+import {
+  TailwindBreakpoints,
+  useBreakpoint,
+} from "@wow-two-beta/fe/foundation/device";
 import { downloadBlob, downloadText } from "@wow-two-beta/fe/foundation/files";
+import {
+  ColorMode,
+  useColorMode,
+} from "@wow-two-beta/fe/foundation/primitives";
 import { useToastHost } from "@wow-two-beta/fe/presentation/feedback/toast-host";
 import { FeedbackToastHost } from "@wow-two-beta/fe/presentation/feedback";
 import {
@@ -26,6 +33,7 @@ import {
   type OnboardingRecord,
 } from "../application/onboarding/UseStudioOnboarding";
 import { useStudio } from "../application/studio/UseStudio";
+import { useStudioAccount } from "../application/studio/UseStudioAccount";
 import type { StudioViewportApi } from "../application/studio/UseStudioViewport";
 import {
   getAvailableMaterials,
@@ -35,11 +43,6 @@ import {
   MATERIALS,
 } from "../domain/studio/catalog";
 import type { TexturePlacement } from "../domain/studio/types";
-import {
-  getSsoSession,
-  ssoUnavailable,
-  ssoLoginUrl,
-} from "../integration/studio/SsoAccess";
 import {
   acceptTicketFragment,
   getIntegrationTicket,
@@ -55,7 +58,8 @@ import ExportDialog from "../presentation/studio/ExportDialog.vue";
 import RenderDialog from "../presentation/studio/RenderDialog.vue";
 import OnboardingDialog from "../presentation/studio/OnboardingDialog.vue";
 import SettingsDialog from "../presentation/studio/SettingsDialog.vue";
-import StudioHeader from "../presentation/studio/StudioHeader.vue";
+import StudioBarControls from "../presentation/studio/StudioBarControls.vue";
+import StudioLookName from "../presentation/studio/StudioLookName.vue";
 import StudioInspector from "../presentation/studio/StudioInspector.vue";
 import StudioLibrary, {
   type LibraryTab,
@@ -71,22 +75,29 @@ import "../presentation/studio/StudioIteration.css";
 import MaterialStudioPage from "../presentation/studio/materials/MaterialStudioPage.vue";
 import StudioConfirmationDialog from "../presentation/studio/StudioConfirmationDialog.vue";
 import { useStudioConfirmation } from "../presentation/studio/UseStudioConfirmation";
+import { seedColorMode } from "./ColorModeSeed";
+import { StudioFrameBarId, useStudioFrame } from "./StudioFrame";
 
-/** Composes the garment editor, presentation controls, and persistence-aware user actions. */
+/**
+ * Composes the garment editor and Material Studio inside the Ocharo frame: the places' presentation controls, the
+ * persistence-aware user actions, and what the frame borrows — settings, notices and the unsaved-work hold.
+ */
 defineOptions({ name: "StudioApp" });
 
-const ssoSession = getSsoSession();
-const connectionError = ssoUnavailable()
+const account = useStudioAccount();
+const connectionError = account.unavailable
   ? "The account session could not be checked. Refresh to reconnect."
   : acceptTicketFragment();
-const deskConnected = ref(
-  ssoSession.enabled
-    ? ssoSession.authenticated
-    : Boolean(getIntegrationTicket()),
+const ticketConnected = ref(Boolean(getIntegrationTicket()));
+// An Ocharo session follows the shared account state; a manual Desk ticket follows this tab's connection.
+const deskConnected = computed(() =>
+  account.session.value.enabled
+    ? account.session.value.authenticated
+    : ticketConnected.value,
 );
 // A 401 settles the Desk session anonymous; an expiry publishes one neutral notice and keeps local work in place.
 const stopUnauthorized = studioAuth.subscribeUnauthorized(() => {
-  deskConnected.value = false;
+  ticketConnected.value = false;
 });
 const stopExpired = studioAuth.subscribeExpired(
   feedbackSessionExpiry(feedbackBus, {
@@ -103,19 +114,10 @@ const studio = useStudio();
 const { refresh: refreshLooks, refreshing: refreshingLooks } = useRefresh(
   studio.refreshLooks,
 );
-function signIn(): void {
-  if (materialDirty.value || studio.persistenceStatus === "saving") {
-    notify("Finish saving your work before reconnecting.");
-    return;
-  }
-  window.location.assign(
-    ssoLoginUrl(window.location.pathname + window.location.search),
-  );
-}
 function connectDesk(ticket: string | null): void {
   try {
     setIntegrationTicket(ticket);
-    deskConnected.value = Boolean(ticket);
+    ticketConnected.value = Boolean(ticket);
     studio.reconnect();
     notify(
       ticket
@@ -136,7 +138,10 @@ const materialPage = computed(() => route.path === "/studio/materials");
 const navigation = useNavigationBlocker(
   () => materialDirty.value || studio.persistenceStatus === "saving",
 );
-const legacyDark = usePersistentState("ocharo-studio.theme", false);
+const colorMode = useColorMode();
+const breakpoint = useBreakpoint(TailwindBreakpoints);
+/** Phones keep the look name above the canvas; the frame's top bar holds it from tablets up. */
+const isPhone = computed(() => ["sm", null].includes(breakpoint.value));
 const onboarding = useStudioOnboarding(() => ({
   value: readOnboarding(studio.settings?.onboarding),
   enabled: studio.persistenceStatus !== "loading",
@@ -170,11 +175,7 @@ const editingMaterialId = computed(() =>
     : material.value.id,
 );
 const placement = computed(() => assignment.value.placement);
-const dark = computed(() =>
-  typeof studio.settings.dark === "boolean"
-    ? studio.settings.dark
-    : legacyDark.value.value,
-);
+const dark = computed(() => colorMode.mode === ColorMode.Dark);
 const materials = computed(() =>
   getAvailableMaterials(garment.value.id, part.value.id).filter((item) =>
     studio.selectedPartIds.every((id) =>
@@ -243,9 +244,10 @@ watch(
     else navigation.proceed();
   },
 );
+// The colour mode is the provider's; a design's synced or recovered `dark` only seeds a browser that stores none.
 watch(
-  dark,
-  (value) => document.documentElement.classList.toggle("dark", value),
+  () => studio.settings.dark,
+  (value) => seedColorMode(value, colorMode),
   { immediate: true },
 );
 watch(
@@ -280,13 +282,20 @@ watch(
   },
   { immediate: true },
 );
+useStudioFrame({
+  openSettings: () => {
+    dialog.value = "settings";
+  },
+  holdSession: (change) =>
+    materialDirty.value || studio.persistenceStatus === "saving"
+      ? change === "reconnect"
+        ? "Finish saving your work before reconnecting."
+        : "Finish saving your work before signing out."
+      : null,
+  notify: (message) => notify(message),
+});
 onMounted(() => window.addEventListener("keydown", onKeyboard));
 onScopeDispose(() => window.removeEventListener("keydown", onKeyboard));
-
-function updateDark(next: boolean): void {
-  legacyDark.setValue(next);
-  studio.updateSettings({ dark: next });
-}
 
 function onKeyboard(event: KeyboardEvent): void {
   if (dialog.value || confirmation.request.value) return;
@@ -442,11 +451,6 @@ function commitName(): void {
   lookName.value = studio.document.name;
 }
 
-function goHome(): void {
-  commitName();
-  void router.push("/");
-}
-
 function onReady(api: StudioViewportApi): void {
   scene.value = api;
   ready.value = true;
@@ -566,22 +570,23 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
 
 <template>
   <div :class="['studio-app', { 'material-page-active': materialPage }]">
-    <StudioHeader
-      :name="lookName"
-      :garment-name="garment.name"
-      :on-name-change="changeName"
-      :on-name-focus="focusName"
-      :on-name-commit="commitName"
-      :is-dirty="studio.isDirty"
-      :persistence-status="studio.persistenceStatus"
-      :on-save="save"
-      :on-export="() => (dialog = 'export')"
-      :on-settings="() => (dialog = 'settings')"
-      :on-home="goHome"
-      :on-new="startNewDesign"
-      :on-materials="() => openMaterials()"
-      :material-page="materialPage"
-    />
+    <Teleport defer :to="`#${StudioFrameBarId}`">
+      <StudioBarControls
+        v-if="!materialPage"
+        :name="lookName"
+        :garment-name="garment.name"
+        :show-name="!isPhone"
+        :on-name-change="changeName"
+        :on-name-focus="focusName"
+        :on-name-commit="commitName"
+        :is-dirty="studio.isDirty"
+        :persistence-status="studio.persistenceStatus"
+        :on-save="save"
+        :on-export="() => (dialog = 'export')"
+        :on-recover="() => (dialog = 'settings')"
+        :on-new="startNewDesign"
+      />
+    </Teleport>
     <MaterialStudioPage
       v-if="materialPage"
       ref="materialEditor"
@@ -594,17 +599,26 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
       :disabled="['loading', 'conflict'].includes(studio.persistenceStatus)"
       :on-select="selectEditingMaterial"
       :on-save="saveMaterial"
-      :on-back="() => router.push('/studio')"
       :on-dirty-change="(value) => (materialDirty = value)"
       :confirm-discard="confirmMaterialDiscard"
     />
-    <main
+    <section
       v-show="!materialPage"
       class="workspace"
       :data-sheet-open="mobileSheet"
-      aria-label="Ocharo design studio"
+      :data-name-row="isPhone || undefined"
+      aria-labelledby="studio-designer-heading"
     >
-      <h1 class="sr-only">Ocharo design studio</h1>
+      <h1 id="studio-designer-heading" class="sr-only">Ocharo design studio</h1>
+      <StudioLookName
+        v-if="isPhone"
+        class="workspace-name island"
+        :name="lookName"
+        :garment-name="garment.name"
+        :on-name-change="changeName"
+        :on-name-focus="focusName"
+        :on-name-commit="commitName"
+      />
       <section class="scene-area" aria-label="Design canvas">
         <div class="viewport">
           <StudioViewport
@@ -723,7 +737,7 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
       >
         <CircleHelp :size="19" /><span>Guide</span>
       </button>
-    </main>
+    </section>
     <input
       ref="fileInput"
       type="file"
@@ -764,16 +778,12 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
     />
     <SettingsDialog
       v-if="dialog === 'settings'"
-      :dark="dark"
       :desk-connected="deskConnected"
-      :sso-enabled="ssoSession.enabled"
-      :account-url="ssoSession.accountUrl"
-      :auth-unavailable="ssoUnavailable()"
-      :on-sign-in="signIn"
+      :sso-enabled="account.session.value.enabled"
+      :auth-unavailable="account.unavailable"
       :connection-error="connectionError"
       :on-connect="connectDesk"
       :persistence-status="studio.persistenceStatus"
-      :on-dark-change="updateDark"
       :on-retry-sync="studio.retrySync"
       :on-resolve-conflict="studio.resolveConflict"
       :on-export-recovery="exportDocument"

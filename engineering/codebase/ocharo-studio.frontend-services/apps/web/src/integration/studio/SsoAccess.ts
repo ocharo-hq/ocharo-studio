@@ -7,8 +7,21 @@ export interface StudioSsoSession {
 }
 let session: StudioSsoSession = { enabled: false, authenticated: false };
 let unavailable = false;
+const listeners = new Set<(session: StudioSsoSession) => void>();
+/** Replaces the cached account state and tells every subscriber, so the frame and editor follow sign-out. */
+function settle(next: StudioSsoSession): void {
+  session = next;
+  for (const listener of listeners) listener(next);
+}
 export function getSsoSession(): StudioSsoSession {
   return session;
+}
+/** Follows every change of the cached account state; returns the unsubscribe. */
+export function subscribeSsoSession(
+  listener: (session: StudioSsoSession) => void,
+): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
 }
 export function ssoUnavailable(): boolean {
   return unavailable;
@@ -16,11 +29,41 @@ export function ssoUnavailable(): boolean {
 /** Settles the cached account state signed out after its session expired; the HttpOnly cookie stays server-owned. */
 export function expireSsoSession(): void {
   if (!session.enabled || !session.authenticated) return;
-  session = {
+  settle({
     ...(session.accountUrl ? { accountUrl: session.accountUrl } : {}),
     enabled: true,
     authenticated: false,
-  };
+  });
+}
+/**
+ * Ends this app's Desk grant through `POST /api/sso/logout` with the session's CSRF token; Desk and the other apps stay
+ * signed in. Resolves `true` once the grant is revoked, after which the cached state reads signed out; any failure
+ * keeps the session as it was.
+ */
+export async function signOutSso(
+  fetcher: typeof fetch = fetch,
+): Promise<boolean> {
+  const current = session;
+  if (!current.enabled || !current.authenticated || !current.csrfToken)
+    return false;
+  try {
+    const response = await fetcher("/api/sso/logout", {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { "X-CSRF-Token": current.csrfToken },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) return false;
+  } catch {
+    return false;
+  }
+  settle({
+    ...(current.accountUrl ? { accountUrl: current.accountUrl } : {}),
+    enabled: true,
+    authenticated: false,
+  });
+  return true;
 }
 export function ssoLoginUrl(path: string): string {
   const safe =
@@ -86,13 +129,13 @@ export async function initializeSso(
   const accountUrl = accountOrigin(
     "accountUrl" in value ? value.accountUrl : undefined,
   );
-  session = {
+  unavailable = false;
+  settle({
     ...(accountUrl ? { accountUrl } : {}),
     enabled: value.enabled,
     authenticated: value.authenticated,
     ...(typeof csrf === "string" ? { csrfToken: csrf } : {}),
-  };
-  unavailable = false;
+  });
   if (session.enabled) {
     try {
       sessionStorage.removeItem("ocharo-studio:integration-ticket");

@@ -26,7 +26,7 @@ const overlayStyle = {
   placeContent: "center",
   gap: "0.75rem",
   textAlign: "center",
-  background: "color-mix(in srgb, var(--canvas, #f4efe8) 82%, transparent)",
+  background: "color-mix(in srgb, var(--canvas, #f5f6fa) 82%, transparent)",
   color: "inherit",
   padding: "2rem",
 } as const;

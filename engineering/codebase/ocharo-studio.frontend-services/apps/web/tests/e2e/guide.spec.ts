@@ -1,4 +1,9 @@
-import { waitForStudioReady, test, expect } from "./fixtures/studioFixture";
+import {
+  openStudioSettings,
+  waitForStudioReady,
+  test,
+  expect,
+} from "./fixtures/studioFixture";
 
 for (const width of [1440, 390, 320]) {
   test(`interactive guide reaches real controls at ${width}px`, async ({
@@ -71,7 +76,7 @@ for (const width of [1440, 390, 320]) {
   });
 }
 
-test("guide Escape restores editor access and can reopen from Settings", async ({
+test("guide Escape restores editor access and can reopen from Studio settings", async ({
   page,
 }) => {
   await page.goto("/studio");
@@ -80,9 +85,9 @@ test("guide Escape restores editor access and can reopen from Settings", async (
   await expect(page.locator("[data-tour-popover]")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.locator("[data-tour-popover]")).toHaveCount(0);
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await openStudioSettings(page);
   await page
-    .getByRole("dialog", { name: "Settings" })
+    .getByRole("dialog", { name: "Studio settings" })
     .getByRole("button", { name: /guide/i })
     .click();
   await expect(

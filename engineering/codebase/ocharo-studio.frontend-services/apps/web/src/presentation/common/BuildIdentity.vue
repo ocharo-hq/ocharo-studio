@@ -2,7 +2,7 @@
 import { useBuildIdentity } from "../../application/common/UseBuildIdentity";
 import "./BuildIdentity.css";
 
-/** Displays the compiled app and independently reported backend build. */
+/** Displays the compiled app and independently reported backend build on the landing page, outside the frame. */
 defineOptions({ name: "BuildIdentity" });
 const appVersion = __APP_VERSION__;
 const { backendVersion, refresh } = useBuildIdentity();

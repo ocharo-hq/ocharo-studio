@@ -1,7 +1,8 @@
 .material-studio {
-  padding: 28px;
+  width: 100%;
   max-width: 1800px;
-  margin: auto;
+  padding: 28px;
+  margin-inline: auto;
 }
 .material-studio:focus-visible {
   outline: none;
@@ -20,18 +21,12 @@
   font:
     36px/1.2 Georgia,
     serif;
-  margin: 12px 0 8px;
+  margin: 0 0 8px;
   outline: none;
 }
 .material-studio-heading p {
   font-size: 13px;
   color: var(--muted);
-}
-.material-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
 }
 .material-editor-actions {
   display: flex;
@@ -66,7 +61,7 @@
   background: transparent;
 }
 .material-browser-list {
-  max-height: calc(100dvh - 290px);
+  max-height: calc(100dvh - var(--frame-bar-height) - 198px);
   min-height: 300px;
   overflow: auto;
   padding: 8px;
@@ -88,6 +83,9 @@
 .material-browser-item.selected {
   background: var(--accent-soft);
   border-color: var(--accent);
+}
+.material-browser-item.selected > svg {
+  color: var(--accent-ink);
 }
 .material-browser-swatch {
   width: 40px;
@@ -266,10 +264,8 @@
 .material-studio-entry:disabled {
   opacity: 0.6;
 }
-.material-page-active .document-heading {
-  display: none;
-}
-@media (max-width: 1180px) {
+/* The page answers the `studio` container — the width the frame leaves it beside the sidebar rail. */
+@container studio (max-width: 1180px) {
   .material-studio-layout {
     grid-template-columns: 200px minmax(220px, 1fr);
   }
@@ -300,7 +296,7 @@
     top: 16px;
   }
 }
-@media (max-width: 700px) {
+@container studio (max-width: 700px) {
   .material-studio {
     padding: 16px 12px;
   }

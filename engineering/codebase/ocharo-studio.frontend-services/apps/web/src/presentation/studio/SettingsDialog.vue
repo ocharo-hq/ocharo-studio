@@ -1,28 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import {
-  BookOpen,
-  CloudOff,
-  Moon,
-  RefreshCw,
-  Sun,
-  TriangleAlert,
-} from "@lucide/vue";
+import { BookOpen, CloudOff, RefreshCw, TriangleAlert } from "@lucide/vue";
 import StudioDialog from "./StudioDialog.vue";
 
-/** Theme, guide, and persistence recovery settings. */
+/**
+ * The Desk connection, sync recovery and the guide. Appearance, the Ocharo account, reconnect and sign-out live in
+ * the frame's account menu.
+ */
 defineOptions({ name: "SettingsDialog" });
 defineProps<{
-  dark: boolean;
   deskConnected?: boolean;
   ssoEnabled?: boolean;
-  accountUrl?: string;
   authUnavailable?: boolean;
-  onSignIn?: () => void;
   connectionError?: string;
   onConnect?: (ticket: string | null) => void;
   persistenceStatus: "loading" | "saving" | "synced" | "offline" | "conflict";
-  onDarkChange: (dark: boolean) => void;
   onRetrySync: () => void;
   onResolveConflict: () => void;
   onExportRecovery: () => void;
@@ -45,20 +37,9 @@ const ticket = ref("");
               : "Designs stay in this browser"
           }}</strong>
           <p v-if="ssoEnabled">
-            Your Ocharo account connects this workspace. Manage your account and
-            sign out in Ocharo Desk.
+            Your Ocharo account connects this workspace. The account menu holds
+            your Ocharo account, reconnect and sign out.
           </p>
-          <a
-            v-if="ssoEnabled && accountUrl"
-            :href="accountUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="button secondary"
-            >Ocharo account</a
-          >
-          <button v-if="ssoEnabled" class="button secondary" @click="onSignIn">
-            Reconnect with Ocharo
-          </button>
           <p v-if="connectionError" role="alert">{{ connectionError }}</p>
           <template v-if="!ssoEnabled && !authUnavailable">
             <p>
@@ -124,12 +105,7 @@ const ticket = ref("");
           </button>
         </div>
       </div>
-      <button class="settings-row" @click="onDarkChange(!dark)">
-        <component :is="dark ? Sun : Moon" :size="20" /><span
-          ><strong>{{ dark ? "Use light theme" : "Use dark theme" }}</strong
-          ><small>Change the studio appearance.</small></span
-        ></button
-      ><button class="settings-row" @click="onGuide">
+      <button class="settings-row" @click="onGuide">
         <BookOpen :size="20" /><span
           ><strong>Open studio guide</strong
           ><small>Replay the getting-started walkthrough.</small></span

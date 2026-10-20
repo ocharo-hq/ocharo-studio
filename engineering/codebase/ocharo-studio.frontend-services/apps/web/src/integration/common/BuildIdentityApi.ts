@@ -1,7 +1,7 @@
-/** Reads only public build metadata; this never transports a session or access ticket. */
+/** Reads the API's informational version from its public status; this never transports a session or access ticket. */
 export async function readBuildIdentity(signal: AbortSignal): Promise<string> {
   try {
-    const response = await fetch("/api/system/version", {
+    const response = await fetch("/api/system/status", {
       credentials: "omit",
       cache: "no-store",
       signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
