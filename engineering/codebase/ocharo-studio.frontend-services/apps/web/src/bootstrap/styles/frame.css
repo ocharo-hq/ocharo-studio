@@ -1,0 +1,95 @@
+/* The Ocharo frame: its one bar height, the approved glass and the "O" mark. */
+
+/* The frame's one top bar; every inset the editor measures from the bar reads this. */
+:root {
+  --frame-bar-height: 56px;
+}
+
+/* The approved Ocharo glass is stronger than the fe SDK `glass` variants (a fixed 75% card fill, 12px blur): 84%
+   header and 92% menu in light, 90% and 96% graphite in dark, 24px blur. Until glass strength is a theme token, the
+   materials live here, matching Desk's and Catalogue's. */
+:root {
+  --oc-glass-color: rgb(255 255 255 / 0.84);
+  --oc-glass-side-color: rgb(255 255 255 / 0.6);
+  --oc-glass-menu-color: rgb(255 255 255 / 0.92);
+  --oc-glass-edge: rgb(24 27 37 / 0.08);
+  --oc-glass-highlight: rgb(255 255 255 / 0.9);
+  --oc-glass-saturate: 120%;
+  --oc-glass-shadow:
+    0 10px 30px rgb(24 27 37 / 0.06), inset 0 1px 0 var(--oc-glass-highlight);
+  --oc-menu-shadow:
+    0 18px 50px rgb(24 27 37 / 0.16), inset 0 1px 0 var(--oc-glass-highlight);
+}
+
+.dark {
+  --oc-glass-color: rgb(41 41 45 / 0.9);
+  --oc-glass-side-color: rgb(33 33 37 / 0.7);
+  --oc-glass-menu-color: rgb(41 41 45 / 0.96);
+  --oc-glass-edge: rgb(255 255 255 / 0.07);
+  --oc-glass-highlight: rgb(255 255 255 / 0.06);
+  --oc-glass-saturate: 100%;
+  --oc-glass-shadow:
+    0 12px 32px rgb(0 0 0 / 0.25), inset 0 1px 0 var(--oc-glass-highlight);
+  --oc-menu-shadow:
+    0 20px 60px rgb(0 0 0 / 0.5), inset 0 1px 0 var(--oc-glass-highlight);
+}
+
+/* One backdrop layer per surface. Solid card is the baseline for browsers without blur and for reduced transparency;
+   the canvas, textiles and editing islands never sit under glass. */
+@utility oc-glass {
+  --oc-glass-fill: var(--color-card);
+  background-color: var(--oc-glass-fill);
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    --oc-glass-fill: var(--oc-glass-color);
+    -webkit-backdrop-filter: blur(24px) saturate(var(--oc-glass-saturate));
+    backdrop-filter: blur(24px) saturate(var(--oc-glass-saturate));
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    --oc-glass-fill: var(--color-card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@utility oc-glass-side {
+  background-color: var(--color-card);
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    background-color: var(--oc-glass-side-color);
+    -webkit-backdrop-filter: blur(24px) saturate(var(--oc-glass-saturate));
+    backdrop-filter: blur(24px) saturate(var(--oc-glass-saturate));
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@utility oc-glass-menu {
+  background-color: var(--color-popover);
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    background-color: var(--oc-glass-menu-color);
+    -webkit-backdrop-filter: blur(24px) saturate(var(--oc-glass-saturate));
+    backdrop-filter: blur(24px) saturate(var(--oc-glass-saturate));
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-popover);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@layer components {
+  .oc-mark {
+    @apply grid size-9 shrink-0 place-items-center rounded-[10px] bg-primary text-lg leading-none font-bold tracking-tight text-primary-foreground;
+  }
+}
+
+/* The frame never lets the document scroll: only its main region does. */
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+}

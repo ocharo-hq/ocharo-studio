@@ -209,3 +209,22 @@ export async function expectStudioResponse(
     });
   }
 }
+
+/** Opens Studio settings from the frame's account menu, where the settings entry lives at every width. */
+export async function openStudioSettings(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Studio settings" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Studio settings" }),
+  ).toBeVisible();
+}
+
+/** Picks the colour mode from the account menu's Appearance rows; the pick closes the menu. */
+export async function setColorMode(
+  page: Page,
+  mode: "System" | "Light" | "Dark",
+): Promise<void> {
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page.getByRole("menuitemradio", { name: mode, exact: true }).click();
+  await expect(page.getByRole("menu")).toHaveCount(0);
+}

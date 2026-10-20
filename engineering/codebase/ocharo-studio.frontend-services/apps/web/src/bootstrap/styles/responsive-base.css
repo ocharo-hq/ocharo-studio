@@ -1,4 +1,5 @@
-@media (min-width: 1600px) {
+/* The editor's layout steps answer the `studio` container — the width the frame leaves it — not the viewport. */
+@container studio (min-width: 1600px) {
   .workspace {
     --studio-panel-width: 306px;
   }
@@ -11,30 +12,28 @@
     width: 76px;
   }
 }
-@media (max-height: 820px) and (min-width: 1001px) {
-  .workspace {
-    min-height: 665px;
-  }
+@media (max-height: 820px) {
+  @container studio (min-width: 1001px) {
+    .viewport {
+      inset: 92px -55px 83px;
+    }
 
-  .viewport {
-    inset: 92px -55px 83px;
-  }
-
-  .panel-divider {
-    margin: 15px 0;
-  }
-  .garment-art {
-    height: 69px;
-    width: 58px;
-  }
-  .library-content {
-    padding-top: 17px;
-  }
-  .range-control {
-    margin-top: 12px;
+    .panel-divider {
+      margin: 15px 0;
+    }
+    .garment-art {
+      height: 69px;
+      width: 58px;
+    }
+    .library-content {
+      padding-top: 17px;
+    }
+    .range-control {
+      margin-top: 12px;
+    }
   }
 }
-@media (max-width: 1190px) and (min-width: 1001px) {
+@container studio (max-width: 1190px) and (min-width: 1001px) {
   .workspace {
     --studio-panel-inset: 16px;
     --studio-panel-width: 252px;
@@ -47,25 +46,10 @@
     font-size: 0;
     padding: 0;
   }
-  .document-heading {
-    padding-left: 0;
-  }
-  .document-heading input {
-    width: 140px;
-  }
 }
-@media (max-width: 1000px) {
-  .app-header {
-    padding: 0 20px;
-    height: 80px;
-    gap: 14px;
-  }
-  .document-heading {
-    display: none;
-  }
+@container studio (max-width: 1000px) {
   .workspace {
-    height: auto;
-    min-height: calc(100dvh - 80px);
+    flex: none;
     overflow: visible;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -110,31 +94,11 @@
   }
 }
 @media (max-width: 560px) {
-  .app-header {
-    height: 72px;
-    padding: 0 15px;
-  }
   .brand {
     gap: 7px;
   }
-  .header-actions {
-    gap: 4px;
-  }
-  .header-actions .icon-button {
-    display: none;
-  }
-  .save-button {
-    width: 36px;
-    padding: 7px;
-  }
-  .save-button span {
-    display: none;
-  }
-  .header-actions .primary {
-    padding: 10px 12px;
-    font-size: 11px;
-    min-height: 36px;
-  }
+}
+@container studio (max-width: 560px) {
   .workspace {
     display: flex;
     flex-direction: column;
@@ -218,8 +182,8 @@
   .attachment-note {
     margin-top: 20px;
   }
-  .document-heading {
-    display: none;
+  .viewport {
+    top: 76px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -234,29 +198,4 @@
 .copy-button {
   width: 100%;
   margin-top: 9px;
-}
-@media (max-width: 560px) {
-  .app-header {
-    height: 107px;
-    padding-bottom: 35px;
-    position: relative;
-  }
-  .document-heading {
-    display: flex;
-    position: absolute;
-    left: 20px;
-    bottom: 6px;
-    padding: 0;
-    gap: 8px;
-  }
-  .document-heading input {
-    width: 185px;
-    font-size: 11px;
-  }
-}
-
-@media (max-width: 560px) {
-  .viewport {
-    top: 76px;
-  }
 }

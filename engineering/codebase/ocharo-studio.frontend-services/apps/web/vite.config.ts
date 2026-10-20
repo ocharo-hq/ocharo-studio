@@ -1,10 +1,33 @@
 import { proxyUnavailable } from "./dev/ProxyProblem";
 import { Agent } from "node:https";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import vue from "@vitejs/plugin-vue";
 import mkcert from "vite-plugin-mkcert";
 import tailwindcss from "@tailwindcss/vite";
 import { readFileSync } from "node:fs";
+import { colorModeScript } from "@wow-two-beta/fe/foundation/primitives";
+import { ThemeMigrationScript, ThemeStorageKey } from "./src/bootstrap/theme";
+
+/**
+ * Serves and emits `/theme.js`: Studio's legacy-choice prelude, then the SDK's pre-paint colour script, so a dark
+ * Studio never flashes light first.
+ */
+function themeScript(): Plugin {
+  const source =
+    ThemeMigrationScript + colorModeScript({ storageKey: ThemeStorageKey });
+  return {
+    name: "ocharo-studio-theme-script",
+    configureServer(server) {
+      server.middlewares.use("/theme.js", (_request, response) => {
+        response.setHeader("Content-Type", "text/javascript");
+        response.end(source);
+      });
+    },
+    generateBundle() {
+      this.emitFile({ type: "asset", fileName: "theme.js", source });
+    },
+  };
+}
 
 // The SPA is served from the .NET host's wwwroot in production, so asset paths are
 // root-relative (base: '/') and API calls use same-origin "/api/..." URLs.
@@ -31,7 +54,12 @@ export default defineConfig(({ command }) => {
       __APP_VERSION__: JSON.stringify(process.env.APP_VERSION || "dev"),
     },
     base: "/",
-    plugins: [vue(), tailwindcss(), ...(useHttps && !https ? [mkcert()] : [])],
+    plugins: [
+      vue(),
+      tailwindcss(),
+      themeScript(),
+      ...(useHttps && !https ? [mkcert()] : []),
+    ],
     build: {
       outDir: "dist",
       emptyOutDir: true,

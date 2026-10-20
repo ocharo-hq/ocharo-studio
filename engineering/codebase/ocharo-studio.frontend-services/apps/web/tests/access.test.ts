@@ -4,6 +4,7 @@ import {
   getIntegrationTicket,
   parseTicketFragment,
   setIntegrationTicket,
+  signOutStudio,
 } from "../src/integration/studio/access";
 import { createServerRepository } from "../src/integration/studio/serverRepository";
 const workspaceId = "d0a8c678-c27f-478f-b4e8-c9928bf88c21";
@@ -97,5 +98,20 @@ describe("Desk connection boundary", () => {
       createServerRepository(fetcher, () => "ticket").read(abort.signal),
     ).rejects.toThrow();
     expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+  it("has no sign-out for a Desk ticket, so the connection stays this tab's", async () => {
+    const values = new Map<string, string>();
+    vi.stubGlobal("sessionStorage", {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+      removeItem: (key: string) => values.delete(key),
+    });
+    setIntegrationTicket("ticket");
+    const fetcher = vi.fn();
+
+    expect(await signOutStudio(fetcher)).toBe(false);
+
+    expect(fetcher).not.toHaveBeenCalled();
+    expect(getIntegrationTicket()).toBe("ticket");
   });
 });

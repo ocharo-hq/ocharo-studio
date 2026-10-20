@@ -1,6 +1,20 @@
+@import "tailwindcss";
+@import "@wow-two-beta/fe/styles.css";
+
+/* The fe SDK's Ocharo theme (Ink and Raspberry / Neutral graphite) and its ambient backdrop, applied by
+   `theme-ocharo` on <html> (index.html) with `dark` from the colour-mode provider. After styles.css, so it wins. */
+@import "@wow-two-beta/fe/themes.css";
+@import "@wow-two-beta/fe/presentation/forms/point-control/styles.css";
+@import "@wow-two-beta/fe/presentation/feedback/toast-host/styles.css";
+
+@import "./styles/frame.css";
 @import "./styles/tokens.css";
 @import "./styles/base.css";
 @import "./styles/studio.css";
 @import "./styles/responsive-base.css";
 @import "./styles/components.css";
 @import "./styles/responsive.css";
+
+/* Tailwind v4 ignores node_modules; point it at the fe SDK's dist so its utility classes are generated. Path is
+   relative to this file: bootstrap/ → src/ → the app root. */
+@source "../../node_modules/@wow-two-beta/fe/dist";

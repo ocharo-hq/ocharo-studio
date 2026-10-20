@@ -1,18 +1,16 @@
 @import "@wow-two-beta/fe/presentation/overlays/tour-popover/styles.css";
 @import "@wow-two-beta/fe/presentation/overlays/modal/styles.css";
 
-.app-header {
-  position: relative;
-}
-
-.workspace:focus-visible {
-  outline: none;
-}
-
-.header-leading {
+/* The Designer's controls in the frame's bar: New design, the centred look name, the save status and Export. */
+.studio-bar {
   display: flex;
+  flex: 1;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
+  min-width: 0;
+}
+.studio-bar-spacer {
+  flex: 1;
 }
 
 .new-design-button {
@@ -30,7 +28,7 @@
   font-weight: 600;
 }
 .new-design-button:hover {
-  color: var(--paper);
+  color: var(--on-accent);
   border-color: var(--accent);
   background: var(--accent);
 }
@@ -74,7 +72,7 @@
 }
 
 .confirmation-danger {
-  color: var(--paper);
+  color: var(--on-accent);
   background: var(--accent);
 }
 
@@ -83,18 +81,27 @@
 }
 
 .document-heading {
-  position: absolute;
-  left: 50%;
-  width: min(34vw, 390px);
+  display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0;
-  padding: 0;
-  transform: translateX(-50%);
+  min-width: 0;
 }
 .document-heading input {
   width: 100%;
+  padding-block: 3px;
+  font-size: 13px;
+  color: var(--ink);
+  background: none;
+  border: none;
   text-align: center;
+  text-overflow: ellipsis;
   transition: background-color 160ms ease;
+}
+.studio-bar-name {
+  flex: 1 1 auto;
+  max-width: 390px;
+  margin-inline: auto;
 }
 .document-heading.is-focused input {
   text-align: left;
@@ -177,12 +184,12 @@
   border-radius: 5px;
 }
 .part-multiselect-options button.selected .part-option-check {
-  color: var(--paper);
+  color: var(--on-accent);
   border-color: var(--accent);
   background: var(--accent);
 }
 .part-multiselect-options small {
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: 8px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -201,6 +208,7 @@
   line-height: 1.5;
 }
 
+/* The bar answers the viewport: it spans the window above the sidebar. */
 @media (max-width: 1180px) {
   .new-design-button span {
     display: none;
@@ -210,73 +218,24 @@
     justify-content: center;
     padding: 8px;
   }
-  .document-heading {
-    width: min(30vw, 220px);
-  }
 }
 
-@media (max-width: 560px) {
-  .new-design-button {
-    width: 30px;
-    min-height: 28px;
-    padding: 5px;
-    border-radius: 7px;
-  }
-  .document-heading {
-    left: 12px;
-    right: 12px;
-    width: auto;
-    top: 56px;
-    bottom: auto;
-    transform: none;
-    text-align: center;
-  }
-  .document-heading input {
-    text-align: center;
-  }
-  .document-heading.is-focused input {
-    text-align: left;
-  }
-  .document-heading.is-focused {
-    text-align: left;
-  }
-  .part-multiselect-trigger {
-    min-width: 118px;
-  }
-  .part-multiselect {
-    position: static;
-  }
-  .part-multiselect-options {
-    left: 50%;
-    width: min(260px, calc(100vw - 28px));
-    transform: translateX(-50%);
-  }
-}
-
-@media (max-width: 560px) {
-  .app-header {
+/* Phones show the three actions as icons, so the bar keeps the app button, the place switch and the account menu. */
+@media (max-width: 639px) {
+  .studio-bar {
     gap: 4px;
   }
-  .header-leading {
-    min-width: 0;
-    gap: 4px;
-  }
-  .header-leading .build-identity {
-    min-width: 0;
-  }
-  .header-leading .build-identity summary {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .header-actions {
-    flex: 0 0 auto;
-    gap: 4px;
-  }
-  .save-status-button {
+  .new-design-button,
+  .save-status-button,
+  .export-button {
     width: 34px;
     min-width: 34px;
+    min-height: 34px;
     justify-content: center;
     padding: 7px;
+  }
+  .new-design-button {
+    border-radius: 9px;
   }
   .save-status-label {
     position: absolute;
@@ -289,24 +248,23 @@
     white-space: nowrap;
     border: 0;
   }
-  .save-divider {
+  .save-divider,
+  .export-button span {
     display: none;
   }
 }
 
-@media (max-width: 400px) {
-  .header-leading .brand-authentic .brand-wordmark {
-    width: 78px;
-    height: 30px;
+@container studio (max-width: 560px) {
+  .part-multiselect-trigger {
+    min-width: 118px;
   }
-  .header-leading .brand-product,
-  .export-button span {
-    display: none;
+  .part-multiselect {
+    position: static;
   }
-  .export-button {
-    width: 34px;
-    min-height: 34px;
-    padding: 7px;
+  .part-multiselect-options {
+    left: 50%;
+    width: min(260px, calc(100vw - 28px));
+    transform: translateX(-50%);
   }
 }
 
@@ -321,7 +279,7 @@
 .review-package-note {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--border, #ccc);
+  border: 1px solid var(--line);
   border-radius: 0.75rem;
   font: inherit;
   color: inherit;

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import "./StudioBrand.css";
-import BuildIdentity from "./BuildIdentity.vue";
 
 /** Approved Ocharo artwork with optional intercepted in-app navigation. */
 defineOptions({ name: "StudioBrand" });
@@ -61,5 +60,4 @@ function navigate(
       <span class="brand-product" aria-hidden="true">studio</span>
     </a>
   </RouterLink>
-  <BuildIdentity />
 </template>

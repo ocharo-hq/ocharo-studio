@@ -99,7 +99,7 @@ export function studioGuideSteps(
       id: "export",
       target: '[data-tour="export-look"]',
       title: "Take the idea with you",
-      body: "Export downloads a clean image or editable design file. Import the design later to keep creating. Reopen this guide from Settings whenever you need it.",
+      body: "Export downloads a clean image or editable design file. Import the design later to keep creating. Reopen this guide from Studio settings in the account menu whenever you need it.",
       panel: "canvas",
       placement: "bottom",
     },

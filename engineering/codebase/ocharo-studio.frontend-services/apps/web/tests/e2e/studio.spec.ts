@@ -1,4 +1,5 @@
 import {
+  setColorMode,
   waitForStudioReady,
   test,
   expect,
@@ -17,13 +18,12 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+/** Appearance lives in the frame's account menu, on the SDK colour-mode provider. */
 async function setTheme(
   page: import("./fixtures/studioFixture").Page,
   theme: "dark" | "light",
 ) {
-  await page.getByRole("button", { name: "Settings", exact: true }).click();
-  await page.getByRole("button", { name: `Use ${theme} theme` }).click();
-  await page.getByRole("button", { name: "Close dialog", exact: true }).click();
+  await setColorMode(page, theme === "dark" ? "Dark" : "Light");
 }
 
 function partButton(
@@ -188,7 +188,8 @@ test("responsive studio and dark theme keep controls reachable", async ({
   await page.goto("/studio");
   await waitForStudioReady(page);
   await setTheme(page, "dark");
-  await expect(page.locator("html")).toHaveClass("dark");
+  await expect(page.locator("html")).toHaveClass(/(^|\s)dark(\s|$)/);
+  await expect(page.locator("html")).toHaveClass(/theme-ocharo/);
   await page.evaluate(() =>
     Promise.allSettled(
       document.getAnimations().map((animation) => animation.finished),
@@ -199,6 +200,11 @@ test("responsive studio and dark theme keep controls reachable", async ({
     fullPage: true,
   });
   await setTheme(page, "light");
+  await expect(page.locator("html")).not.toHaveClass(/(^|\s)dark(\s|$)/);
+  // The choice is remembered for the next first paint.
+  expect(
+    await page.evaluate(() => localStorage.getItem("ocharo-studio.theme")),
+  ).toBe("light");
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator(".save-status-button")).toBeVisible();
   expect(

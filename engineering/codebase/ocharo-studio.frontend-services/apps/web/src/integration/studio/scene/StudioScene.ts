@@ -222,8 +222,9 @@ export class StudioScene implements StudioViewportApi {
     this.#requestRender();
   }
 
+  /** Fades distant geometry towards the Ocharo theme's canvas, so the garment settles into either colour mode. */
   setDark(dark: boolean): void {
-    this.#scene.fog = new THREE.FogExp2(dark ? 0x101218 : 0xf4efe8, 0.055);
+    this.#scene.fog = new THREE.FogExp2(dark ? 0x141416 : 0xf5f6fa, 0.055);
     this.#requestRender();
   }
 

@@ -1,7 +1,4 @@
 /* Responsive studio refinement */
-.workspace {
-  min-height: 0;
-}
 .document-heading input {
   border-radius: 7px;
   padding-inline: 8px;
@@ -38,8 +35,8 @@
 }
 .export-button:hover {
   color: var(--paper);
-  border-color: #2f493d;
-  background: #2f493d;
+  border-color: var(--ink);
+  background: var(--ink);
 }
 .spin {
   animation: studio-spin 1s linear infinite;
@@ -218,7 +215,7 @@
   letter-spacing: 0.08em;
 }
 .story-chapters b {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 @media (max-width: 560px) {

@@ -1,69 +1,37 @@
-@import "tailwindcss" source(none);
-@import "@wow-two-beta/fe/presentation/forms/point-control/styles.css";
-@import "@wow-two-beta/fe/presentation/feedback/toast-host/styles.css";
-@source "../../";
-
-@theme inline {
-  --color-background: var(--canvas);
-  --color-foreground: var(--ink);
-  --color-primary: var(--accent);
-  --color-primary-foreground: var(--paper);
-  --color-card: var(--paper);
-  --color-border: var(--line);
-  --color-ring: var(--accent);
-  --color-muted-foreground: var(--muted);
-  --color-muted: var(--wash);
-  --color-popover: var(--paper);
-  --color-popover-foreground: var(--ink);
-  --color-info: var(--info);
-  --color-info-soft: var(--info-soft);
-  --color-success: var(--success);
-  --color-success-soft: var(--success-soft);
-  --color-warning: var(--warning);
-  --color-warning-soft: var(--warning-soft);
-  --color-destructive: var(--danger);
-  --color-destructive-soft: var(--danger-soft);
+/* Studio's type is its own; every colour comes from the fe SDK Ocharo theme. */
+@theme {
   --font-sans: "Avenir Next", "Segoe UI", sans-serif;
 }
+
+/* Studio's short names for the theme tokens its stylesheets read. They resolve on <html>, where `theme-ocharo` and
+   `dark` sit, so they follow the colour mode. `--accent-ink` is accent-coloured text, readable on cards and on
+   `--accent-soft`; `--on-accent` is text on an `--accent` fill. */
 :root {
-  --canvas: #f1f0eb;
-  --paper: #fffefa;
-  --ink: #303b37;
-  --muted: #626b62;
-  --accent: #7a3944;
-  --accent-soft: #f6e9e9;
-  --line: #e7e7df;
-  --wash: #f5f5ef;
-  --info: #2f5f86;
-  --info-soft: #e5eef5;
-  --success: #2f6a47;
-  --success-soft: #e4f0e8;
-  --warning: #8a5a0a;
-  --warning-soft: #f7ecd8;
-  --danger: #a8322d;
-  --danger-soft: #f8e6e3;
-  --shadow: 0 8px 28px #28372b06, 0 1px 3px #28372b03;
+  --canvas: var(--color-background);
+  --paper: var(--color-card);
+  --ink: var(--color-foreground);
+  --muted: var(--color-muted-foreground);
+  --accent: var(--color-primary);
+  --accent-ink: var(--color-primary-soft-foreground);
+  --on-accent: var(--color-primary-foreground);
+  --accent-soft: var(--color-primary-soft);
+  --line: var(--color-border);
+  --wash: var(--color-muted);
+  --info: var(--color-info);
+  --info-soft: var(--color-info-soft);
+  --success: var(--color-success);
+  --success-soft: var(--color-success-soft);
+  --warning: var(--color-warning);
+  --warning-soft: var(--color-warning-soft);
+  --danger: var(--color-destructive);
+  --danger-soft: var(--color-destructive-soft);
+  /* Island depth is a scene neutral the theme does not carry. */
+  --shadow: 0 8px 28px rgb(24 27 37 / 0.05), 0 1px 3px rgb(24 27 37 / 0.03);
   font-family: var(--font-sans);
   color: var(--ink);
   background: var(--canvas);
   font-synthesis: none;
 }
 :root.dark {
-  --canvas: #242b29;
-  --paper: #303835;
-  --ink: #eceee5;
-  --muted: #b0b9ad;
-  --accent: #daa0aa;
-  --accent-soft: #4d3c40;
-  --line: #46504a;
-  --wash: #39423d;
-  --info: #93bddf;
-  --info-soft: #2c3f4d;
-  --success: #93cda9;
-  --success-soft: #2c4236;
-  --warning: #e3b660;
-  --warning-soft: #4a3d25;
-  --danger: #f0968d;
-  --danger-soft: #4f2f2d;
-  --shadow: 0 8px 28px #0002;
+  --shadow: 0 8px 28px rgb(0 0 0 / 0.22);
 }

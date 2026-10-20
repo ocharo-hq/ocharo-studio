@@ -1,5 +1,10 @@
 import { AuthStatus, createAuthBridge } from "@wow-two-beta/fe/auth";
-import { expireSsoSession, getSsoSession, ssoUnavailable } from "./SsoAccess";
+import {
+  expireSsoSession,
+  getSsoSession,
+  signOutSso,
+  ssoUnavailable,
+} from "./SsoAccess";
 const TICKET_KEY = "ocharo-studio:integration-ticket";
 export const DESK_ORIGIN =
   import.meta.env.VITE_OCHARO_PLATFORM_ORIGIN ?? "https://localhost:8264";
@@ -41,6 +46,19 @@ export function handleUnauthorized(): StudioSessionExpired {
   const error = new StudioSessionExpired();
   studioAuth.onUnauthorized(error);
   return error;
+}
+/**
+ * Ends this app's Ocharo grant and settles the bridge anonymous without an expiry notice, so later 401s of the ended
+ * session stay quiet. Browser recovery and local edits are untouched. Resolves `false`, changing nothing, on failure.
+ */
+export async function signOutStudio(
+  fetcher: typeof fetch = fetch,
+): Promise<boolean> {
+  if (!(await signOutSso(fetcher))) return false;
+  connectedSession = undefined;
+  if (studioAuth.getSession().status !== AuthStatus.Anonymous)
+    studioAuth.publishSession({ status: AuthStatus.Anonymous, user: null });
+  return true;
 }
 export function getConnectedSession(): StudioSession | undefined {
   return connectedSession;
