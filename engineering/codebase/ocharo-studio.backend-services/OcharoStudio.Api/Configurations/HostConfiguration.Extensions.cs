@@ -1,11 +1,13 @@
 using Ocharo.Sso;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.StaticFiles;
+using OcharoStudio.Api.RuntimeConfig.Settings;
 using OcharoStudio.Api.Studio.Access;
 using OcharoStudio.Application;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
 using WoW.Two.Sdk.Beta.Be.Foundation.Configuration;
+using WoW.Two.Sdk.Beta.Be.Foundation.Options;
 using WoW.Two.Sdk.Beta.Be.Mediator;
 using WoW.Two.Sdk.Beta.Be.Web.Hosting;
 using WoW.Two.Sdk.Beta.Be.Web.ProblemDetails;
@@ -57,6 +59,22 @@ public static partial class HostConfiguration
         return builder;
     }
 
+    /// <summary>Registers the public runtime settings the SPA reads at startup: the Ocharo app and site addresses.</summary>
+    private static WebApplicationBuilder AddRuntimeConfig(this WebApplicationBuilder builder)
+    {
+        // Every address is optional, and a malformed one is left out rather than failing the host over a menu link.
+        builder.Services.AddValidatedSettings<OcharoAppsSettings>(builder.Configuration, OcharoAppsSettings.SectionName, _ => { });
+        return builder;
+    }
+
+    /// <summary>Warns once about each configured app address the runtime config leaves out.</summary>
+    private static void WarnAboutRejectedRuntimeConfig(this WebApplication app)
+    {
+        var rejected = app.Services.GetRequiredService<OcharoAppsSettings>().RejectedSettings();
+        if (rejected.Count > 0)
+            app.Logger.LogWarning("Runtime config leaves out {Settings}: each must be a plain HTTPS address.", string.Join(", ", rejected));
+    }
+
     /// <summary>Registers the HTTP boundary, controllers and OpenAPI documentation.</summary>
     private static WebApplicationBuilder AddControllers(this WebApplicationBuilder builder)
     {
@@ -96,7 +114,9 @@ public static partial class HostConfiguration
     private static WebApplication UseStudioAccess(this WebApplication app)
     {
         app.UseAuthentication();
-        app.UseOcharoSso(http => http.Request.Path == "/health" || http.Request.Path == "/api/system/version");
+        // Health, build identity, status and the public runtime settings answer before sign-in.
+        app.UseOcharoSso(http => http.Request.Path == "/health" || http.Request.Path == "/api/system/version"
+            || http.Request.Path == "/api/system/status" || http.Request.Path == "/api/runtime-config");
         app.UseAuthorization();
         return app;
     }

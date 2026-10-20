@@ -15,6 +15,7 @@ public static partial class HostConfiguration
             .AddIngress()
             .AddStudio()
             .AddStudioAccess()
+            .AddRuntimeConfig()
             .AddControllers();
     }
 
@@ -24,6 +25,7 @@ public static partial class HostConfiguration
         await app.Services.InitializeStudioDatabaseAsync(app.Lifetime.ApplicationStopping);
 
         app.UseHttpProblemDetails();
+        app.WarnAboutRejectedRuntimeConfig();
 
         return app
             .UseIngress()
