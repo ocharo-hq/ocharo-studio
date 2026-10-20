@@ -1,6 +1,6 @@
 # ventures.ocharo-studio — Product Context
 
-*Last updated: 2026-09-28*
+*Last updated: 2026-10-20*
 
 > Current state changes often. Durable product definition: `product.md`.
 
@@ -45,6 +45,7 @@ These questions refine delivery; they do not block the confirmed product model.
 - 2026-09-26 — Replace the dress form with a faceless figure after the catalogue model and remodel all five garments in Blender; the reusable 3D library lives in Maftuna's workspace (`assets/3d/ocharo-garments/`) and the studio syncs copies.
 - 2026-09-27 — Make the brand silhouette (cream dress form over an ivory skirt) the studio's garment holder; the catalogue-model figure, the model girl, moves to the later final-render feature.
 - 2026-09-28 — Add Studio render (print-size PNGs on the silhouette or the model) and physically based cloth shading; build the high-definition model girl in Blender with MPFB2 once its downloads are approved.
+- 2026-10-20 — Wear the Ocharo workspace frame: the SDK `ocharo` theme replaces Studio's palette; one 56px top bar with the app button and the account menu, a Designer/Materials sidebar collapsed to an icon rail by default, and no frame bottom bar on phones. Studio stays English-only for this rollout.
 
 ## Version ownership
 

@@ -1,6 +1,6 @@
 # Architecture
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-20*
 
 ## Runtime
 
@@ -15,11 +15,46 @@ The landing and editor are lazy Vue routes created by the shared Vue SDK adapter
 and the React SDK package are absent from the application. Immutable reducer operations remain pure TypeScript;
 Vue composables expose live getters and own persistence, onboarding, and renderer teardown.
 
+Besides the studio API, the host serves the suite's fixed public endpoints: `GET /api/system/status`
+(`{service, status, version}`, anonymous, `no-store`) beside the retained `/api/system/version`, and
+`GET /api/runtime-config` (anonymous, `no-store`), which maps the optional `OcharoApps:*` settings onto the
+`OCHARO_*_URL` keys and leaves out, with one startup warning, any value that is not a plain absolute HTTPS address.
+Both, with `/health` and `/api/system/version`, answer before an Ocharo session.
+
 ## Browser studio
 
 The responsive editor places a fixed mannequin at the centre of floating library, contextual, inspector, camera,
 and help islands. Garment choice, part choice, material application, pattern placement, and camera navigation remain
 separate operations. Keyboard-accessible form controls provide alternatives to canvas part selection.
+
+## Ocharo frame
+
+Designer (`/studio`) and Materials (`/studio/materials`) render inside the suite's frame, `bootstrap/AppLayout.vue`,
+mounted through the `/studio` layout route; both places share one editor component, so a move between them keeps
+the open design, unsaved material edits and the navigation guard. The landing page and the missing page stay outside
+the frame with their own header, on the same theme.
+
+- One 56px glass top bar (`--frame-bar-height`): the SDK `AppSwitcherMenu` (current `studio`, the "O" mark) with the
+  app version, the open place's own controls, then the SDK `AccountMenu`. The Designer teleports New design, the look
+  name, the save status and Export into the bar; phones keep the look name in a row above the canvas.
+- The app menu reads the runtime-config seam ahead of build-time `VITE_OCHARO_*_URL` values and local defaults
+  (`application/common/UseOcharoApps.ts`); startup problems only reach the console, since the menu keeps working.
+- The account menu holds Studio settings, the colour mode, and the Studio and API versions from
+  `/api/system/status`. With an Ocharo session it adds who is signed in, the Ocharo account, Reconnect with Ocharo and
+  sign-out through `POST /api/sso/logout`. Reconnect and sign-out wait while material edits are unsaved or a save is
+  in flight; a sign-out keeps browser recovery and settles the bridge anonymous without an expiry notice.
+- The sidebar is the SDK `SidebarMenu` with Designer and Materials, an icon rail by default
+  (`ocharo-studio.sidebar-collapsed`), expandable from `lg`, hidden below `md`. Phones switch places from a compact
+  SDK menu in the top bar and have no bottom bar; the app menu opens full screen there.
+- The editor's layout answers the `studio` container — the width the frame leaves it beside the rail or an expanded
+  sidebar — rather than the viewport, so the floating islands, canvas and camera tools keep clear of each other.
+
+The SDK `ocharo` theme supplies every colour (`theme-ocharo` on `<html>`); Studio's stylesheets read short aliases
+of its tokens. One SDK `ColorModeProvider` owns the colour mode under `ocharo-studio.theme`, and the generated
+`/theme.js` applies it before the first paint. That script first turns the boolean earlier builds stored under the
+key into `dark` or `light`; with no stored mode, a recovered `settings.dark` seeds it once, and the editor seeds it
+once more from synced settings. Studio no longer writes `settings.dark`; older saved states keep the field
+unchanged in later syncs, so an older open tab still finds its theme, and Studio reads it only for that seed.
 
 ## Asset contract
 

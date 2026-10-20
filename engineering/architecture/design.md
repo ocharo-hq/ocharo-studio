@@ -1,6 +1,6 @@
 # Studio interface
 
-*Last updated: 2026-09-26*
+*Last updated: 2026-10-20*
 
 ## Direction
 
@@ -15,14 +15,19 @@ hide texture transform controls. The bottom island owns camera presets, zoom, fi
 
 ## Tokens and surfaces
 
-Semantic tokens live in `src/bootstrap/styles/tokens.css`, extending the workspace Vue SDK token stylesheet.
-Light and dark palettes share the same layout. The theme preference uses the SDK persistent-state hook;
-bootstrap owns the root `dark` class. Ivory/ink surfaces have restrained borders and shadows. Light-mode
-secondary text uses `#626b62` for readable contrast against the canvas and cards.
+Since the Ocharo frame rollout (2026-10-20) every colour comes from the fe SDK `ocharo` theme: Ink and Raspberry in
+light, Neutral graphite in dark, with its medium ambient backdrop behind the frame. `src/bootstrap/styles/tokens.css`
+maps Studio's short names (`--canvas`, `--paper`, `--ink`, `--accent`, …) onto the theme tokens; accent-coloured text
+reads `--accent-ink` (the theme's primary-soft foreground) and text on an accent fill reads `--on-accent`, so both
+stay readable in dark. The top bar, sidebar and menus are glass (`styles/frame.css`, matching Desk and Catalogue);
+the canvas, textiles and editing islands stay solid. The SDK colour-mode provider owns the root `dark` class and the
+System / Light / Dark choice in the account menu. Scene neutrals follow the theme canvas: the fog fades towards
+`#f5f6fa` or `#141416`, and the floor shadow stays a coverage-only black.
 
 Desktop preserves a large central canvas with floating controls. Compact tablet and phone layouts switch between
 Canvas, Library and Edit part; an open sheet reserves the lower screen while the garment remains above it.
-Controls remain reachable without horizontal scrolling.
+Controls remain reachable without horizontal scrolling. The layout steps answer the editor's own width, so the
+sidebar rail and an expanded sidebar move them as the viewport would.
 
 ## Interaction and accessibility
 
@@ -71,7 +76,8 @@ enter the recovery cache immediately, while one focused editing gesture creates 
 lets queued writes finish; per-tab recovery remains available when offline or after a reload. The studio
 opens its current draft when returning. Camera and inspector view state reset when the editor remounts.
 
-The shared `StudioBrand` keeps the same wordmark across both pages. Native in-page anchors and router links retain
+The landing header keeps the `StudioBrand` wordmark with the build-identity pill; the frame replaces both in the
+editor with the suite's app button, the app version and the account menu's versions. Native in-page anchors and router links retain
 keyboard and modified-click behavior. Landing layouts use a split hero on large screens and stacked content on
 phones; light/dark themes share the same semantic tokens. No new design direction approval is needed because the
 user explicitly retained this visual system and authorized the landing build.
