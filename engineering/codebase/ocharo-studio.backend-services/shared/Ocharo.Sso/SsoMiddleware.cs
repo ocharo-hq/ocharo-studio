@@ -94,8 +94,8 @@ public sealed class SsoMiddleware(RequestDelegate next, SsoRouting routing)
         if (path == "/api/sso/session" && HttpMethods.IsGet(http.Request.Method))
         {
             await JsonAsync(http, new { enabled = true, authenticated = true, accountUrl = options.DeskOrigin, userId = actor.UserId,
-                organizationId = actor.OrganizationId, canEdit = actor.CanEdit, canApprove = actor.CanApprove,
-                csrfToken = fromCookie ? session?.Csrf : null });
+                organizationId = actor.OrganizationId, name = actor.DisplayName, email = actor.Email, canEdit = actor.CanEdit,
+                canApprove = actor.CanApprove, csrfToken = fromCookie ? session?.Csrf : null });
             return;
         }
         if (path == "/api/sso/logout" && HttpMethods.IsPost(http.Request.Method))

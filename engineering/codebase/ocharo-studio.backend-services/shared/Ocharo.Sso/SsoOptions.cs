@@ -42,8 +42,18 @@ public sealed class SsoOptions
     }
 }
 
-public sealed record SsoActor(bool Active, string UserId, Guid OrganizationId, string? Role, bool CanEdit, bool CanApprove, DateTimeOffset ExpiresAt)
+/// <summary>Live Desk authority for one request. DisplayName and Email are the operator's current Desk profile;
+/// each is null when an older Desk omits it or its value is blank, oversized or contains control characters.</summary>
+public sealed record SsoActor(bool Active, string UserId, Guid OrganizationId, string? Role, bool CanEdit, bool CanApprove, DateTimeOffset ExpiresAt,
+    string? DisplayName = null, string? Email = null)
 {
+    public string? DisplayName { get; init; } = Displayable(DisplayName, 200);
+    public string? Email { get; init; } = Displayable(Email, 256);
+    private static string? Displayable(string? value, int maximum)
+    {
+        var text = value?.Trim();
+        return string.IsNullOrEmpty(text) || text.Length > maximum || text.Any(char.IsControl) ? null : text;
+    }
     internal bool Valid(SsoOptions options, DateTimeOffset now)
     {
         return Active && !string.IsNullOrWhiteSpace(UserId) && UserId.Length <= 200 && OrganizationId != Guid.Empty && ExpiresAt > now &&
