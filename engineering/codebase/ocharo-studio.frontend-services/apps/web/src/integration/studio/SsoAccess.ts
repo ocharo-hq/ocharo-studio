@@ -1,9 +1,13 @@
-/** Only CSRF metadata reaches JavaScript; delegation grants remain on the app backend. */
+/** Only CSRF metadata and the operator's display identity reach JavaScript; delegation grants remain on the app backend. */
 export interface StudioSsoSession {
   enabled: boolean;
   authenticated: boolean;
   csrfToken?: string;
   accountUrl?: string;
+  /** The operator's current Desk display name, while authenticated; absent when Desk sends none. */
+  name?: string;
+  /** The operator's current Desk email, while authenticated; absent when Desk sends none. */
+  email?: string;
 }
 let session: StudioSsoSession = { enabled: false, authenticated: false };
 let unavailable = false;
@@ -94,6 +98,16 @@ function accountOrigin(value: unknown): string | undefined {
   }
   return undefined;
 }
+/** The longest name and email the menu shows, as the backend bounds them. @internal */
+const IdentityLimit = { Name: 200, Email: 256 } as const;
+/** A display value the session may carry: trimmed, non-empty, bounded and free of control characters. */
+function displayable(value: unknown, maximum: number): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const text = value.trim();
+  return text && text.length <= maximum && !/[\x00-\x1f\x7f-\x9f]/.test(text)
+    ? text
+    : undefined;
+}
 export async function initializeSso(
   fetcher: typeof fetch = fetch,
 ): Promise<StudioSsoSession> {
@@ -129,12 +143,25 @@ export async function initializeSso(
   const accountUrl = accountOrigin(
     "accountUrl" in value ? value.accountUrl : undefined,
   );
+  // Only an authenticated session names who is signed in; `null` from an older Desk reads as absent.
+  const signedIn = value.enabled && value.authenticated;
+  const name = signedIn
+    ? displayable("name" in value ? value.name : undefined, IdentityLimit.Name)
+    : undefined;
+  const email = signedIn
+    ? displayable(
+        "email" in value ? value.email : undefined,
+        IdentityLimit.Email,
+      )
+    : undefined;
   unavailable = false;
   settle({
     ...(accountUrl ? { accountUrl } : {}),
     enabled: value.enabled,
     authenticated: value.authenticated,
     ...(typeof csrf === "string" ? { csrfToken: csrf } : {}),
+    ...(name ? { name } : {}),
+    ...(email ? { email } : {}),
   });
   if (session.enabled) {
     try {
