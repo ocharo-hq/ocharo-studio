@@ -56,7 +56,8 @@ function choose(id: string | null): void {
     </DropdownMenuTrigger>
     <DropdownMenuContent
       aria-label="Studio sections"
-      class="oc-glass-menu w-56 border-(--oc-glass-edge) text-foreground shadow-(--oc-menu-shadow)"
+      variant="glass-menu"
+      class="w-56"
     >
       <MenuRadioGroup
         label="Studio sections"

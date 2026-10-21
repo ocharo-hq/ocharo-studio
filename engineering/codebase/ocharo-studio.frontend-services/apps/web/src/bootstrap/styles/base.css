@@ -67,7 +67,7 @@
       serif;
     letter-spacing: -0.7px;
   }
-  :where(.oc-glass-menu) h2 {
+  :where(.surface-glass-menu) h2 {
     font-family: var(--font-sans);
     letter-spacing: normal;
   }

@@ -60,7 +60,7 @@ const footerClass =
         >
       </SidebarMenuItem>
     </SidebarMenu>
-    <div class="flex flex-col gap-1 border-t border-(--oc-glass-edge) p-2">
+    <div class="flex flex-col gap-1 border-t border-glass-edge p-2">
       <RouterLink
         to="/"
         :class="[footerClass, { 'justify-center': props.collapsed }]"
