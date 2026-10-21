@@ -50,6 +50,120 @@ describe("shared Ocharo session", () => {
     );
   });
 
+  it("carries the operator's Desk name and email while authenticated", async () => {
+    const { initializeSso, getSsoSession } =
+      await import("../src/integration/studio/SsoAccess");
+    await initializeSso(
+      vi.fn().mockResolvedValue(
+        response({
+          data: {
+            enabled: true,
+            authenticated: true,
+            csrfToken,
+            userId: "user-a",
+            name: "  Maftuna Rakhimova ",
+            email: "maftuna@ocharo.example",
+          },
+        }),
+      ),
+    );
+    expect(getSsoSession()).toEqual({
+      enabled: true,
+      authenticated: true,
+      csrfToken,
+      name: "Maftuna Rakhimova",
+      email: "maftuna@ocharo.example",
+    });
+  });
+
+  it("reads a session without a name or email, or with null ones, as unnamed", async () => {
+    const { initializeSso } =
+      await import("../src/integration/studio/SsoAccess");
+    for (const identity of [{}, { name: null, email: null }]) {
+      const session = await initializeSso(
+        vi.fn().mockResolvedValue(
+          response({
+            data: {
+              enabled: true,
+              authenticated: true,
+              csrfToken,
+              ...identity,
+            },
+          }),
+        ),
+      );
+      expect(session).toEqual({
+        enabled: true,
+        authenticated: true,
+        csrfToken,
+      });
+    }
+  });
+
+  it("drops a name or email that is blank, oversized, not text or holds control characters", async () => {
+    const { initializeSso } =
+      await import("../src/integration/studio/SsoAccess");
+    for (const [name, email] of [
+      ["   ", ""],
+      ["a".repeat(201), `${"a".repeat(250)}@ocharo.example`],
+      [42, { address: "maftuna@ocharo.example" }],
+      ["Maftuna\nRakhimova", "maftuna@ocharo.example\u0000"],
+    ]) {
+      const session = await initializeSso(
+        vi.fn().mockResolvedValue(
+          response({
+            data: {
+              enabled: true,
+              authenticated: true,
+              csrfToken,
+              name,
+              email,
+            },
+          }),
+        ),
+      );
+      expect(session.name).toBeUndefined();
+      expect(session.email).toBeUndefined();
+    }
+  });
+
+  it("names no one in a session that is not signed in, and forgets the name on sign-out", async () => {
+    const { getSsoSession, initializeSso, signOutSso } =
+      await import("../src/integration/studio/SsoAccess");
+    const anonymous = await initializeSso(
+      vi.fn().mockResolvedValue(
+        response({
+          data: {
+            enabled: true,
+            authenticated: false,
+            name: "Maftuna Rakhimova",
+            email: "maftuna@ocharo.example",
+          },
+        }),
+      ),
+    );
+    expect(anonymous).toEqual({ enabled: true, authenticated: false });
+    await initializeSso(
+      vi.fn().mockResolvedValue(
+        response({
+          data: {
+            enabled: true,
+            authenticated: true,
+            csrfToken,
+            name: "Maftuna Rakhimova",
+            email: "maftuna@ocharo.example",
+          },
+        }),
+      ),
+    );
+    expect(
+      await signOutSso(
+        vi.fn().mockResolvedValue(new Response(null, { status: 204 })),
+      ),
+    ).toBe(true);
+    expect(getSsoSession()).toEqual({ enabled: true, authenticated: false });
+  });
+
   it("limits the central account link to a plain HTTPS origin", async () => {
     const { initializeSso } =
       await import("../src/integration/studio/SsoAccess");
