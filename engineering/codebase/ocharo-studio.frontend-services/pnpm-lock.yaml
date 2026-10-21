@@ -20,8 +20,8 @@ importers:
         specifier: 5.102.8
         version: 5.102.8(vue@3.5.41(typescript@5.9.3))
       '@wow-two-beta/fe':
-        specifier: 0.0.28
-        version: 0.0.28(@tanstack/vue-query@5.102.8(vue@3.5.41(typescript@5.9.3)))(@vue/test-utils@2.5.1(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(tailwindcss@4.3.3)(vue-router@4.6.4(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))
+        specifier: 0.0.31
+        version: 0.0.31(@tanstack/vue-query@5.102.8(vue@3.5.41(typescript@5.9.3)))(@vue/test-utils@2.5.1(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(tailwindcss@4.3.3)(vue-router@4.6.4(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -665,8 +665,8 @@ packages:
       '@vue/server-renderer':
         optional: true
 
-  '@wow-two-beta/fe@0.0.28':
-    resolution: {integrity: sha512-kApM3tVWXUu6ArxXEGcIvQ2VwoQYtDXQ1V+24UcQDD09YWWiiYCdJnJ40v/UHfb7HqOPijkz8gUj0j4tr9kxCg==}
+  '@wow-two-beta/fe@0.0.31':
+    resolution: {integrity: sha512-CH8BW8n4duv6jXkcmHxzkRX5kfa6YTY3CVhkApvCC9fuSPTsA9+oeFv5EFZobYZq0p1Pa+Zeho5Gpw1ytjfZJg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@tanstack/vue-form': ^1.0.0
@@ -1684,7 +1684,7 @@ snapshots:
     optionalDependencies:
       '@vue/server-renderer': 3.5.41
 
-  '@wow-two-beta/fe@0.0.28(@tanstack/vue-query@5.102.8(vue@3.5.41(typescript@5.9.3)))(@vue/test-utils@2.5.1(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(tailwindcss@4.3.3)(vue-router@4.6.4(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))':
+  '@wow-two-beta/fe@0.0.31(@tanstack/vue-query@5.102.8(vue@3.5.41(typescript@5.9.3)))(@vue/test-utils@2.5.1(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(tailwindcss@4.3.3)(vue-router@4.6.4(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))':
     dependencies:
       '@floating-ui/vue': 1.1.11(vue@3.5.41(typescript@5.9.3))
       bignumber.js: 11.1.5
