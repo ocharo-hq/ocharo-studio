@@ -96,11 +96,16 @@ const signedIn = computed(
     Boolean(account.session.value.csrfToken),
 );
 const accountOpen = ref(false);
-const accountIdentity = computed(() =>
-  signedIn.value
-    ? { description: "Signed in through Ocharo Desk", onSignOut: signOut }
-    : {},
-);
+/** The operator's Desk name and email head the menu; without an email it says where they signed in. */
+const accountIdentity = computed(() => {
+  if (!signedIn.value) return {};
+  const { name, email } = account.session.value;
+  return {
+    ...(name ? { name } : {}),
+    description: email ?? "Signed in through Ocharo Desk",
+    onSignOut: signOut,
+  };
+});
 /** The app's own version, then the API's from its status, with the commit the build carries split off. */
 const versions = computed<AccountMenuVersion[]>(() => {
   const [api = "", commit] = backendVersion.value.split("+");
@@ -113,11 +118,6 @@ watch(accountOpen, (open) => {
   if (open) void refreshBackendVersion();
 });
 
-/** Opens Desk's account page in another tab, so unsaved edits here stay. */
-function openDeskAccount(): void {
-  const url = account.session.value.accountUrl;
-  if (url) window.open(url, "_blank", "noopener,noreferrer");
-}
 /** True when the open place's unsaved or in-flight work must finish first; the place shows why. */
 function held(change: StudioSessionChange): boolean {
   const reason = place.value?.holdSession(change) ?? null;
@@ -146,7 +146,8 @@ async function signOut(): Promise<void> {
   >
     <AppShellHeader
       height="auto"
-      class="oc-glass border-b border-(--oc-glass-edge) p-0 pt-[env(safe-area-inset-top)] shadow-(--oc-glass-shadow)"
+      variant="glass"
+      class="p-0 pt-[env(safe-area-inset-top)]"
     >
       <div
         class="studio-frame-bar flex min-h-(--frame-bar-height) w-full min-w-0 items-center gap-1 px-2 sm:gap-2 sm:px-4"
@@ -162,7 +163,7 @@ async function signOut(): Promise<void> {
             close-label="Close"
             new-tab-label="(opens in a new tab)"
             trigger-label="Ocharo apps — Studio"
-            panel-class="oc-glass-menu border-(--oc-glass-edge) text-foreground shadow-(--oc-menu-shadow)"
+            variant="glass-menu"
             class="max-sm:gap-1.5 max-sm:[&>span:not([data-app-switcher-mark])]:sr-only [&[data-state=open]_[data-app-switcher-chevron]]:text-primary-soft-foreground"
           >
             <template #mark><span class="oc-mark">O</span></template>
@@ -183,7 +184,7 @@ async function signOut(): Promise<void> {
           v-bind="accountIdentity"
           :versions="versions"
           :is-busy="account.signingOut.value"
-          panel-class="oc-glass-menu overflow-x-hidden border-(--oc-glass-edge) text-foreground shadow-(--oc-menu-shadow)"
+          variant="glass-menu"
           class="max-sm:[&_[data-account-menu-chevron]]:hidden"
         >
           <template #items>
@@ -191,9 +192,11 @@ async function signOut(): Promise<void> {
               ><Settings :size="15" class="shrink-0" aria-hidden="true" />Studio
               settings</MenuItem
             >
+            <!-- Desk's account page opens in another tab, so unsaved edits here stay. -->
             <MenuItem
               v-if="ssoEnabled && account.session.value.accountUrl"
-              @select="openDeskAccount"
+              :href="account.session.value.accountUrl"
+              target="_blank"
               ><ExternalLink
                 :size="15"
                 class="shrink-0"
@@ -211,7 +214,7 @@ async function signOut(): Promise<void> {
         </AccountMenu>
       </div>
     </AppShellHeader>
-    <AppShellSidebar class="oc-glass-side border-e border-(--oc-glass-edge)">
+    <AppShellSidebar variant="glass">
       <StudioNav
         :current="section"
         :collapsed="isRail"

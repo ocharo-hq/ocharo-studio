@@ -109,9 +109,10 @@ function overlay(role: "menu" | "dialog"): DOMWrapper<HTMLElement> {
   return new DOMWrapper(element!);
 }
 
+/** Opens the account menu; its trigger is "Account menu", or "Account menu for {name}" once Desk names the operator. */
 async function openAccountMenu(): Promise<DOMWrapper<HTMLElement>> {
   await wrapper!
-    .get('header button[aria-haspopup="menu"][aria-label="Account menu"]')
+    .get('header button[aria-haspopup="menu"][aria-label^="Account menu"]')
     .trigger("click");
   await flushPromises();
   return overlay("menu");
@@ -262,6 +263,51 @@ describe("Ocharo frame in Studio", () => {
     expect(document.body.textContent).toContain("Designs stay in this browser");
   });
 
+  it("paints the bar, sidebar and menus with the SDK glass of the Ocharo theme", async () => {
+    await mountStudio("/studio", { width: 1440 });
+
+    const header = wrapper!.get("header[role=banner]");
+    expect(header.classes()).toEqual(
+      expect.arrayContaining(["surface-glass", "border-glass-edge"]),
+    );
+    expect(wrapper!.get("aside").classes()).toEqual(
+      expect.arrayContaining(["surface-glass-side", "border-glass-edge"]),
+    );
+    const menu = await openAccountMenu();
+    expect(menu.classes()).toEqual(
+      expect.arrayContaining(["surface-glass-menu", "border-glass-edge"]),
+    );
+    // The SDK keeps the panel from scrolling sideways, so Studio no longer clips it.
+    expect(menu.find(".overflow-x-hidden").exists()).toBe(false);
+    expect(
+      [...document.querySelectorAll("[class]")].some((element) =>
+        [...element.classList].some((name) => name.startsWith("oc-glass")),
+      ),
+    ).toBe(false);
+  });
+
+  it("opens the app and section menus on the glass menu material", async () => {
+    await mountStudio("/studio", { width: 1440 });
+    await wrapper!
+      .get('header button[aria-label="Ocharo apps — Studio"]')
+      .trigger("click");
+    await flushPromises();
+    const titles = [...document.querySelectorAll(".surface-glass-menu h2")];
+    expect(titles.map((title) => title.textContent?.trim())).toEqual([
+      "Ocharo apps",
+    ]);
+    wrapper!.unmount();
+    wrapper = undefined;
+    document.body.innerHTML = "";
+
+    await mountStudio("/studio", { width: 390 });
+    await wrapper!
+      .get('header button[aria-label="Studio sections — Designer"]')
+      .trigger("click");
+    await flushPromises();
+    expect(overlay("menu").classes()).toContain("surface-glass-menu");
+  });
+
   it("names the Ocharo session, links the account and signs this app out", async () => {
     await mountStudio("/studio", {
       ssoSession: {
@@ -269,14 +315,30 @@ describe("Ocharo frame in Studio", () => {
         authenticated: true,
         csrfToken,
         accountUrl: "https://desk.example/",
+        name: "Maftuna Rakhimova",
+        email: "maftuna@ocharo.example",
       },
     });
 
+    expect(
+      wrapper!
+        .find('header button[aria-label="Account menu for Maftuna Rakhimova"]')
+        .exists(),
+    ).toBe(true);
     const menu = await openAccountMenu();
-    expect(menu.get("[data-account-menu-identity]").text()).toContain(
-      "Signed in through Ocharo Desk",
-    );
-    expect(menuRow(menu, "Ocharo account")).toBeDefined();
+    const identity = menu.get("[data-account-menu-identity]");
+    expect(identity.findAll("p").map((line) => line.text())).toEqual([
+      "Maftuna Rakhimova",
+      "maftuna@ocharo.example",
+    ]);
+    // Desk's account page is a real link row: it opens in another tab, so unsaved edits here stay.
+    const account = menu.get('a[role="menuitem"][href="https://desk.example"]');
+    expect(account.attributes()).toMatchObject({
+      target: "_blank",
+      rel: "noopener noreferrer",
+    });
+    expect(account.text()).toContain("Ocharo account");
+    expect(account.text()).toContain("(opens in a new tab)");
     expect(menuRow(menu, "Reconnect with Ocharo")).toBeDefined();
     await menu.get("[data-account-menu-sign-out]").trigger("click");
     await flushPromises();
@@ -295,6 +357,58 @@ describe("Ocharo frame in Studio", () => {
     expect(after.find("[data-account-menu-sign-out]").exists()).toBe(false);
     expect(after.find("[data-account-menu-identity]").exists()).toBe(false);
     expect(menuRow(after, "Reconnect with Ocharo")).toBeDefined();
+    // Signed out, the trigger no longer names anyone.
+    expect(
+      wrapper!
+        .find('header button[aria-haspopup="menu"][aria-label="Account menu"]')
+        .exists(),
+    ).toBe(true);
+  });
+
+  it("says where the operator signed in when an older Desk sends no name or email", async () => {
+    await mountStudio("/studio", {
+      ssoSession: {
+        enabled: true,
+        authenticated: true,
+        csrfToken,
+        accountUrl: "https://desk.example/",
+        name: null,
+        email: null,
+      },
+    });
+
+    expect(
+      wrapper!
+        .find('header button[aria-haspopup="menu"][aria-label="Account menu"]')
+        .exists(),
+    ).toBe(true);
+    const menu = await openAccountMenu();
+    const identity = menu.get("[data-account-menu-identity]");
+    expect(identity.findAll("p").map((line) => line.text())).toEqual([
+      "Signed in through Ocharo Desk",
+    ]);
+    expect(menu.find("[data-account-menu-sign-out]").exists()).toBe(true);
+  });
+
+  it("names the operator without an email, keeping where they signed in", async () => {
+    await mountStudio("/studio", {
+      ssoSession: {
+        enabled: true,
+        authenticated: true,
+        csrfToken,
+        name: "Maftuna Rakhimova",
+      },
+    });
+
+    const menu = await openAccountMenu();
+    expect(
+      menu
+        .get("[data-account-menu-identity]")
+        .findAll("p")
+        .map((line) => line.text()),
+    ).toEqual(["Maftuna Rakhimova", "Signed in through Ocharo Desk"]);
+    // Without an account address there is no account row to open.
+    expect(menu.find('a[role="menuitem"]').exists()).toBe(false);
   });
 
   it("holds sign-out while material edits are unsaved", async () => {
