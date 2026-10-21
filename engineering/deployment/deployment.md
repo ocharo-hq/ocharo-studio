@@ -1,6 +1,6 @@
 # Deployment
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-21*
 
 The Dockerfile packages the Vue SPA and .NET API into one image.
 Its build context is `engineering/codebase/`. Compose mounts the named `ocharo-studio-data` volume at
@@ -14,7 +14,7 @@ docker build -f engineering/deployment/Dockerfile -t ocharo-studio:local enginee
 
 The local compose endpoint uses `127.0.0.1:18260`.
 `publish-docker-image.yml` is the Wheelhouse marker and the only CI file: it calls the shared `delivery.yml` of
-`wow-two-platform.pipelines` `v0.9.1`. A docs-only push builds nothing; a backend change runs the host checks; a
+`wow-two-platform.pipelines` `v0.10.0`. A docs-only push builds nothing; a backend change runs the host checks; a
 frontend or test change runs the frontend checks and the full three-shard browser suite; a shared file runs all.
 Publication then builds `ghcr.io/ocharo-hq/ocharo-studio/studio`. Work lands on `main` only: a `main` build releases `vX.Y.Z` with
 `ocharo-studio-release.tar.gz`; Wheelhouse deploys it to dev automatically and promotes that same release to prod
@@ -32,12 +32,17 @@ frontend and backend locally; it did not rebuild or publish a Docker image.
 
 - The release bundle mounts the target's settings file at `/app/appsettings.Target.json` (pipelines `v0.7.0`);
   the host reads it through the be sdk's `AddSettingsFiles`, after `appsettings.json`.
-- `deploy.yml` requires two keys there, and the runner refuses a deploy missing either:
+- `deploy.yml` (descriptor 2) types its keys under `settings.keys` (pipelines `v0.10.0`); the runner refuses a deploy
+  missing a required one, and Wheelhouse checks each saved value against its type:
 
-  | Key | Value on the VPS |
-  |---|---|
-  | `OcharoPlatform:BaseUrl` | the Desk origin Studio introspects tickets against, `https://…` |
-  | `Deployment:TrustedProxies` | a JSON array naming the ingress: Traefik's `platform` address, `[ "172.30.0.2" ]` |
+  | Key | Type | Source |
+  |---|---|---|
+  | `OcharoPlatform:BaseUrl` | `url`, required | the owner, on the first deploy: the Desk origin Studio introspects tickets against |
+  | `Deployment:TrustedProxies` | required | derived by Wheelhouse: the ingress's address on the server's `platform` network |
+  | `AllowedHosts` | — | derived by Wheelhouse: the site's hosts, the service's platform name and `localhost` |
+  | `OcharoApps:{Desk,Catalogue,Studio,Marketing,Editorial,Brand,Atlas,Wear,Blog}` | `url`, optional | the owner: the Ocharo app menu served at `/api/runtime-config`; an unset key leaves that app out |
+
+- The one site, `app`, is public; Wheelhouse binds its host per environment.
 
 - Forwarded `X-Forwarded-Proto`, `-Host` and `-For` apply only from loopback and those proxies (the be sdk's
   `AddProxyAwareHosting`), so Desk tickets and the account sign-in see `https` and the public host behind Traefik.
@@ -52,7 +57,7 @@ frontend and backend locally; it did not rebuild or publish a Docker image.
 
 ## Convention adoption status
 
-`deploy.yml` lists the one `studio` service; Wheelhouse deploys its bundle. Remaining differences from the shared
+`deploy.yml` lists the one `studio` service on the public `app` site; Wheelhouse deploys its bundle. Remaining differences from the shared
 startup defaults:
 
 - Studio's `/health` is hand-mapped, not the SDK boot bundle's endpoint.

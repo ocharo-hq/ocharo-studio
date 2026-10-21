@@ -1,11 +1,14 @@
 # yaml-language-server: $schema=../../../../../../../../../conventions/deployment/descriptor/deploy.schema.json
-# What this product deploys: its services, how each builds, what changes it and which sites it serves.
+# What this product deploys: its sites, its services, how each builds, what changes it and which paths it serves.
 # Format and rules: wow-two-ws/conventions/deployment/descriptor/deploy-descriptor.md. Hostnames, secrets and
 # environments live in Wheelhouse targets, never here. Paths are relative to engineering/.
 #
 # Ocharo Studio is one image: the .NET API serving the Vue 3D editor, with its SQLite state on the data volume.
-descriptor: 1
+# Both environments run as .NET Production (no dotnetEnvironment).
+descriptor: 2
 product: ocharo-studio
+sites:
+  app: {}                               # public: a domain, or Wheelhouse's sslip.io host until one is bound
 services:
   studio:
     build: { dockerfile: deployment/Dockerfile }
@@ -13,9 +16,22 @@ services:
       - codebase/ocharo-studio.backend-services/**
       - codebase/ocharo-studio.frontend-services/**
     health: /health
-    settings:                           # mounted at /app/appsettings.Target.json (pipelines v0.7.0)
-      required: [OcharoPlatform:BaseUrl, Deployment:TrustedProxies]   # the ingress address, a JSON array
+    settings:                           # mounted at /app/appsettings.Target.json
+      # Wheelhouse derives Deployment:TrustedProxies (the ingress address) and AllowedHosts; nobody types them.
+      required: [Deployment:TrustedProxies]
+      keys:
+        OcharoPlatform:BaseUrl: { type: url, required: true }   # the Desk origin Studio introspects tickets against
+        # The Ocharo app menu, served anonymously at /api/runtime-config; an unset key leaves that app out.
+        OcharoApps:Desk: { type: url }
+        OcharoApps:Catalogue: { type: url }
+        OcharoApps:Studio: { type: url }
+        OcharoApps:Marketing: { type: url }
+        OcharoApps:Editorial: { type: url }
+        OcharoApps:Brand: { type: url }
+        OcharoApps:Atlas: { type: url }
+        OcharoApps:Wear: { type: url }
+        OcharoApps:Blog: { type: url }
     volumes:
       data: /app/appdata
     sites:
-      app: { exposure: public }           # a domain, or Wheelhouse's sslip.io host until one is bound
+      app: {}
