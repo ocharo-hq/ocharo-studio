@@ -1,6 +1,6 @@
 # Architecture
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-21*
 
 ## Runtime
 
@@ -41,20 +41,25 @@ the frame with their own header, on the same theme.
   (`application/common/UseOcharoApps.ts`); startup problems only reach the console, since the menu keeps working.
 - The account menu holds Studio settings, the colour mode, and the Studio and API versions from
   `/api/system/status`. With an Ocharo session it adds who is signed in, the Ocharo account, Reconnect with Ocharo and
-  sign-out through `POST /api/sso/logout`. Reconnect and sign-out wait while material edits are unsaved or a save is
-  in flight; a sign-out keeps browser recovery and settles the bridge anonymous without an expiry notice.
+  sign-out through `POST /api/sso/logout`. `GET /api/sso/session` names the operator with their Desk `name` and
+  `email` (either may be null from an older Desk); the menu shows the name with the email under it, and says
+  "Signed in through Ocharo Desk" where no email came. The Ocharo account row is an SDK `MenuItem` link to Desk's
+  origin in a new tab, so unsaved edits stay. Reconnect and sign-out wait while material edits are unsaved or a save
+  is in flight; a sign-out keeps browser recovery and settles the bridge anonymous without an expiry notice.
 - The sidebar is the SDK `SidebarMenu` with Designer and Materials, an icon rail by default
   (`ocharo-studio.sidebar-collapsed`), expandable from `lg`, hidden below `md`. Phones switch places from a compact
   SDK menu in the top bar and have no bottom bar; the app menu opens full screen there.
 - The editor's layout answers the `studio` container — the width the frame leaves it beside the rail or an expanded
   sidebar — rather than the viewport, so the floating islands, canvas and camera tools keep clear of each other.
 
-The SDK `ocharo` theme supplies every colour (`theme-ocharo` on `<html>`); Studio's stylesheets read short aliases
-of its tokens. One SDK `ColorModeProvider` owns the colour mode under `ocharo-studio.theme`, and the generated
-`/theme.js` applies it before the first paint. That script first turns the boolean earlier builds stored under the
-key into `dark` or `light`; with no stored mode, a recovered `settings.dark` seeds it once, and the editor seeds it
-once more from synced settings. Studio no longer writes `settings.dark`; older saved states keep the field
-unchanged in later syncs, so an older open tab still finds its theme, and Studio reads it only for that seed.
+The SDK `ocharo` theme supplies every colour (`theme-ocharo` on `<html>`) and the approved frame glass; Studio's
+stylesheets read short aliases of its tokens. The bar and sidebar take the SDK `glass` variant, the app, section and
+account menus `glass-menu`; `styles/frame.css` keeps only the bar height and the "O" mark. One SDK
+`ColorModeProvider` owns the colour mode under `ocharo-studio.theme`, and the generated `/theme.js` applies it before
+the first paint. That script first turns the boolean earlier builds stored under the key into `dark` or `light`; with
+no stored mode, a recovered `settings.dark` seeds it once, and the editor seeds it once more from synced settings.
+Studio no longer writes `settings.dark`; older saved states keep the field unchanged in later syncs, so an older open
+tab still finds its theme, and Studio reads it only for that seed.
 
 ## Asset contract
 

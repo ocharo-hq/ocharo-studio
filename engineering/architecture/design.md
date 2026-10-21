@@ -1,6 +1,6 @@
 # Studio interface
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-21*
 
 ## Direction
 
@@ -19,10 +19,10 @@ Since the Ocharo frame rollout (2026-10-20) every colour comes from the fe SDK `
 light, Neutral graphite in dark, with its medium ambient backdrop behind the frame. `src/bootstrap/styles/tokens.css`
 maps Studio's short names (`--canvas`, `--paper`, `--ink`, `--accent`, …) onto the theme tokens; accent-coloured text
 reads `--accent-ink` (the theme's primary-soft foreground) and text on an accent fill reads `--on-accent`, so both
-stay readable in dark. The top bar, sidebar and menus are glass (`styles/frame.css`, matching Desk and Catalogue);
-the canvas, textiles and editing islands stay solid. The SDK colour-mode provider owns the root `dark` class and the
-System / Light / Dark choice in the account menu. Scene neutrals follow the theme canvas: the fog fades towards
-`#f5f6fa` or `#141416`, and the floor shadow stays a coverage-only black.
+stay readable in dark. The top bar, sidebar and menus wear the theme's approved glass through the SDK glass
+variants (fe SDK 0.0.31); the canvas, textiles and editing islands stay solid. The SDK colour-mode provider owns the
+root `dark` class and the System / Light / Dark choice in the account menu. Scene neutrals follow the theme canvas:
+the fog fades towards `#f5f6fa` or `#141416`, and the floor shadow stays a coverage-only black.
 
 Desktop preserves a large central canvas with floating controls. Compact tablet and phone layouts switch between
 Canvas, Library and Edit part; an open sheet reserves the lower screen while the garment remains above it.
