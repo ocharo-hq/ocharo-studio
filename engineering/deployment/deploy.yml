@@ -3,12 +3,13 @@
 # Format and rules: wow-two-ws/conventions/deployment/descriptor/deploy-descriptor.md. Hostnames, secrets and
 # environments live in Wheelhouse targets, never here. Paths are relative to engineering/.
 #
-# Ocharo Studio is one image: the .NET API serving the Vue 3D editor, with its SQLite state on the data volume.
+# Ocharo Studio is one image: the .NET API serving the Vue 3D editor, with its SQLite state on the data volume. It is a
+# repository of the one `ocharo` product (Wheelhouse decision 70), so its site and volume carry its own name.
 # Both environments run as .NET Production (no dotnetEnvironment).
 descriptor: 2
-product: ocharo-studio
+product: ocharo
 sites:
-  app: {}                               # public: a domain, or Wheelhouse's sslip.io host until one is bound
+  studio: {}                            # public: a domain, or Wheelhouse's sslip.io host until one is bound
 services:
   studio:
     build: { dockerfile: deployment/Dockerfile }
@@ -32,6 +33,6 @@ services:
         OcharoApps:Wear: { type: url }
         OcharoApps:Blog: { type: url }
     volumes:
-      data: /app/appdata
+      studio-data: /app/appdata
     sites:
-      app: {}
+      studio: {}
