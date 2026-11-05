@@ -1,6 +1,6 @@
 # Ocharo Studio — Backlog
 
-*Last updated: 2026-10-21*
+*Last updated: 2026-11-05*
 
 ## Features
 
@@ -14,6 +14,7 @@
 
 | Item | Type | Notes |
 |---|---|---|
+| Identity follow-ups | engineering | After the move to Ocharo's Identity (2026-11-05): BFF sessions live in memory, so a restart signs everyone out, and a durable SQLite or shared cache would end that; `deployment/docker-compose.yml` sets no `Identity:Client:*`, so it no longer boots alone; workspaces saved under Desk's old user ids are not migrated to Identity subjects. |
 | Human garment review | product | Validate fidelity, clipping, controls and useful exports with Maftuna. |
 | Accessibility | engineering | Assistive-technology and keyboard-only acceptance. |
 | Metric textile mapping | feature | Calibrate measured tiles before displaying centimetres. |

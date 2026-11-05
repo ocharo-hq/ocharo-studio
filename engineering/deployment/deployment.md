@@ -1,6 +1,6 @@
 # Deployment
 
-*Last updated: 2026-10-21*
+*Last updated: 2026-11-05*
 
 The Dockerfile packages the Vue SPA and .NET API into one image.
 Its build context is `engineering/codebase/`. Compose mounts the named `ocharo-studio-data` volume at
@@ -22,11 +22,10 @@ by digest. A short-lived branch or dispatched commit builds a candidate that rea
 no dev or test branch.
 It uses the repository's own GitHub identity; no owner, remote, or registry credentials are hardcoded.
 
-The frontend lockfile consumes published `@wow-two-beta/fe@0.0.23`; the host pins `WoW2.Sdk.Beta.Be` `10.0.71-beta`.
+The frontend lockfile consumes published `@wow-two-beta/fe@0.0.23`; the host pins `WoW2.Sdk.Beta.Be` `10.0.98-beta`.
 
-The connected build requires HTTPS and a trusted Platform introspection origin. The plain HTTP Compose preview
-supports browser-only editing; it cannot accept protected-state bearer tickets. This integration pass built the
-frontend and backend locally; it did not rebuild or publish a Docker image.
+Sign-in requires HTTPS and `Identity:Client:*`, which the Compose preview does not set, so it no longer boots alone;
+browser-only editing needs no sign-in on any host that does boot.
 
 ## Settings
 
@@ -37,7 +36,8 @@ frontend and backend locally; it did not rebuild or publish a Docker image.
 
   | Key | Type | Source |
   |---|---|---|
-  | `OcharoPlatform:BaseUrl` | `url`, required | the owner, on the first deploy: the Desk origin Studio introspects tickets against |
+  | `Identity:Client:{Authority,ClientSecret}` | linked with `from` | `Sites:identity:Url` and identity's `Identity:Server:Clients:5:ClientSecret`, both in `ocharo-platform`'s descriptor |
+  | `Identity:Client:{ClientId,CookieName,PostSignOutRedirectPath}` | defaults | `studio`, `__Host-ocharo-studio`, `/` |
   | `Deployment:TrustedProxies` | required | derived by Wheelhouse: the ingress's address on the server's `platform` network |
   | `AllowedHosts` | — | derived by Wheelhouse: the site's hosts, the service's platform name and `localhost` |
   | `OcharoApps:{Desk,Catalogue,Studio,Marketing,Editorial,Brand,Atlas,Wear,Blog}` | `url`, optional | the owner: the Ocharo app menu served at `/api/runtime-config`; an unset key leaves that app out |
@@ -45,13 +45,16 @@ frontend and backend locally; it did not rebuild or publish a Docker image.
 - The one site, `app`, is public; Wheelhouse binds its host per environment.
 
 - Forwarded `X-Forwarded-Proto`, `-Host` and `-For` apply only from loopback and those proxies (the be sdk's
-  `AddProxyAwareHosting`), so Desk tickets and the account sign-in see `https` and the public host behind Traefik.
+  `AddProxyAwareHosting`), so the sign-in sees `https` and the public host behind Traefik.
   The checked-in default trusts no proxy; another workload's forged headers are ignored.
 - `dotnetEnvironment` stays off: deployed dev and prod both run as .NET `Production`. The runner sets
   `DEPLOY_ENVIRONMENT`, so a deployed host is never a local run: it skips `appsettings.Local.json` and maps no
   OpenAPI document. `DB_CONNECTION` still overrides the SQLite connection string.
 - Startup creates or extends the SQLite schema on the data volume before serving; a failure aborts startup. Studio
   has no EF migrations.
+- Identity client 5's `RedirectUris:0` `{site}/api/identity/callback` and `PostSignOutRedirectUris:0` `{site}/` are owner
+  keys on `identity`, typed per environment. Sign-in sessions live in memory, so a restart or deploy signs everyone out
+  once; the Data Protection key ring stays at `/app/appdata/keys`.
 - `appsettings.Local.json`, `appsettings.Target.json` and the retired `appsettings.Machine.json` are gitignored and
   excluded from the Docker build context.
 

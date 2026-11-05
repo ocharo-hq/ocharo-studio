@@ -11,8 +11,8 @@ The repository contains a running browser studio with one fixed mannequin and fi
 built-in details. The generated catalogue supports per-part material choice, rotation, scale, offsets, and anchored
 pattern placement.
 
-Connected looks persist in SQLite under a Platform organization/member identity, with browser recovery.
-Without a Desk connection, the editor keeps designs in this browser and supports explicit JSON backup.
+Signed-in looks persist in SQLite under the session's organization and member, with browser recovery.
+Without signing in, the editor keeps designs in this browser and supports explicit JSON backup.
 They can be saved as independent copies, reopened, exported as portable JSON, or captured as PNG previews.
 The responsive editor uses floating island controls around a WebGL canvas. The `/` landing page introduces the
 workflow, garment families, and catalogue textiles; `/studio` opens the editor with an unobstructed mannequin.
@@ -45,17 +45,27 @@ dotnet run --project engineering/codebase/ocharo-studio.backend-services/OcharoS
 ```
 
 The backend build installs the locked frontend dependencies and builds the SPA into its generated `wwwroot/`.
-The lockfile resolves published `@wow-two-beta/fe@0.0.23`; the backend pins `WoW2.Sdk.Beta.Be` `10.0.71-beta`.
+The lockfile resolves published `@wow-two-beta/fe@0.0.23`; the backend pins `WoW2.Sdk.Beta.Be` `10.0.98-beta`.
 
 The `https` launch profile sets `LOCAL_SETTINGS=true`, so only that run reads the gitignored
-`OcharoStudio.Api/appsettings.Local.json`. It holds this machine's Desk introspection origin, which
-`appsettings.Development.json` no longer carries because deployed dev reads that file too:
+`OcharoStudio.Api/appsettings.Local.json`. It holds this machine's Identity client, which
+`appsettings.Development.json` does not carry because deployed dev reads that file too:
 
 ```json
-{ "OcharoPlatform": { "BaseUrl": "https://localhost:8264" } }
+{
+  "Identity": {
+    "Client": {
+      "Authority": "https://localhost:8404",
+      "ClientId": "studio",
+      "ClientSecret": "<the studio client's secret>",
+      "CookieName": "__Host-ocharo-studio",
+      "PostSignOutRedirectPath": "/"
+    }
+  }
+}
 ```
 
-Without it, a local run rejects Desk tickets and browser-only editing still works. OpenAPI (`/openapi/v1.json`)
+The host needs that block to start. OpenAPI (`/openapi/v1.json`)
 is mapped on a local run only, never on a deployed host.
 
 For frontend work, run these commands from `engineering/codebase/ocharo-studio.frontend-services/`:
@@ -87,8 +97,8 @@ See the verification record for executed checks and live-integration evidence bo
 - `engineering/planning/`: current backlog, archived foundation brief, and verification.
 
 The backend exposes capability information at `GET /api/studio` and workspace state at
-`GET|PUT /api/studio/state`. Session and state require a short-lived `ocharo-studio` bearer ticket and current
-Platform membership. A supplied `X-Studio-Workspace` UUID must match the server-derived workspace.
+`GET|PUT /api/studio/state`. Session and state require a session from Ocharo's Identity with a role in its
+organization; saving needs `studio:edit`. A supplied `X-Studio-Workspace` UUID must match the server-derived workspace.
 
 ## Boundaries
 

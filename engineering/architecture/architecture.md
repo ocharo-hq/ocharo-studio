@@ -95,7 +95,7 @@ Material decoration overlays, accurate cloth simulation, resizing, and sewing-pa
 
 A versioned JSON design document contains garment and asset versions, every declared part assignment, and per-part
 texture transforms. SQLite stores one draft, saved looks, settings, and shared material scales per authenticated workspace.
-The API derives that workspace deterministically from the current Platform organization and member identity.
+The API derives that workspace deterministically from the session's organization id and Identity subject.
 Optimistic revisions serialize writes and return a conflict rather than overwriting newer state. Per-tab browser
 recovery protects unsynchronized edits. Users can update a look, save a copy with a new identity, import or export
 validated JSON, and export the current view as PNG.
@@ -110,20 +110,19 @@ One state request may contain at most 100 looks and 4 MiB total; settings are ca
 1 MiB. The total budget still applies when many looks contain thumbnails. Invalid or oversized state returns `400`,
 does not change SQLite, and leaves the browser recovery copy available.
 
-Desk issues five-minute tickets for the `ocharo-studio` audience. Studio accepts credentials only over HTTPS and
-rechecks ticket expiry, current membership, and write rights through Platform introspection on every protected request.
-`X-Studio-Workspace` can select only the authenticated workspace; a UUID alone grants no access. The frontend sends
-an explicit bearer header with ambient cookies omitted. Studio owns no account/password database.
+Sign-in is optional and runs through Ocharo's Identity as BFF client `studio`: the API keeps the tokens, the browser a
+secure session cookie and an in-memory `X-Csrf-Token`. Session and state need a role in the session's organization;
+saving needs `studio:edit`. `X-Studio-Workspace` can select only the authenticated workspace; a UUID alone grants no
+access. Studio owns no account/password database.
 Behind the ingress, TLS ends at Traefik: forwarded scheme and host apply only from `Deployment:TrustedProxies`, so
-the HTTPS-only ticket and account checks see the public origin and no other sender can claim it.
+the HTTPS-only sign-in sees the public origin and no other sender can claim it.
 
 The browser routes every Studio 401 through one fe sdk auth bridge. The first current 401 of a connected session
-expires it once: the ticket or cached account state clears, one neutral notice appears and browser recovery stays.
+expires it once: the cached account state clears, one neutral notice appears and browser recovery stays.
 Studio deliberately stays on the page instead of redirecting to sign-in, because it remains usable signed out and
 unsaved material edits would not survive navigation.
 
-An exact configured Desk issuer and Studio audience guard the connection fragment, which is removed before its
-credential enters tab-scoped session storage. Browser-only designs remain usable without a ticket. Recovery binds
+Browser-only designs remain usable without signing in. Recovery binds
 to the authenticated workspace; switching members or organizations requires preserving recovery and explicitly
 loading the destination workspace rather than silently uploading existing local work. Portable JSON is the explicit
 transfer and backup format. SQLite and browser storage are unencrypted local development stores.
