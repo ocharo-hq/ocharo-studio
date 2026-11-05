@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { BookOpen, CloudOff, RefreshCw, TriangleAlert } from "@lucide/vue";
 import StudioDialog from "./StudioDialog.vue";
 
 /**
- * The Desk connection, sync recovery and the guide. Appearance, the Ocharo account, reconnect and sign-out live in
+ * The Ocharo sign-in, sync recovery and the guide. Appearance, the Ocharo account, reconnect and sign-out live in
  * the frame's account menu.
  */
 defineOptions({ name: "SettingsDialog" });
 defineProps<{
-  deskConnected?: boolean;
-  ssoEnabled?: boolean;
+  signedIn?: boolean;
   authUnavailable?: boolean;
   connectionError?: string;
-  onConnect?: (ticket: string | null) => void;
+  onSignIn?: () => void;
   persistenceStatus: "loading" | "saving" | "synced" | "offline" | "conflict";
   onRetrySync: () => void;
   onResolveConflict: () => void;
@@ -21,57 +19,29 @@ defineProps<{
   onGuide: () => void;
   onClose: () => void;
 }>();
-const ticket = ref("");
 </script>
 <template>
   <StudioDialog title="Studio settings" :on-close="onClose"
     ><div class="settings-list">
       <section
         class="sync-recovery desk-connection"
-        aria-label="Ocharo Desk connection"
+        aria-label="Ocharo sign-in"
       >
         <div>
           <strong>{{
-            deskConnected
-              ? "Connected through Ocharo Desk"
+            signedIn
+              ? "Signed in with your Ocharo account"
               : "Designs stay in this browser"
           }}</strong>
-          <p v-if="ssoEnabled">
+          <p v-if="signedIn">
             Your Ocharo account connects this workspace. The account menu holds
-            your Ocharo account, reconnect and sign out.
+            reconnect and sign out.
           </p>
           <p v-if="connectionError" role="alert">{{ connectionError }}</p>
-          <template v-if="!ssoEnabled && !authUnavailable">
-            <p>
-              Open Studio from your Desk workspace to save securely. A
-              connection expires after five minutes.
-            </p>
-            <label for="desk-ticket">Desk connection ticket</label>
-            <input
-              id="desk-ticket"
-              v-model="ticket"
-              type="password"
-              autocomplete="off"
-              placeholder="Paste a short-lived ticket"
-            />
-            <button
-              class="button secondary"
-              :disabled="!ticket.trim()"
-              @click="
-                () => {
-                  onConnect?.(ticket);
-                  ticket = '';
-                }
-              "
-            >
-              Connect and sync this design
-            </button>
-            <button
-              v-if="deskConnected"
-              class="button secondary"
-              @click="onConnect?.(null)"
-            >
-              Use browser only
+          <template v-if="!signedIn && !authUnavailable">
+            <p>Sign in to save your designs to your workspace.</p>
+            <button class="button secondary" @click="onSignIn?.()">
+              Sign in
             </button>
           </template>
         </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";
-import { ExternalLink, RefreshCw, Settings } from "@lucide/vue";
+import { RefreshCw, Settings } from "@lucide/vue";
 import {
   TailwindBreakpoints,
   useBreakpoint,
@@ -87,22 +87,20 @@ const items = computed<AppSwitcherItem[]>(() =>
   })),
 );
 
-/** Who is signed in, the account rows and sign-out exist only with an Ocharo session; a local run has none. */
-const ssoEnabled = computed(() => account.session.value.enabled);
+/** Who is signed in; the account rows and sign-out exist only with an Ocharo session, and anonymous visitors see Sign in. */
 const signedIn = computed(
   () =>
-    account.session.value.enabled &&
     account.session.value.authenticated &&
     Boolean(account.session.value.csrfToken),
 );
 const accountOpen = ref(false);
-/** The operator's Desk name and email head the menu; without an email it says where they signed in. */
+/** The person's name and email head the menu; without an email it says where they signed in. */
 const accountIdentity = computed(() => {
   if (!signedIn.value) return {};
   const { name, email } = account.session.value;
   return {
     ...(name ? { name } : {}),
-    description: email ?? "Signed in through Ocharo Desk",
+    description: email ?? "Signed in with your Ocharo account",
     onSignOut: signOut,
   };
 });
@@ -192,23 +190,10 @@ async function signOut(): Promise<void> {
               ><Settings :size="15" class="shrink-0" aria-hidden="true" />Studio
               settings</MenuItem
             >
-            <!-- Desk's account page opens in another tab, so unsaved edits here stay. -->
-            <MenuItem
-              v-if="ssoEnabled && account.session.value.accountUrl"
-              :href="account.session.value.accountUrl"
-              target="_blank"
-              ><ExternalLink
-                :size="15"
-                class="shrink-0"
-                aria-hidden="true"
-              />Ocharo account</MenuItem
-            >
-            <MenuItem v-if="ssoEnabled" @select="reconnect"
-              ><RefreshCw
-                :size="15"
-                class="shrink-0"
-                aria-hidden="true"
-              />Reconnect with Ocharo</MenuItem
+            <MenuItem @select="reconnect"
+              ><RefreshCw :size="15" class="shrink-0" aria-hidden="true" />{{
+                signedIn ? "Reconnect with Ocharo" : "Sign in"
+              }}</MenuItem
             >
           </template>
         </AccountMenu>

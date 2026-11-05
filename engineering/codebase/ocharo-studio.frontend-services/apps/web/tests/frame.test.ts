@@ -16,12 +16,21 @@ import {
 import AppRouter from "../src/bootstrap/AppRouter.vue";
 import { createStudioRouter } from "../src/bootstrap/router";
 import { MATERIALS } from "../src/domain/studio/catalog";
-import { initializeSso } from "../src/integration/studio/SsoAccess";
+import { initializeIdentity } from "../src/integration/studio/IdentityAccess";
 
 /** The informational version the stubbed `/api/system/status` reports: a release and the commit it was built from. */
 const ApiVersion = "0.1.4+8f2c1d9e4b7a";
 const SidebarCollapsedKey = "ocharo-studio.sidebar-collapsed";
 const csrfToken = "verified-server-csrf-token-123456";
+const EndSessionUrl = "https://identity.example/connect/logout";
+/** A signed-in `/api/identity/session` body for `person`. */
+const signedIn = (person: Record<string, unknown>) => ({
+  isAuthenticated: true,
+  person: { sub: "user-a", ...person },
+  organization: { id: "org-a", name: "Ocharo", slug: "ocharo", role: "owner" },
+  permissions: ["studio:edit"],
+  csrfToken,
+});
 /** The WebGL scene is out of reach in happy-dom; the frame and the editor's controls are real. */
 const ViewportStub = defineComponent({
   name: "StudioViewport",
@@ -50,8 +59,8 @@ interface MountOptions {
   readonly width?: number;
   /** When given, `/api/runtime-config` serves it and the app menu resolves it the way startup does. */
   readonly runtimeConfig?: Record<string, string>;
-  /** The session `/api/sso/session` serves; default SSO disabled. `/api/sso/logout` answers 204. */
-  readonly ssoSession?: Record<string, unknown>;
+  /** The session `/api/identity/session` serves; default signed out. `/api/identity/sign-out` ends it. */
+  readonly identitySession?: Record<string, unknown>;
 }
 
 /** Mounts the whole app — the real route table, the frame and the editor — at `path`. */
@@ -70,20 +79,22 @@ async function mountStudio(path: string, options: MountOptions = {}) {
           version: ApiVersion,
         }),
       );
-    if (pathname === "/api/sso/session")
+    if (pathname === "/api/identity/session")
       return Promise.resolve(
         Response.json({
-          data: options.ssoSession ?? { enabled: false, authenticated: false },
+          data: options.identitySession ?? { isAuthenticated: false },
         }),
       );
-    if (pathname === "/api/sso/logout")
-      return Promise.resolve(new Response(null, { status: 204 }));
+    if (pathname === "/api/identity/sign-out")
+      return Promise.resolve(
+        Response.json({ data: { endSessionUrl: EndSessionUrl } }),
+      );
     return Promise.resolve(
       Response.json({ title: "Not found" }, { status: 404 }),
     );
   });
   vi.stubGlobal("fetch", fetcher);
-  await initializeSso(fetcher as unknown as typeof fetch);
+  await initializeIdentity(fetcher as unknown as typeof fetch);
   const router = createStudioRouter({ history: RouterHistoryMode.Memory });
   await router.push(path);
   await router.isReady();
@@ -109,7 +120,7 @@ function overlay(role: "menu" | "dialog"): DOMWrapper<HTMLElement> {
   return new DOMWrapper(element!);
 }
 
-/** Opens the account menu; its trigger is "Account menu", or "Account menu for {name}" once Desk names the operator. */
+/** Opens the account menu; its trigger is "Account menu", or "Account menu for {name}" once Identity names the person. */
 async function openAccountMenu(): Promise<DOMWrapper<HTMLElement>> {
   await wrapper!
     .get('header button[aria-haspopup="menu"][aria-label^="Account menu"]')
@@ -308,16 +319,15 @@ describe("Ocharo frame in Studio", () => {
     expect(overlay("menu").classes()).toContain("surface-glass-menu");
   });
 
-  it("names the Ocharo session, links the account and signs this app out", async () => {
+  it("names the Ocharo session and signs this app out through Identity", async () => {
+    const assign = vi
+      .spyOn(window.location, "assign")
+      .mockImplementation(() => undefined);
     await mountStudio("/studio", {
-      ssoSession: {
-        enabled: true,
-        authenticated: true,
-        csrfToken,
-        accountUrl: "https://desk.example/",
+      identitySession: signedIn({
         name: "Maftuna Rakhimova",
         email: "maftuna@ocharo.example",
-      },
+      }),
     });
 
     expect(
@@ -331,32 +341,25 @@ describe("Ocharo frame in Studio", () => {
       "Maftuna Rakhimova",
       "maftuna@ocharo.example",
     ]);
-    // Desk's account page is a real link row: it opens in another tab, so unsaved edits here stay.
-    const account = menu.get('a[role="menuitem"][href="https://desk.example"]');
-    expect(account.attributes()).toMatchObject({
-      target: "_blank",
-      rel: "noopener noreferrer",
-    });
-    expect(account.text()).toContain("Ocharo account");
-    expect(account.text()).toContain("(opens in a new tab)");
     expect(menuRow(menu, "Reconnect with Ocharo")).toBeDefined();
     await menu.get("[data-account-menu-sign-out]").trigger("click");
     await flushPromises();
 
     expect(fetcher).toHaveBeenCalledWith(
-      "/api/sso/logout",
+      "/api/identity/sign-out",
       expect.objectContaining({
         method: "POST",
-        headers: { "X-CSRF-Token": csrfToken },
+        headers: { "X-Csrf-Token": csrfToken },
       }),
     );
     await vi.waitFor(() =>
       expect(document.body.textContent).toContain("Signed out of Studio."),
     );
+    expect(assign).toHaveBeenCalledWith(EndSessionUrl);
     const after = await openAccountMenu();
     expect(after.find("[data-account-menu-sign-out]").exists()).toBe(false);
     expect(after.find("[data-account-menu-identity]").exists()).toBe(false);
-    expect(menuRow(after, "Reconnect with Ocharo")).toBeDefined();
+    expect(menuRow(after, "Sign in")).toBeDefined();
     // Signed out, the trigger no longer names anyone.
     expect(
       wrapper!
@@ -365,16 +368,18 @@ describe("Ocharo frame in Studio", () => {
     ).toBe(true);
   });
 
-  it("says where the operator signed in when an older Desk sends no name or email", async () => {
+  it("offers Sign in to an anonymous visitor and keeps the editor open", async () => {
+    await mountStudio("/studio");
+
+    const menu = await openAccountMenu();
+    expect(menuRow(menu, "Sign in")).toBeDefined();
+    expect(menu.find("[data-account-menu-sign-out]").exists()).toBe(false);
+    expect(document.querySelector("header[role=banner]")).not.toBeNull();
+  });
+
+  it("says where the person signed in when Identity sends no name or email", async () => {
     await mountStudio("/studio", {
-      ssoSession: {
-        enabled: true,
-        authenticated: true,
-        csrfToken,
-        accountUrl: "https://desk.example/",
-        name: null,
-        email: null,
-      },
+      identitySession: signedIn({ name: null, email: null }),
     });
 
     expect(
@@ -385,19 +390,14 @@ describe("Ocharo frame in Studio", () => {
     const menu = await openAccountMenu();
     const identity = menu.get("[data-account-menu-identity]");
     expect(identity.findAll("p").map((line) => line.text())).toEqual([
-      "Signed in through Ocharo Desk",
+      "Signed in with your Ocharo account",
     ]);
     expect(menu.find("[data-account-menu-sign-out]").exists()).toBe(true);
   });
 
-  it("names the operator without an email, keeping where they signed in", async () => {
+  it("names the person without an email, keeping where they signed in", async () => {
     await mountStudio("/studio", {
-      ssoSession: {
-        enabled: true,
-        authenticated: true,
-        csrfToken,
-        name: "Maftuna Rakhimova",
-      },
+      identitySession: signedIn({ name: "Maftuna Rakhimova" }),
     });
 
     const menu = await openAccountMenu();
@@ -406,15 +406,14 @@ describe("Ocharo frame in Studio", () => {
         .get("[data-account-menu-identity]")
         .findAll("p")
         .map((line) => line.text()),
-    ).toEqual(["Maftuna Rakhimova", "Signed in through Ocharo Desk"]);
-    // Without an account address there is no account row to open.
+    ).toEqual(["Maftuna Rakhimova", "Signed in with your Ocharo account"]);
     expect(menu.find('a[role="menuitem"]').exists()).toBe(false);
   });
 
   it("holds sign-out while material edits are unsaved", async () => {
     const patterned = MATERIALS.find((material) => material.textureUrl)!;
     await mountStudio(`/studio/materials?material=${patterned.id}`, {
-      ssoSession: { enabled: true, authenticated: true, csrfToken },
+      identitySession: signedIn({}),
     });
     const scale = wrapper!.get('input[aria-label="Material scale"]');
     await scale.setValue("2");
@@ -425,7 +424,7 @@ describe("Ocharo frame in Studio", () => {
     await flushPromises();
 
     expect(fetcher).not.toHaveBeenCalledWith(
-      "/api/sso/logout",
+      "/api/identity/sign-out",
       expect.anything(),
     );
     await vi.waitFor(() =>

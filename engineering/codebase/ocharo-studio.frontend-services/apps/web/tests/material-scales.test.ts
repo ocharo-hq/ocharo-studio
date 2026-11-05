@@ -1,11 +1,16 @@
+vi.mock("../src/integration/studio/IdentityAccess", () => ({
+  getIdentitySession: () => ({
+    authenticated: true,
+    csrfToken: "fixture-csrf-token-1234567890",
+  }),
+  identityUnavailable: () => false,
+}));
 vi.mock("../src/integration/studio/access", () => ({
-  getIntegrationTicket: () => "fixture-ticket",
   loadStudioSession: async () => ({
     workspaceId: "d0a8c678-c27f-478f-b4e8-c9928bf88c21",
     userId: "fixture-member",
     organizationId: "f74556b7-caf8-41db-a25c-030d1f7d7987",
     canEdit: true,
-    expiresAt: "2099-01-01T00:00:00Z",
   }),
 }));
 import { describe, expect, it, vi } from "vitest";
@@ -320,7 +325,7 @@ describe("material library recovery and transport", () => {
       settings: {},
     };
     const fetcher = vi.fn(async () => new Response(JSON.stringify(value)));
-    const repo = createServerRepository(fetcher, () => "fixture-ticket");
+    const repo = createServerRepository(fetcher);
     expect((await repo.read()).materials).toEqual({});
     fetcher.mockImplementation(
       async () =>
@@ -350,7 +355,7 @@ describe("material library recovery and transport", () => {
           status: 400,
         }),
     );
-    const repo = createServerRepository(fetcher, () => "fixture-ticket");
+    const repo = createServerRepository(fetcher);
     await expect(repo.read()).rejects.toThrow(
       "Review your design settings. Your browser keeps a recovery copy.",
     );

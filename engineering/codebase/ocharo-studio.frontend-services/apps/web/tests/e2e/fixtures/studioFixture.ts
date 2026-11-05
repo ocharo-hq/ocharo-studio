@@ -10,13 +10,13 @@ import {
 export { expect };
 export type { Page, Locator } from "@playwright/test";
 
-/** Exercises real client persistence with a deterministic authenticated, revisioned transport. */
+/** Exercises real client persistence with a deterministic signed-in Identity session and revisioned transport. */
 export const test = base.extend<{ authenticatedStudio: void }>({
   authenticatedStudio: [
     async ({ context }, use) => {
       const workspaceId = randomUUID();
       const organizationId = randomUUID();
-      const token = `synthetic-browser-review-${randomUUID()}`;
+      const csrfToken = `synthetic-csrf-${randomUUID()}`;
       let state: Record<string, unknown> = {
         revision: 0,
         draft: null,
@@ -24,19 +24,31 @@ export const test = base.extend<{ authenticatedStudio: void }>({
         settings: {},
         materials: {},
       };
-      await context.addInitScript(
-        ({ token }) => {
-          sessionStorage.setItem("ocharo-studio:integration-ticket", token);
-        },
-        { token },
+      await context.route("**/api/identity/session", (route) =>
+        route.fulfill({
+          headers: { "Cache-Control": "no-store" },
+          json: {
+            data: {
+              isAuthenticated: true,
+              person: {
+                sub: "synthetic-browser-review-member",
+              },
+              organization: {
+                id: organizationId,
+                name: "Ocharo",
+                slug: "ocharo",
+                role: "owner",
+              },
+              permissions: ["studio:edit"],
+              csrfToken,
+              expiresAt: new Date(Date.now() + 300_000).toISOString(),
+            },
+          },
+        }),
       );
       await context.route("**/api/studio/{session,state}", async (route) => {
         const request = route.request();
         const headers = request.headers();
-        if (headers.authorization !== `Bearer ${token}`) {
-          await route.fulfill({ status: 401, json: {} });
-          return;
-        }
         if (new URL(request.url()).pathname.endsWith("/session")) {
           await route.fulfill({
             headers: { "Cache-Control": "no-store" },
@@ -45,9 +57,15 @@ export const test = base.extend<{ authenticatedStudio: void }>({
               organizationId,
               userId: "synthetic-browser-review-member",
               canEdit: true,
-              expiresAt: new Date(Date.now() + 300_000).toISOString(),
             },
           });
+          return;
+        }
+        if (
+          request.method() === "PUT" &&
+          headers["x-csrf-token"] !== csrfToken
+        ) {
+          await route.fulfill({ status: 400, json: {} });
           return;
         }
         if (headers["x-studio-workspace"] !== workspaceId) {
@@ -77,22 +95,28 @@ export const test = base.extend<{ authenticatedStudio: void }>({
 });
 test.use({ ignoreHTTPSErrors: false });
 
+/** The signed-in Identity session's CSRF token, read through the same routing the editor uses. */
+async function csrfTokenOf(page: Page): Promise<string> {
+  return page.evaluate(async () => {
+    const response = await fetch("/api/identity/session", {
+      credentials: "same-origin",
+    });
+    return (await response.json()).data.csrfToken as string;
+  });
+}
+
 /** Reads through browser routing so the request uses the same auth boundary as the editor. */
 export async function readRemote(page: Page) {
   return page.evaluate(async () => {
-    const authorization = {
-      Authorization: `Bearer ${sessionStorage.getItem("ocharo-studio:integration-ticket")}`,
-    };
     const session = await fetch("/api/studio/session", {
-      headers: authorization,
-      credentials: "omit",
+      credentials: "same-origin",
     });
     if (!session.ok)
       throw new Error(`Review session rejected: ${session.status}`);
     const identity = await session.json();
     const response = await fetch("/api/studio/state", {
-      headers: { ...authorization, "X-Studio-Workspace": identity.workspaceId },
-      credentials: "omit",
+      headers: { "X-Studio-Workspace": identity.workspaceId },
+      credentials: "same-origin",
     });
     if (!response.ok)
       throw new Error(`Review state rejected: ${response.status}`);
@@ -101,29 +125,29 @@ export async function readRemote(page: Page) {
 }
 
 export async function writeRemote(page: Page, state: Record<string, unknown>) {
-  return page.evaluate(async (value) => {
-    const authorization = {
-      Authorization: `Bearer ${sessionStorage.getItem("ocharo-studio:integration-ticket")}`,
-    };
-    const session = await fetch("/api/studio/session", {
-      headers: authorization,
-      credentials: "omit",
-    });
-    const identity = await session.json();
-    const response = await fetch("/api/studio/state", {
-      method: "PUT",
-      credentials: "omit",
-      body: JSON.stringify(value),
-      headers: {
-        ...authorization,
-        "Content-Type": "application/json",
-        "X-Studio-Workspace": identity.workspaceId,
-      },
-    });
-    if (!response.ok)
-      throw new Error(`Review state rejected: ${response.status}`);
-    return response.json();
-  }, state);
+  const csrfToken = await csrfTokenOf(page);
+  return page.evaluate(
+    async ({ value, csrfToken }) => {
+      const session = await fetch("/api/studio/session", {
+        credentials: "same-origin",
+      });
+      const identity = await session.json();
+      const response = await fetch("/api/studio/state", {
+        method: "PUT",
+        credentials: "same-origin",
+        body: JSON.stringify(value),
+        headers: {
+          "Content-Type": "application/json",
+          "X-Csrf-Token": csrfToken,
+          "X-Studio-Workspace": identity.workspaceId,
+        },
+      });
+      if (!response.ok)
+        throw new Error(`Review state rejected: ${response.status}`);
+      return response.json();
+    },
+    { value: state, csrfToken },
+  );
 }
 
 /** A cold Vite entry or reload must mount the lazy editor before absence means ready. */

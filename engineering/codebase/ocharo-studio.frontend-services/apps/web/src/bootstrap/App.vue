@@ -43,12 +43,8 @@ import {
   MATERIALS,
 } from "../domain/studio/catalog";
 import type { TexturePlacement } from "../domain/studio/types";
-import {
-  acceptTicketFragment,
-  getIntegrationTicket,
-  setIntegrationTicket,
-  studioAuth,
-} from "../integration/studio/access";
+import { hasSignInError } from "../integration/studio/IdentityAccess";
+import { studioAuth } from "../integration/studio/access";
 import {
   createCreativeHandoff,
   type CreativeReviewPackage,
@@ -87,46 +83,27 @@ defineOptions({ name: "StudioApp" });
 const account = useStudioAccount();
 const connectionError = account.unavailable
   ? "The account session could not be checked. Refresh to reconnect."
-  : acceptTicketFragment();
-const ticketConnected = ref(Boolean(getIntegrationTicket()));
-// An Ocharo session follows the shared account state; a manual Desk ticket follows this tab's connection.
-const deskConnected = computed(() =>
-  account.session.value.enabled
-    ? account.session.value.authenticated
-    : ticketConnected.value,
-);
-// A 401 settles the Desk session anonymous; an expiry publishes one neutral notice and keeps local work in place.
-const stopUnauthorized = studioAuth.subscribeUnauthorized(() => {
-  ticketConnected.value = false;
-});
+  : hasSignInError()
+    ? "Sign-in did not complete. Your designs stay in this browser."
+    : undefined;
+const signedIn = computed(() => account.session.value.authenticated);
 const stopExpired = studioAuth.subscribeExpired(
   feedbackSessionExpiry(feedbackBus, {
     ...SessionExpiredNotice,
     description:
-      "Your designs stay in this browser. Reconnect from Ocharo Desk to sync them.",
+      "Your designs stay in this browser. Sign in again to sync them.",
   }),
 );
-onScopeDispose(() => {
-  stopUnauthorized();
-  stopExpired();
-});
+onScopeDispose(stopExpired);
 const studio = useStudio();
 const { refresh: refreshLooks, refreshing: refreshingLooks } = useRefresh(
   studio.refreshLooks,
 );
-function connectDesk(ticket: string | null): void {
-  try {
-    setIntegrationTicket(ticket);
-    ticketConnected.value = Boolean(ticket);
-    studio.reconnect();
-    notify(
-      ticket
-        ? "Connecting to your Desk workspace…"
-        : "Browser-only mode. Your local designs remain available.",
-    );
-  } catch (error) {
-    notify(error instanceof Error ? error.message : "Connection failed.");
-  }
+/** Leaves for the Ocharo sign-in unless unsaved or in-flight work must finish first. */
+function signIn(): void {
+  if (materialDirty.value || studio.persistenceStatus === "saving")
+    return notify("Finish saving your work before signing in.");
+  account.signIn();
 }
 
 const router = useRouter();
@@ -778,11 +755,10 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
     />
     <SettingsDialog
       v-if="dialog === 'settings'"
-      :desk-connected="deskConnected"
-      :sso-enabled="account.session.value.enabled"
+      :signed-in="signedIn"
       :auth-unavailable="account.unavailable"
       :connection-error="connectionError"
-      :on-connect="connectDesk"
+      :on-sign-in="signIn"
       :persistence-status="studio.persistenceStatus"
       :on-retry-sync="studio.retrySync"
       :on-resolve-conflict="studio.resolveConflict"

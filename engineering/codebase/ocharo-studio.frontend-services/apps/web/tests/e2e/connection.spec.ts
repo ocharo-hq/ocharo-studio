@@ -44,24 +44,16 @@ test("browser-only designs survive reload without requesting private storage", a
   await expect(
     page.getByText("Designs stay in this browser", { exact: true }),
   ).toBeVisible();
-  const connection = page.getByRole("region", {
-    name: "Ocharo Desk connection",
-  });
+  const connection = page.getByRole("region", { name: "Ocharo sign-in" });
+  const signIn = connection.getByRole("button", { name: "Sign in" });
   for (const width of [1440, 320]) {
     await page.setViewportSize({ width, height: 900 });
-    const labelBounds = await connection.locator("label").boundingBox();
-    const inputBounds = await connection
-      .getByLabel("Desk connection ticket")
-      .boundingBox();
+    await expect(signIn).toBeVisible();
+    const buttonBounds = await signIn.boundingBox();
     const connectionBounds = await connection.boundingBox();
-    expect(labelBounds).not.toBeNull();
-    expect(inputBounds).not.toBeNull();
+    expect(buttonBounds).not.toBeNull();
     expect(connectionBounds).not.toBeNull();
-    expect(inputBounds!.y).toBeGreaterThanOrEqual(
-      labelBounds!.y + labelBounds!.height,
-    );
-    expect(inputBounds!.width).toBeGreaterThan(180);
-    expect(inputBounds!.x + inputBounds!.width).toBeLessThan(
+    expect(buttonBounds!.x + buttonBounds!.width).toBeLessThanOrEqual(
       connectionBounds!.x + connectionBounds!.width,
     );
   }
@@ -71,12 +63,10 @@ test("browser-only designs survive reload without requesting private storage", a
   expect(storageRequests).toEqual([]);
 });
 
-test("ticket fragment is cleared and expired access preserves browser recovery", async ({
-  page,
-}) => {
+test("expired sign-in preserves browser recovery", async ({ page }) => {
   const workspaceId = "d0a8c678-c27f-478f-b4e8-c9928bf88c21";
   const organizationId = "f74556b7-caf8-41db-a25c-030d1f7d7987";
-  const ticket = "browser-fixture-ticket";
+  const csrfToken = "browser-fixture-csrf-token-123456";
   let revoked = false;
   let state: Record<string, unknown> = {
     revision: 0,
@@ -86,23 +76,44 @@ test("ticket fragment is cleared and expired access preserves browser recovery",
     materials: {},
   };
   let writes = 0;
-  await page.route("**/api/studio/session", (route) => {
-    expect(route.request().headers().authorization).toBe(`Bearer ${ticket}`);
-    return route.fulfill({
+  await page.route("**/api/identity/session", (route) =>
+    route.fulfill({
       json: {
-        workspaceId,
-        organizationId,
-        userId: "fixture-member",
-        canEdit: true,
-        expiresAt: new Date(Date.now() + 300_000).toISOString(),
+        data: revoked
+          ? { isAuthenticated: false }
+          : {
+              isAuthenticated: true,
+              person: { sub: "fixture-member" },
+              organization: {
+                id: organizationId,
+                name: "Ocharo",
+                slug: "ocharo",
+                role: "owner",
+              },
+              permissions: ["studio:edit"],
+              csrfToken,
+            },
       },
-    });
-  });
+    }),
+  );
+  await page.route("**/api/studio/session", (route) =>
+    revoked
+      ? route.fulfill({ status: 401, json: {} })
+      : route.fulfill({
+          json: {
+            workspaceId,
+            organizationId,
+            userId: "fixture-member",
+            canEdit: true,
+          },
+        }),
+  );
   await page.route("**/api/studio/state", async (route) => {
-    expect(route.request().headers().authorization).toBe(`Bearer ${ticket}`);
+    expect(route.request().headers().authorization).toBeUndefined();
     expect(route.request().headers()["x-studio-workspace"]).toBe(workspaceId);
     if (revoked) return route.fulfill({ status: 401, json: {} });
     if (route.request().method() === "PUT") {
+      expect(route.request().headers()["x-csrf-token"]).toBe(csrfToken);
       state = {
         ...route.request().postDataJSON(),
         revision: Number(state.revision) + 1,
@@ -111,14 +122,8 @@ test("ticket fragment is cleared and expired access preserves browser recovery",
     }
     return route.fulfill({ json: state });
   });
-  const fragment = new URLSearchParams({
-    "ocharo-ticket": ticket,
-    audience: "ocharo-studio",
-    issuer: process.env.VITE_OCHARO_PLATFORM_ORIGIN ?? "https://localhost:8264",
-  });
-  await page.goto(`/studio#${fragment}`);
+  await page.goto("/studio");
   await waitForStudioReady(page);
-  await expect(page).toHaveURL(/\/studio$/);
   await expect.poll(() => writes).toBeGreaterThan(0);
   await page
     .getByRole("textbox", { name: "Look name" })
@@ -126,16 +131,6 @@ test("ticket fragment is cleared and expired access preserves browser recovery",
   await expect
     .poll(() => (state.draft as { name?: string } | null)?.name)
     .toBe("Connected design review");
-  expect(
-    await page.evaluate(() =>
-      localStorage.getItem("ocharo-studio:integration-ticket"),
-    ),
-  ).toBeNull();
-  expect(
-    await page.evaluate(() =>
-      sessionStorage.getItem("ocharo-studio:integration-ticket"),
-    ),
-  ).toBe(ticket);
   revoked = true;
   await page
     .getByRole("textbox", { name: "Look name" })

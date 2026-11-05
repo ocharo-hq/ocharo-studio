@@ -24,7 +24,15 @@ export default defineConfig({
             "dotnet run --project ../../../ocharo-studio.backend-services/OcharoStudio.Api --no-launch-profile -p:BuildSpa=false --urls https://localhost:8260",
           url: "https://localhost:8260/health",
           timeout: 120000,
-          env: { DB_CONNECTION: "Data Source=appdata/studio-browser-tests.db" },
+          env: {
+            DB_CONNECTION: "Data Source=appdata/studio-browser-tests.db",
+            // The API needs a configured Identity client to boot; these are inert fixtures, never a real secret.
+            Identity__Client__Authority: "https://identity.test",
+            Identity__Client__ClientId: "ocharo-studio-e2e",
+            Identity__Client__ClientSecret: "e2e-fixture-not-a-secret",
+            Identity__Client__CookieName: "ocharo-studio-e2e",
+            Identity__Client__PostSignOutRedirectPath: "/",
+          },
         },
         {
           command: "pnpm preview --host localhost --port 8262 --strictPort",

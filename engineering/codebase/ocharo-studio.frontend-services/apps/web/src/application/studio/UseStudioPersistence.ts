@@ -171,7 +171,7 @@ export function useStudioPersistence(
             state.value = {
               ...state.value,
               notice:
-                "This recovery belongs to another Desk workspace. Download it before loading this workspace's saved designs.",
+                "This recovery belongs to another Ocharo workspace. Download it before loading this workspace's saved designs.",
             };
             return;
           }

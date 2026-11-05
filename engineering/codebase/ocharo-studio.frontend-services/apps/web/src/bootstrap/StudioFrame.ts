@@ -18,7 +18,7 @@ export type StudioSessionChange = "reconnect" | "sign-out";
  * the account session where it is.
  */
 export interface StudioPlaceControls {
-  /** Opens Studio settings: the Desk connection, sync recovery and the guide. */
+  /** Opens Studio settings: the Ocharo sign-in, sync recovery and the guide. */
   readonly openSettings: () => void;
   /**
    * The notice owed while unsaved or in-flight work must finish before the account session changes — a reconnect

@@ -1,6 +1,5 @@
-import { getSsoSession, ssoUnavailable } from "./SsoAccess";
+import { getIdentitySession, identityUnavailable } from "./IdentityAccess";
 import {
-  getIntegrationTicket,
   handleUnauthorized,
   loadStudioSession,
   type StudioSession,
@@ -59,10 +58,8 @@ export function getWorkspaceId(): string {
 
 export function createServerRepository(
   fetcher: typeof fetch = fetch,
-  readTicket: () => string | null = getIntegrationTicket,
 ): ServerRepository {
   let session: StudioSession | undefined;
-  let connectedTicket: string | undefined;
   async function request(
     method: "GET" | "PUT",
     snapshot?: StudioSnapshot,
@@ -70,39 +67,26 @@ export function createServerRepository(
   ): Promise<StudioSnapshot> {
     if (snapshot && !migrateMaterialScales(snapshot.materials))
       throw new Error("Invalid material scale library.");
-    const sso = getSsoSession();
-    if (ssoUnavailable())
+    const identity = getIdentitySession();
+    if (identityUnavailable())
       throw new Error(
         "The account session could not be checked. Refresh to reconnect.",
       );
-    const ticket = sso.enabled ? null : readTicket();
-    if (sso.enabled && !sso.authenticated)
-      throw new Error("Sign in through Ocharo Desk to sync this workspace.");
-    if (!sso.enabled && !ticket)
-      throw new Error(
-        "Browser-only mode. Connect from Ocharo Desk to save to your workspace.",
-      );
-    const connectionKey = sso.enabled ? "cookie" : ticket!;
-    if (!session || connectedTicket !== connectionKey) {
-      session = await loadStudioSession(fetcher, ticket, signal);
-      connectedTicket = connectionKey;
-    }
+    if (!identity.authenticated)
+      throw new Error("Browser-only mode. Sign in to save to your workspace.");
+    session ??= await loadStudioSession(fetcher, signal);
     signal?.throwIfAborted();
     if (method === "PUT" && !session.canEdit)
       throw new Error(
-        "Your Desk membership allows viewing only. Local edits remain in this browser.",
+        "Your Ocharo membership allows viewing only. Local edits remain in this browser.",
       );
     const response = await fetcher("/api/studio/state", {
       method,
-      credentials: sso.enabled ? "same-origin" : "omit",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json",
         "X-Studio-Workspace": session.workspaceId,
-        ...(sso.enabled
-          ? method === "PUT"
-            ? { "X-CSRF-Token": sso.csrfToken! }
-            : {}
-          : { Authorization: `Bearer ${ticket}` }),
+        ...(method === "PUT" ? { "X-Csrf-Token": identity.csrfToken! } : {}),
       },
       ...(snapshot ? { body: JSON.stringify(snapshot) } : {}),
       signal: signal ?? AbortSignal.timeout(15000),
@@ -114,7 +98,7 @@ export function createServerRepository(
     if (response.status === 403) {
       session = undefined;
       throw new Error(
-        "Your Desk access changed. Reconnect; your browser recovery is preserved.",
+        "Your Ocharo access changed. Sign in again; your browser recovery is preserved.",
       );
     }
     if (response.status === 409) throw new StudioConflict();

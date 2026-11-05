@@ -8,20 +8,15 @@ import {
   ocharoAppsPlugin,
   reportOcharoAppsStartup,
 } from "./application/common/UseOcharoApps";
-import { initializeSso, ssoLoginUrl } from "./integration/studio/SsoAccess";
+import { initializeIdentity } from "./integration/studio/IdentityAccess";
 
 async function start(): Promise<void> {
   // The app links load beside the account check within a bounded wait; the landing page can open the frame in place,
   // so every entry resolves them. A failure keeps the build-time addresses.
   const links = loadOcharoApps().catch(() => null);
   try {
-    const session = await initializeSso();
-    if (session.enabled && !session.authenticated) {
-      window.location.assign(
-        ssoLoginUrl(window.location.pathname + window.location.search),
-      );
-      return;
-    }
+    // Anonymous visitors open the app too: browser-only editing needs no account, and a session only adds server state.
+    await initializeIdentity();
   } catch {
     /* Local recovery remains available; remote sync stays blocked until rechecked. */
   }

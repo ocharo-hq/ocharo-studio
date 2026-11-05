@@ -69,6 +69,9 @@ export default defineConfig(({ command }) => {
       port: 8262,
       strictPort: true,
       proxy: {
+        // Every API route rides this proxy, the Identity session routes too (`/api/identity/session`, `sign-in`, the
+        // OIDC `callback`, `sign-out`). `changeOrigin` stays off, so the API sees this origin: the BFF builds its
+        // callback as https://localhost:8262/api/identity/callback and the session cookie lands on this origin.
         "/api": {
           target: httpsTarget(
             process.env.STUDIO_API_URL ?? "https://localhost:8260",
