@@ -5,7 +5,9 @@
 #
 # Ocharo Studio is one image: the .NET API serving the Vue 3D editor, with its SQLite state on the data volume. It is a
 # repository of the one `ocharo` product (Wheelhouse decision 70), so its site and volume carry its own name.
-# Both environments run as .NET Production (no dotnetEnvironment).
+# Both environments run as .NET Production (no dotnetEnvironment). Signing in is optional: the editor works in the
+# browser for anyone, and server state needs a session from Ocharo's Identity, which ocharo-platform's descriptor declares.
+# Sessions live in memory, so a restart or deploy signs everyone out once; the key ring stays on the data volume.
 descriptor: 2
 product: ocharo
 sites:
@@ -21,7 +23,13 @@ services:
       # Wheelhouse derives Deployment:TrustedProxies (the ingress address) and AllowedHosts; nobody types them.
       required: [Deployment:TrustedProxies]
       keys:
-        OcharoPlatform:BaseUrl: { type: url, required: true }   # the Desk origin Studio introspects tickets against
+        # Sign-in through Ocharo's Identity as client 5, whose keys ocharo-platform's descriptor declares. Studio binds no
+        # organization: each member's workspace derives from the session's organization and subject, and saving needs studio:edit.
+        Identity:Client:Authority: { from: Sites:identity:Url }
+        Identity:Client:ClientId: { default: studio }
+        Identity:Client:ClientSecret: { from: Identity:Server:Clients:5:ClientSecret }
+        Identity:Client:CookieName: { default: __Host-ocharo-studio }
+        Identity:Client:PostSignOutRedirectPath: { default: "/" }
         # The Ocharo app menu, served anonymously at /api/runtime-config; an unset key leaves that app out.
         OcharoApps:Desk: { type: url }
         OcharoApps:Catalogue: { type: url }

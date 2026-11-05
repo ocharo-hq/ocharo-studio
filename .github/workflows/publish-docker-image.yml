@@ -39,8 +39,7 @@ jobs:
       backends: |
         [{"name": "Host", "dir": "engineering/codebase/ocharo-studio.backend-services", "dotnet": "10.0.x",
           "timeout": 20,
-          "run": ["python3 shared/sync-sso.py --check",
-                  "dotnet build OcharoStudio.BackendServices.slnx -p:BuildSpa=false",
+          "run": ["dotnet build OcharoStudio.BackendServices.slnx -p:BuildSpa=false",
                   "dotnet test OcharoStudio.BackendServices.slnx --no-build"],
           "paths": ["engineering/codebase/ocharo-studio.backend-services/**"]}]
       frontends: |
