@@ -13,7 +13,7 @@
     <!-- wow-two backend SDK (kit): mediator, Result/DomainError, IKeyedEntity, web/problem-details. On nuget.org. -->
     <PackageVersion Include="WoW2.Sdk.Beta.Be" Version="10.0.103-beta" />
     <!-- Sign-in through Ocharo's Identity instance: the BFF (session cookie, OIDC code flow with PKCE, X-Csrf-Token). -->
-    <PackageVersion Include="WoW2.Sdk.Beta.Be.Identity.Client" Version="10.0.26-beta" />
+    <PackageVersion Include="WoW2.Sdk.Beta.Be.Identity.Client" Version="10.0.27-beta" />
   </ItemGroup>
 
   <ItemGroup>
