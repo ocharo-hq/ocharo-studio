@@ -25,9 +25,9 @@ services:
       keys:
         # Sign-in through Ocharo's Identity as client 5, whose keys ocharo-platform's descriptor declares. Studio binds no
         # organization: each member's workspace derives from the session's organization and subject, and saving needs studio:edit.
-        Identity:Client:Authority: { from: Sites:identity:Url }
+        Identity:Client:Authority: { from: { repository: platform, key: Sites:identity:Url } }
         Identity:Client:ClientId: { default: studio }
-        Identity:Client:ClientSecret: { from: Identity:Server:Clients:5:ClientSecret }
+        Identity:Client:ClientSecret: { from: { repository: platform, key: Identity:Server:Clients:5:ClientSecret } }
         Identity:Client:CookieName: { default: __Host-ocharo-studio }
         Identity:Client:PostSignOutRedirectPath: { default: "/" }
         # The Ocharo app menu, served anonymously at /api/runtime-config; an unset key leaves that app out.
