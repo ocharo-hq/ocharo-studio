@@ -7,6 +7,5 @@ The backend contains API, Application, Domain, Persistence, and test projects. S
 under a Platform member-and-organization workspace UUID with atomic revision comparison. Application validation owns request bounds,
 document schemas, and the generated garment/material contract; Persistence owns SQLite access and stored JSON.
 The workspace header is not an account, authentication credential, or authorization claim.
-Studio consumes Platform audience tickets for protected state; account storage and commerce remain Platform responsibilities.
-Reject bearer credentials over HTTP and preserve TLS verification for Platform introspection.
+Studio reads a session from Ocharo's Identity for protected state; accounts belong to Identity and commerce to Platform.
 Use `OcharoStudio.BackendServices.slnx` as the solution entry point.

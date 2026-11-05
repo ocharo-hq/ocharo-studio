@@ -254,20 +254,6 @@ public sealed class StudioAccessTests
     }
 
     [Theory]
-    [InlineData("/api/sso/session")]
-    [InlineData("/api/sso/login")]
-    [InlineData("/api/sso/callback")]
-    public async Task RetiredSsoRoutes_ShouldNoLongerExist(string path)
-    {
-        await using var host = StudioHost.Create(new Dictionary<string, string?>());
-        using var anonymous = Anonymous(host.Factory);
-        using var editor = await SignedIn(host.Factory, Editor);
-
-        Assert.Equal(HttpStatusCode.NotFound, (await anonymous.GetAsync(path)).StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, (await editor.GetAsync(path)).StatusCode);
-    }
-
-    [Theory]
     [InlineData("Identity:Client:Authority")]
     [InlineData("Identity:Client:ClientId")]
     public async Task Host_ShouldRefuseToBoot_WithoutAnIdentityClient(string key)

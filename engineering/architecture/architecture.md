@@ -40,12 +40,10 @@ the frame with their own header, on the same theme.
 - The app menu reads the runtime-config seam ahead of build-time `VITE_OCHARO_*_URL` values and local defaults
   (`application/common/UseOcharoApps.ts`); startup problems only reach the console, since the menu keeps working.
 - The account menu holds Studio settings, the colour mode, and the Studio and API versions from
-  `/api/system/status`. With an Ocharo session it adds who is signed in, the Ocharo account, Reconnect with Ocharo and
-  sign-out through `POST /api/sso/logout`. `GET /api/sso/session` names the operator with their Desk `name` and
-  `email` (either may be null from an older Desk); the menu shows the name with the email under it, and says
-  "Signed in through Ocharo Desk" where no email came. The Ocharo account row is an SDK `MenuItem` link to Desk's
-  origin in a new tab, so unsaved edits stay. Reconnect and sign-out wait while material edits are unsaved or a save
-  is in flight; a sign-out keeps browser recovery and settles the bridge anonymous without an expiry notice.
+  `/api/system/status`. Signed out it offers "Sign in"; with an Ocharo session it adds who is signed in and sign-out through
+  `POST /api/identity/sign-out`. `GET /api/identity/session` names the person with their `name` and `email` (either may
+  be absent); the menu shows the name with the email under it. Sign-in and sign-out wait while material edits are unsaved
+  or a save is in flight; a sign-out keeps browser recovery and settles the bridge anonymous without an expiry notice.
 - The sidebar is the SDK `SidebarMenu` with Designer and Materials, an icon rail by default
   (`ocharo-studio.sidebar-collapsed`), expandable from `lg`, hidden below `md`. Phones switch places from a compact
   SDK menu in the top bar and have no bottom bar; the app menu opens full screen there.
