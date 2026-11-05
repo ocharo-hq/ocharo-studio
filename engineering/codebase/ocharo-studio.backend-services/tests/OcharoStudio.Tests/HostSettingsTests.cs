@@ -1,5 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
@@ -7,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using OcharoStudio.Api.Configurations;
 using OcharoStudio.Persistence;
 using WoW.Two.Sdk.Beta.Be.Foundation.Configuration;
@@ -21,24 +24,24 @@ namespace OcharoStudio.Tests;
 /// </summary>
 public sealed class HostSettingsTests : IDisposable
 {
-    private const string TargetOrigin = "https://desk.target.test";
-    private const string LocalOrigin = "https://desk.local.test";
+    private const string TargetAuthority = "https://identity.target.test/";
+    private const string LocalAuthority = "https://identity.local.test/";
     private readonly string _root = Path.Combine(Path.GetTempPath(), "ocharo-studio-settings-" + Guid.NewGuid());
 
     public HostSettingsTests()
     {
         Directory.CreateDirectory(_root);
         File.WriteAllText(Path.Combine(_root, "appsettings.Target.json"),
-            $$"""{ "OcharoPlatform": { "BaseUrl": "{{TargetOrigin}}" } }""");
+            $$"""{ "Identity": { "Client": { "Authority": "{{TargetAuthority}}" } } }""");
         File.WriteAllText(Path.Combine(_root, "appsettings.Local.json"),
-            $$"""{ "OcharoPlatform": { "BaseUrl": "{{LocalOrigin}}" } }""");
+            $$"""{ "Identity": { "Client": { "Authority": "{{LocalAuthority}}" } } }""");
     }
 
     [Theory]
-    [InlineData("Development", null, "true", LocalOrigin)]   // the https launch profile
-    [InlineData("Development", null, null, TargetOrigin)]    // a local run whose profile never asked
-    [InlineData("Development", "dev", "true", TargetOrigin)] // deployed dev runs as Development; the runner names it
-    [InlineData("Production", null, "true", TargetOrigin)]
+    [InlineData("Development", null, "true", LocalAuthority)]   // the https launch profile
+    [InlineData("Development", null, null, TargetAuthority)]  // a local run whose profile never asked
+    [InlineData("Development", "dev", "true", TargetAuthority)] // deployed dev runs as Development; the runner names it
+    [InlineData("Production", null, "true", TargetAuthority)]
     public void SettingsFilesFollowTheLocalRun(string environment, string? deployed, string? localSettings, string expected)
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -54,7 +57,7 @@ public sealed class HostSettingsTests : IDisposable
 
         builder.Configure();
 
-        Assert.Equal(expected, builder.Configuration["OcharoPlatform:BaseUrl"]);
+        Assert.Equal(expected, builder.Configuration["Identity:Client:Authority"]);
     }
 
     [Theory]
@@ -66,6 +69,8 @@ public sealed class HostSettingsTests : IDisposable
         {
             builder.UseEnvironment("Development");
             if (deployed is not null) builder.UseSetting("DEPLOY_ENVIRONMENT", deployed);
+            foreach (var (key, value) in StudioTestIdentity.Settings())
+                builder.UseSetting(key, value);
             builder.ConfigureServices(services =>
             {
                 services.RemoveAll<StudioDatabaseSettings>();
@@ -88,7 +93,7 @@ public sealed class HostSettingsTests : IDisposable
         File.WriteAllText(Path.Combine(root, "appsettings.Target.json"), $$"""
             {
               "ConnectionStrings": { "Studio": "Data Source={{database}};Pooling=False" },
-              "OcharoPlatform": { "BaseUrl": "{{TargetOrigin}}" },
+              "Identity": { "Client": { "Authority": "{{TargetAuthority}}", "ClientId": "studio", "CookieName": "__Host-ocharo-studio" } },
               "Deployment": { "TrustedProxies": [ "172.30.0.2" ] }
             }
             """);
@@ -108,8 +113,10 @@ public sealed class HostSettingsTests : IDisposable
         var configuration = factory.Services.GetRequiredService<IConfiguration>();
         Assert.Equal(Environments.Production, environment.EnvironmentName);
         Assert.False(environment.IsLocalRun(configuration));
-        Assert.Equal(TargetOrigin, configuration["OcharoPlatform:BaseUrl"]);
+        Assert.Equal(TargetAuthority, configuration["Identity:Client:Authority"]);
         Assert.True(File.Exists(database), "startup initializes the target's SQLite schema before serving");
+        var keyRing = factory.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.XmlRepository;
+        Assert.Equal(Path.Combine(root, "appdata", "keys"), Assert.IsType<FileSystemXmlRepository>(keyRing).Directory.FullName);
     }
 
     /// <summary>The API project folder, found above the test output, so the deployed test reads its checked-in settings.</summary>

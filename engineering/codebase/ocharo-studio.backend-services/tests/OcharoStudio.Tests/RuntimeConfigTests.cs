@@ -54,23 +54,22 @@ public sealed class RuntimeConfigTests
     }
 
     [Fact]
-    public async Task RuntimeConfig_ShouldAnswerWithoutASession_WhenSsoGuardsTheRestOfTheApi()
+    public async Task RuntimeConfig_ShouldAnswerWithoutASession_WhenSignInGuardsTheRestOfTheApi()
     {
-        await using var host = StudioHost.Create(EveryApp, sso: true);
-        using var client = host.Factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            BaseAddress = new Uri(StudioHost.SsoOrigin), AllowAutoRedirect = false, HandleCookies = false
-        });
+        await using var host = StudioHost.Create(EveryApp, realCookieScheme: true);
+        using var client = StudioTestIdentity.Anonymous(host.Factory);
         using var request = new HttpRequestMessage(HttpMethod.Get, "/api/runtime-config");
-        request.Headers.Add("Cookie", "__Host-ocharo-studio=forged");
+        request.Headers.Add("Cookie", $"{StudioTestIdentity.CookieName}=forged");
 
         using var response = await client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.True(response.Headers.CacheControl!.NoStore);
         Assert.Contains("OCHARO_DESK_URL", (await ReadAsync(response)).Keys);
-        // The SSO boundary still holds for the private API.
-        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/studio/state")).StatusCode);
+        // The session boundary still holds for the private API, the forged cookie included.
+        using var state = new HttpRequestMessage(HttpMethod.Get, "/api/studio/state");
+        state.Headers.Add("Cookie", $"{StudioTestIdentity.CookieName}=forged");
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.SendAsync(state)).StatusCode);
     }
 
     [Fact]
@@ -142,42 +141,42 @@ public sealed class RuntimeConfigTests
     }
 }
 
-/// <summary>An isolated Studio host with its own SQLite file, optionally behind enabled SSO.</summary>
+/// <summary>An isolated Studio host with its own content root and SQLite file, signed in through
+/// <see cref="StudioTestIdentity"/> unless it keeps the real cookie scheme; <c>settings</c> apply last, so a test may change
+/// or clear (null) any default.</summary>
 internal sealed class StudioHost : IAsyncDisposable
 {
-    public const string SsoOrigin = "https://studio.test";
-
-    private readonly string root;
+    /// <summary>What the host's SPA <c>index.html</c> holds.</summary>
+    public const string SpaShell = "studio-shell";
 
     private StudioHost(string root, WebApplicationFactory<Program> factory)
     {
-        this.root = root;
+        Root = root;
         Factory = factory;
     }
 
+    /// <summary>The host's content root, beside its database and key ring.</summary>
+    public string Root { get; }
+
     public WebApplicationFactory<Program> Factory { get; }
 
-    public static StudioHost Create(IReadOnlyDictionary<string, string?> settings, bool sso = false)
+    public static StudioHost Create(IReadOnlyDictionary<string, string?> settings, bool realCookieScheme = false)
     {
         var root = Path.Combine(Path.GetTempPath(), "ocharo-studio-host-" + Guid.NewGuid().ToString("N"));
-        var configuration = new Dictionary<string, string?>(settings);
-        if (sso)
-        {
-            configuration["Identity:Sso:Enabled"] = "true";
-            configuration["Identity:Sso:DeskOrigin"] = "https://desk.test";
-            configuration["Identity:Sso:ClientOrigin"] = SsoOrigin;
-            configuration["Identity:Sso:ClientId"] = "studio";
-            configuration["Identity:Sso:ClientSecret"] = new string('s', 32);
-        }
-        Directory.CreateDirectory(root);
+        Directory.CreateDirectory(Path.Combine(root, "wwwroot"));
+        File.WriteAllText(Path.Combine(root, "wwwroot", "index.html"), $"<!doctype html><title>{SpaShell}</title>");
+        var configuration = StudioTestIdentity.Settings();
+        foreach (var (key, value) in settings) configuration[key] = value;
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Testing");
+            builder.UseContentRoot(root);
             builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(configuration));
             builder.ConfigureServices(services =>
             {
                 services.RemoveAll<StudioDatabaseSettings>();
                 services.AddSingleton(new StudioDatabaseSettings($"Data Source={Path.Combine(root, "studio.db")};Pooling=False"));
+                if (!realCookieScheme) StudioTestIdentity.Use(services);
             });
         });
         return new StudioHost(root, factory);
@@ -187,6 +186,6 @@ internal sealed class StudioHost : IAsyncDisposable
     {
         await Factory.DisposeAsync();
         SqliteConnection.ClearAllPools();
-        try { Directory.Delete(root, true); } catch (IOException) { }
+        try { Directory.Delete(Root, true); } catch (IOException) { }
     }
 }

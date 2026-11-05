@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using OcharoStudio.Api.Studio.Access;
 using Microsoft.AspNetCore.Mvc;
@@ -29,16 +28,17 @@ public sealed class StudioController(
     public IActionResult Session()
     {
         Response.Headers.CacheControl = "no-store";
+        if (StudioAccess.MemberOf(User) is not { } member) return Forbid();
+
         return Ok(new {
-            workspaceId = User.FindFirstValue(StudioIntegrationAuthenticationHandler.WorkspaceClaim),
-            userId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-            organizationId = User.FindFirstValue(StudioIntegrationAuthenticationHandler.OrganizationClaim),
-            canEdit = User.FindFirstValue(StudioIntegrationAuthenticationHandler.EditClaim) == "true",
-            expiresAt = User.FindFirstValue("ocharo:expires-at")
+            workspaceId = member.WorkspaceId,
+            userId = member.UserId,
+            organizationId = member.OrganizationId,
+            canEdit = member.CanEdit
         });
     }
 
-    /// <summary>Returns state belonging to the member identified by the Desk ticket.</summary>
+    /// <summary>Returns state belonging to the member the session names.</summary>
     [Authorize]
     [HttpGet("state")]
     public async Task<ActionResult<StudioState>> GetState(
@@ -46,9 +46,9 @@ public sealed class StudioController(
         CancellationToken ct)
     {
         Response.Headers.CacheControl = "no-store";
-        if (!TryWorkspace(workspace, out var workspaceId)) return Forbid();
+        if (SelectedMember(workspace) is not { } member) return Forbid();
 
-        return Ok(await stateService.GetAsync(workspaceId, ct));
+        return Ok(await stateService.GetAsync(member.WorkspaceId, ct));
     }
 
     /// <summary>Atomically replaces a workspace state when its revision is current.</summary>
@@ -61,16 +61,14 @@ public sealed class StudioController(
         CancellationToken ct)
     {
         Response.Headers.CacheControl = "no-store";
-        if (!TryWorkspace(workspace, out var workspaceId)) return Forbid();
-
-        if (User.FindFirstValue(StudioIntegrationAuthenticationHandler.EditClaim) != "true") return Forbid();
+        if (SelectedMember(workspace) is not { CanEdit: true } member) return Forbid();
 
         var errors = stateValidator.Validate(request);
         if (errors.Count > 0)
             return ValidationProblem(new ValidationProblemDetails(
                 new Dictionary<string, string[]> { ["state"] = [.. errors] }) { Status = StatusCodes.Status400BadRequest });
 
-        var result = await stateService.PutAsync(workspaceId, request, ct);
+        var result = await stateService.PutAsync(member.WorkspaceId, request, ct);
         if (result.Failure == StudioStateWriteFailure.MaterialsRequired)
             return ValidationProblem(new ValidationProblemDetails(
                 new Dictionary<string, string[]>
@@ -84,10 +82,11 @@ public sealed class StudioController(
         return Ok(result.State);
     }
 
-    private bool TryWorkspace(string? supplied, out Guid workspaceId)
+    /// <summary>The session's member, unless the request names another workspace: the header selects only the authenticated one.</summary>
+    private StudioMember? SelectedMember(string? supplied)
     {
-        var owned = User.FindFirstValue(StudioIntegrationAuthenticationHandler.WorkspaceClaim);
-        return Guid.TryParseExact(owned, "D", out workspaceId) && workspaceId != Guid.Empty &&
-            (supplied is null || Guid.TryParseExact(supplied, "D", out var selected) && selected == workspaceId);
+        var member = StudioAccess.MemberOf(User);
+        return member is not null && (supplied is null || Guid.TryParseExact(supplied, "D", out var selected) && selected == member.WorkspaceId)
+            ? member : null;
     }
 }

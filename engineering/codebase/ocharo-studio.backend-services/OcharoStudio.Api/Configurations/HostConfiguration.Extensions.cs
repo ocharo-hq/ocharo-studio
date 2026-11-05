@@ -1,13 +1,11 @@
-using Ocharo.Sso;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.StaticFiles;
 using OcharoStudio.Api.RuntimeConfig.Settings;
-using OcharoStudio.Api.Studio.Access;
 using OcharoStudio.Application;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
 using WoW.Two.Sdk.Beta.Be.Foundation.Configuration;
 using WoW.Two.Sdk.Beta.Be.Foundation.Options;
+using WoW.Two.Sdk.Beta.Be.Identity.Bff;
 using WoW.Two.Sdk.Beta.Be.Mediator;
 using WoW.Two.Sdk.Beta.Be.Web.Hosting;
 using WoW.Two.Sdk.Beta.Be.Web.ProblemDetails;
@@ -43,19 +41,6 @@ public static partial class HostConfiguration
         builder.Services.AddScoped<StudioStateService>();
         builder.Services.AddSingleton(StudioCatalogContract.LoadEmbedded());
         builder.Services.AddSingleton<StudioStateValidator>();
-        return builder;
-    }
-
-    /// <summary>Registers the Desk access client and Studio authentication and authorization.</summary>
-    private static WebApplicationBuilder AddStudioAccess(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddHttpClient<StudioAccessClient>(client => client.Timeout = TimeSpan.FromSeconds(5))
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
-        builder.Services.AddAuthentication(StudioIntegrationAuthenticationHandler.SchemeName)
-            .AddScheme<AuthenticationSchemeOptions, StudioIntegrationAuthenticationHandler>(
-                StudioIntegrationAuthenticationHandler.SchemeName, _ => { });
-        builder.Services.AddAuthorization();
-        builder.Services.AddOcharoSso(builder.Configuration, "studio", "ocharo-studio");
         return builder;
     }
 
@@ -110,21 +95,11 @@ public static partial class HostConfiguration
         return app;
     }
 
-    /// <summary>Configures Studio authentication before authorization and controller execution.</summary>
-    private static WebApplication UseStudioAccess(this WebApplication app)
-    {
-        app.UseAuthentication();
-        // Health, build identity, status and the public runtime settings answer before sign-in.
-        app.UseOcharoSso(http => http.Request.Path == "/health" || http.Request.Path == "/api/system/version"
-            || http.Request.Path == "/api/system/status" || http.Request.Path == "/api/runtime-config");
-        app.UseAuthorization();
-        return app;
-    }
-
-    /// <summary>Configures controllers, build identity, health and missing API routes.</summary>
+    /// <summary>Configures controllers, the Identity session routes, build identity, health and missing API routes.</summary>
     private static WebApplication MapStudioEndpoints(this WebApplication app)
     {
         app.MapControllers();
+        app.MapIdentityBffEndpoints();
         app.MapGet("/api/system/version", (HttpContext context) =>
         {
             context.Response.Headers.CacheControl = "no-store";

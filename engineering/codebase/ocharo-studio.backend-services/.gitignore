@@ -1,0 +1,2 @@
+# The Data Protection key ring a local run writes beside its database (DataProtection:KeysPath, else appdata/keys).
+**/appdata/keys/

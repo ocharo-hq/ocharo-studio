@@ -24,6 +24,8 @@ public sealed class HostCompositionTests
             using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
             {
                 builder.UseEnvironment("Testing");
+                foreach (var (key, value) in StudioTestIdentity.Settings())
+                    builder.UseSetting(key, value);
                 builder.ConfigureServices(services =>
                 {
                     services.RemoveAll<StudioDatabaseSettings>();

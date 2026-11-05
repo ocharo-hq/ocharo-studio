@@ -11,7 +11,7 @@ public static class StudioDatabaseInitializer
         CancellationToken ct = default)
     {
         var settings = services.GetRequiredService<StudioDatabaseSettings>();
-        EnsureDirectory(settings.ConnectionString);
+        if (settings.DataDirectory is { } directory) Directory.CreateDirectory(directory);
 
         await using var connection = new SqliteConnection(settings.ConnectionString);
         await connection.OpenAsync(ct);
@@ -38,13 +38,5 @@ public static class StudioDatabaseInitializer
                 "ALTER TABLE studio_workspaces ADD COLUMN materials_json TEXT NOT NULL DEFAULT '{}';";
             await migrate.ExecuteNonQueryAsync(ct);
         }
-    }
-
-    private static void EnsureDirectory(string connectionString)
-    {
-        var path = new SqliteConnectionStringBuilder(connectionString).DataSource;
-        if (string.IsNullOrWhiteSpace(path) || path == ":memory:") return;
-        var directory = Path.GetDirectoryName(Path.GetFullPath(path));
-        if (directory is not null) Directory.CreateDirectory(directory);
     }
 }
