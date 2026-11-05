@@ -57,6 +57,17 @@ public sealed class StudioAccessTests
     }
 
     [Fact]
+    public async Task SignalRoute_ShouldAnswer401_ForAnUnsignedPostWithoutASession()
+    {
+        await using var host = StudioHost.Create(new Dictionary<string, string?> { ["Identity:Client:SignalUrl"] = "https://app.test/api/identity/signal" });
+        using var client = Anonymous(host.Factory);
+
+        var response = await client.PostAsJsonAsync("/api/identity/signal", new { });
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
     public async Task IdentitySessionRoute_ShouldCarryExpiryPermissionsAndCsrfToken()
     {
         await using var host = StudioHost.Create(new Dictionary<string, string?>());

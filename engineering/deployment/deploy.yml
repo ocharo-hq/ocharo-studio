@@ -29,6 +29,7 @@ services:
         Identity:Client:ClientId: { default: studio }
         Identity:Client:ClientSecret: { from: { repository: platform, key: Identity:Server:Clients:5:ClientSecret } }
         Identity:Client:CookieName: { default: __Host-ocharo-studio }
+        Identity:Client:SignalUrl: { from: { repository: platform, key: Identity:Server:Clients:5:SignalUrl } }
         Identity:Client:PostSignOutRedirectPath: { default: "/" }
         # The Ocharo app menu, served anonymously at /api/runtime-config; an unset key leaves that app out.
         OcharoApps:Desk: { type: url }

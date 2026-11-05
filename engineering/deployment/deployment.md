@@ -38,6 +38,7 @@ browser-only editing needs no sign-in on any host that does boot.
   |---|---|---|
   | `Identity:Client:{Authority,ClientSecret}` | linked with `from` | `Sites:identity:Url` and identity's `Identity:Server:Clients:5:ClientSecret`, both in `ocharo-platform`'s descriptor |
   | `Identity:Client:{ClientId,CookieName,PostSignOutRedirectPath}` | defaults | `studio`, `__Host-ocharo-studio`, `/` |
+  | `Identity:Client:SignalUrl` | linked with `from` | identity's `Identity:Server:Clients:5:SignalUrl`, an owner key `{site}/api/identity/signal` |
   | `Deployment:TrustedProxies` | required | derived by Wheelhouse: the ingress's address on the server's `platform` network |
   | `AllowedHosts` | — | derived by Wheelhouse: the site's hosts, the service's platform name and `localhost` |
   | `OcharoApps:{Desk,Catalogue,Studio,Marketing,Editorial,Brand,Atlas,Wear,Blog}` | `url`, optional | the owner: the Ocharo app menu served at `/api/runtime-config`; an unset key leaves that app out |
