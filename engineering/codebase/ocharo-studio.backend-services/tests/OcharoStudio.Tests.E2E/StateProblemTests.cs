@@ -2,8 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
-using OcharoStudio.Api.Studio.Errors;
-using WoW.Two.Sdk.Beta.Be.Web.ErrorMapping;
 using AwesomeAssertions;
 using Xunit;
 using static OcharoStudio.Tests.E2E.StudioTestIdentity;
@@ -31,7 +29,6 @@ public sealed class StateProblemTests
         var problem = await stale.Content.ReadFromJsonAsync<JsonElement>();
         problem.GetProperty("status").GetInt32().Should().Be(409);
         problem.GetProperty("detail").GetString().Should().Be("Revision conflict");
-        host.Factory.Services.GetRequiredService<IErrorHttpStatusCodeMapper>().Should().BeOfType<StudioErrorHttpStatusCodeMapper>();
     }
 
     [Fact]

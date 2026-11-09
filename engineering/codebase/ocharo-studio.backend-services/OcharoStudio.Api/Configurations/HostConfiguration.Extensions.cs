@@ -4,7 +4,6 @@ using OcharoStudio.Api.RuntimeConfig.Settings;
 using OcharoStudio.Api.Studio.Thumbnails;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Infrastructure;
-using OcharoStudio.Api.Studio.Errors;
 using OcharoStudio.Infrastructure.Studio.Services;
 using OcharoStudio.Infrastructure.Studio.Validators;
 using Npgsql;
@@ -20,7 +19,6 @@ using WoW.Two.Sdk.Beta.Be.Foundation.Options;
 using WoW.Two.Sdk.Beta.Be.Identity.Bff;
 using WoW.Two.Sdk.Beta.Be.Mediator;
 using WoW.Two.Sdk.Beta.Be.Meta;
-using WoW.Two.Sdk.Beta.Be.Web.ErrorMapping;
 using WoW.Two.Sdk.Beta.Be.Web.Json;
 using WoW.Two.Sdk.Beta.Be.Web.ProblemDetails;
 
@@ -83,7 +81,6 @@ public static partial class HostConfiguration
         builder.Services.AddSingleton<LegacySqliteImport>();
 
         builder.Services.AddMediator(typeof(InfrastructureAssembly).Assembly);
-        builder.Services.AddSingleton<IErrorHttpStatusCodeMapper, StudioErrorHttpStatusCodeMapper>();
         builder.AddStudioThumbnails();
         builder.Services.AddScoped<StudioStateService>();
         builder.Services.AddSingleton(StudioCatalogContract.LoadEmbedded());

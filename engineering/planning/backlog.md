@@ -22,7 +22,6 @@
 | Model rendering | product | Choose generated stills or rotatable scenes and exact scene IDs. |
 | Normalized storage | engineering | Workspaces keep state and material JSON as text in `studio.workspaces`; design entity tables and APIs before splitting them. |
 | Retire the SQLite volume | engineering | Once `import-sqlite` has run on dev and prod, drop the `studio-data` volume and the `LegacySqlite` settings, the 503 guard and the verb. |
-| be sdk: bad-gateway error | sdk gap | No `AppError` type maps to 502; Studio decorates the status mapper to keep a refused Files call at 502 (`StudioErrorHttpStatusCodeMapper`). |
 | Pipelines tag pin | engineering | `publish-docker-image.yml` pins `delivery.yml` by SHA `e134a47` because no pipelines tag contains it yet; re-pin to the first tag that does. Covers sweep D-1. |
 | fe sdk: slider gesture events | sdk gap | `SliderInput` (0.0.31) emits no gesture start and end, which Studio's undo grouping needs, and has no labelled value readout; `RangeControl.vue` stays a thin wrapper until a `SliderField` lands. |
 | fe sdk: confirmation host | sdk gap | `useConfirmation` has no component that renders an `AlertModal` from a request; Studio composes it in its Designer page. |

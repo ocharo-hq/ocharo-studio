@@ -7,10 +7,6 @@ namespace OcharoStudio.Application.Studio.Errors;
 /// <summary>Holds the error catalogue of Studio's state and thumbnail use cases.</summary>
 public static class StudioErrors
 {
-    /// <summary>The metadata key that marks a call WoW2 Files refused for a reason Studio cannot name: the host answers it
-    /// as a bad gateway rather than as Files being unavailable.</summary>
-    public const string FilesRefusedKey = "filesRefused";
-
     /// <summary>The field a state that fails validation reports its failures under.</summary>
     public const string StateField = "state";
 
@@ -40,15 +36,14 @@ public static class StudioErrors
     public static AppError ThumbnailNotFound() => AppErrorFactory.NotFound("The thumbnail was not found.");
 
     /// <summary>Creates the error for a WoW2 Files call that failed, by the kind the thumbnail store gave it: a refused
-    /// input, a file gone, Files unavailable, else a refusal marked by <see cref="FilesRefusedKey"/>.</summary>
+    /// input, a file gone, Files unavailable, else Files refusing for a reason Studio cannot name (502).</summary>
     /// <param name="refusal">The failure the thumbnail store raised.</param>
     public static AppError FilesFailed(StudioFilesException refusal) => refusal.Status switch
     {
         400 => AppErrorFactory.Validation(refusal.Message),
         404 => AppErrorFactory.NotFound(refusal.Message),
         503 => AppErrorFactory.ExternalUnavailable(refusal.Message),
-        _ => AppError.Of(AppErrorType.ExternalUnavailable, refusal.Message,
-            new Dictionary<string, object?>(StringComparer.Ordinal) { [FilesRefusedKey] = true }),
+        _ => AppErrorFactory.ExternalRejected(refusal.Message),
     };
 
     private static FieldError Field(string property, string message, string code) =>

@@ -94,7 +94,7 @@ or docs; `excepted` rows stay with the reason; open work sits in the [backlog](.
 | S-1, S-2, S-10 | fixed | PostgreSQL in schema `studio` of `ocharo_{env}`, bespoke set `001-workspaces` keyed into Identity, `TimeProvider` in the store; `import-sqlite` copies the old store |
 | S-3, S-4, S-5, S-8, S-9 | fixed | `ServiceHost.RunAsync` and the boot bundle; `/health` and `/health/ready`; `SpaHosting` with `.glb`/`.gltf` types (be sdk `10.0.107-beta`); two `HostConfiguration` files |
 | S-6, S-7 | fixed | `AddControllersWithSdkJson` (the SPA reads a missing `draft` as `null`); `/api/system/version` removed |
-| S-11, S-12 | fixed | `OcharoStudio.Infrastructure` holds the handlers, service and validator; state and thumbnail requests return `AppResult` through `ISender`, collapsed with `.Match`; Files' 502 keeps its status through `StudioErrorHttpStatusCodeMapper` |
+| S-11, S-12 | fixed | `OcharoStudio.Infrastructure` holds the handlers, service and validator; state and thumbnail requests return `AppResult` through `ISender`, collapsed with `.Match`; a refused Files call is `ExternalRejected` (502, be sdk `10.0.109-beta`) |
 | S-13, S-14 | fixed | controller under `Studio/Controllers/`; HTTP 8261 beside HTTPS 8260 |
 | S-15, S-16, R-2 | fixed | Unit, Integration and E2E projects on AwesomeAssertions, `tests/tests.md` |
 | F-1, F-2, F-8, F-10 | fixed | `lucide-vue-next`; the SDK client with `Result` (`ModelAssets` keeps a plain fetch for a static `.glb`); `VITE_HTTPS=false`; no compiled origins. The `-http` launch entry lives in wow-two-ws: backlog "Local launch entries" |

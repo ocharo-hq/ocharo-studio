@@ -43,11 +43,11 @@ public sealed class StudioThumbnailLinkGetQueryHandlerTests
     }
 
     [Theory]
-    [InlineData(400, AppErrorType.Validation, false)]
-    [InlineData(404, AppErrorType.NotFound, false)]
-    [InlineData(503, AppErrorType.ExternalUnavailable, false)]
-    [InlineData(502, AppErrorType.ExternalUnavailable, true)]
-    public async Task HandleAsync_ShouldMapAFilesRefusalByItsStatus_WhenTheLinkIsRefused(int status, AppErrorType type, bool refused)
+    [InlineData(400, AppErrorType.Validation)]
+    [InlineData(404, AppErrorType.NotFound)]
+    [InlineData(503, AppErrorType.ExternalUnavailable)]
+    [InlineData(502, AppErrorType.ExternalRejected)]
+    public async Task HandleAsync_ShouldMapAFilesRefusalByItsStatus_WhenTheLinkIsRefused(int status, AppErrorType type)
     {
         var thumbnails = new FakeStudioThumbnailStore { Refusal = new StudioFilesException("Files said no.", status) };
 
@@ -56,7 +56,6 @@ public sealed class StudioThumbnailLinkGetQueryHandlerTests
         var error = Failure(result);
         error.Type.Should().Be(type);
         error.Message.Should().Be("Files said no.");
-        (error.Metadata?.ContainsKey(StudioErrors.FilesRefusedKey) == true).Should().Be(refused);
     }
 
     [Fact]
