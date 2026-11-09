@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
 using OcharoStudio.Application.Studio.State;
+using OcharoStudio.Infrastructure.Studio.Services;
+using OcharoStudio.Infrastructure.Studio.Validators;
 using OcharoStudio.Persistence;
 using WoW.Two.Sdk.Beta.Be.Mediator;
 using AwesomeAssertions;

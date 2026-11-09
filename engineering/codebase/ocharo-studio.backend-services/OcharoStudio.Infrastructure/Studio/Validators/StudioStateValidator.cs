@@ -2,8 +2,9 @@ using System.Text;
 using System.Text.Json;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using OcharoStudio.Application.Studio.State;
 
-namespace OcharoStudio.Application.Studio.State;
+namespace OcharoStudio.Infrastructure.Studio.Validators;
 
 /// <summary>Validates bounded portable studio documents before persistence.</summary>
 public sealed class StudioStateValidator(StudioCatalogContract catalog)

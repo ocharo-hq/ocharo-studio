@@ -8,6 +8,7 @@
     <Project Path="OcharoStudio.Api/OcharoStudio.Api.csproj" />
     <Project Path="OcharoStudio.Application/OcharoStudio.Application.csproj" />
     <Project Path="OcharoStudio.Domain/OcharoStudio.Domain.csproj" />
+    <Project Path="OcharoStudio.Infrastructure/OcharoStudio.Infrastructure.csproj" />
     <Project Path="OcharoStudio.Persistence/OcharoStudio.Persistence.csproj" />
   </Folder>
   <Folder Name="/Tests/">

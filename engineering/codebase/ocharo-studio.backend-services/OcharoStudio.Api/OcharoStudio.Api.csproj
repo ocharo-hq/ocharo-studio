@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OcharoStudio.Application\OcharoStudio.Application.csproj" />
+    <ProjectReference Include="..\OcharoStudio.Infrastructure\OcharoStudio.Infrastructure.csproj" />
     <ProjectReference Include="..\OcharoStudio.Persistence\OcharoStudio.Persistence.csproj" />
   </ItemGroup>
 

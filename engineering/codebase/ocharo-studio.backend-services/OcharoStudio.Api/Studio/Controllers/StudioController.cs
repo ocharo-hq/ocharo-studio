@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using OcharoStudio.Api.Studio.Access;
 using Microsoft.AspNetCore.Mvc;
+using OcharoStudio.Application.Studio.Commands;
+using OcharoStudio.Application.Studio.Queries;
 using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence.Import;
 using WoW.Two.Sdk.Beta.Be.Mediator;
+using WoW.Two.Sdk.Beta.Be.Web.ExceptionHandling.Extensions;
 
 namespace OcharoStudio.Api.Studio.Controllers;
 
@@ -13,9 +16,6 @@ namespace OcharoStudio.Api.Studio.Controllers;
 [Route("api/studio")]
 public sealed class StudioController(
     ISender sender,
-    StudioStateService stateService,
-    StudioStateValidator stateValidator,
-    IStudioThumbnailStore thumbnails,
     LegacySqliteSettings legacy) : ControllerBase
 {
     /// <summary>Answers state routes 503 while the retired SQLite store waits for <c>import-sqlite</c>, so no write lands in
@@ -60,7 +60,11 @@ public sealed class StudioController(
         if (SelectedMember(workspace) is not { } member) return Forbid();
         if (StorageMoving() is { } moving) return moving;
 
-        return Ok(await stateService.GetAsync(member.WorkspaceId, ct));
+        var result = await sender.SendAsync(new StudioStateGetQuery { WorkspaceId = member.WorkspaceId }, ct);
+
+        return result.Match<IActionResult>(
+            ok => Ok(ok.Data),
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Atomically replaces a workspace state when its revision is current.</summary>
@@ -76,37 +80,16 @@ public sealed class StudioController(
         if (SelectedMember(workspace) is not { CanEdit: true } member) return Forbid();
         if (StorageMoving() is { } moving) return moving;
 
-        var errors = stateValidator.Validate(request);
-        if (errors.Count > 0)
-            return ValidationProblem(new ValidationProblemDetails(
-                new Dictionary<string, string[]> { ["state"] = [.. errors] }) { Status = StatusCodes.Status400BadRequest });
-
-        StudioStateWriteResult result;
-        try
+        var command = new StudioStateReplaceCommand
         {
-            result = await stateService.PutAsync(new StudioWorkspace(member.WorkspaceId, member.OrganizationId, member.UserId), request, ct);
-        }
-        catch (StudioFilesException failure)
-        {
-            return Problem(statusCode: failure.Status, title: failure.Message);
-        }
-        if (result.Failure == StudioStateWriteFailure.ThumbnailUnknown)
-            return ValidationProblem(new ValidationProblemDetails(
-                new Dictionary<string, string[]>
-                {
-                    ["thumbnail"] = ["A thumbnail link names a file this workspace does not hold."]
-                }) { Status = StatusCodes.Status400BadRequest });
-        if (result.Failure == StudioStateWriteFailure.MaterialsRequired)
-            return ValidationProblem(new ValidationProblemDetails(
-                new Dictionary<string, string[]>
-                {
-                    ["materials"] =
-                    ["Material metadata is required. Reload or upgrade the studio before saving."]
-                }) { Status = StatusCodes.Status400BadRequest });
-        if (result.State is null)
-            return Problem(statusCode: StatusCodes.Status409Conflict, title: "Revision conflict");
+            Workspace = new StudioWorkspace(member.WorkspaceId, member.OrganizationId, member.UserId),
+            State = request,
+        };
+        var result = await sender.SendAsync(command, ct);
 
-        return Ok(result.State);
+        return result.Match<IActionResult>(
+            ok => Ok(ok.Data),
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>Links to a saved look's thumbnail in WoW2 Files: a redirect to a short-lived link, for a member whose workspace
@@ -117,21 +100,17 @@ public sealed class StudioController(
     {
         if (SelectedMember(null) is not { } member) return Forbid();
         if (StorageMoving() is { } moving) return moving;
-        var route = StudioThumbnailRoute.Url(sha256, fileId);
-        if (!thumbnails.Enabled || !StudioThumbnailRoute.TryParse(route, out _, out _)
-            || !await stateService.HoldsThumbnailAsync(member.WorkspaceId, route, ct))
-            return NotFound();
 
-        try
-        {
-            if (await thumbnails.LinkAsync(fileId, ct) is not { } link) return NotFound();
-            Response.Headers.CacheControl = "private, max-age=300";
-            return Redirect(link.AbsoluteUri);
-        }
-        catch (StudioFilesException failure)
-        {
-            return Problem(statusCode: failure.Status, title: failure.Message);
-        }
+        var query = new StudioThumbnailLinkGetQuery { WorkspaceId = member.WorkspaceId, Sha256 = sha256, FileId = fileId };
+        var result = await sender.SendAsync(query, ct);
+
+        return result.Match<IActionResult>(
+            ok =>
+            {
+                Response.Headers.CacheControl = "private, max-age=300";
+                return Redirect(ok.Data.AbsoluteUri);
+            },
+            fail => this.ToProblem(fail.Error));
     }
 
     /// <summary>The session's member, unless the request names another workspace: the header selects only the authenticated one.</summary>

@@ -1,4 +1,5 @@
 using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
+using OcharoStudio.Infrastructure.Studio.QueryHandlers;
 using AwesomeAssertions;
 using Xunit;
 

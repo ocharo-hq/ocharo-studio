@@ -1,5 +1,6 @@
 using System.Text.Json;
 using OcharoStudio.Application.Studio.State;
+using OcharoStudio.Infrastructure.Studio.Validators;
 using AwesomeAssertions;
 using Xunit;
 

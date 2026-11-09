@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <!-- Kit: mediator handlers, AppResult/AppError, the problem factory's status-mapper seam. -->
+    <PackageReference Include="WoW2.Sdk.Beta.Be" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OcharoStudio.Application\OcharoStudio.Application.csproj" />
+    <ProjectReference Include="..\OcharoStudio.Domain\OcharoStudio.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Let the test projects reach internal handlers for direct unit tests. -->
+    <InternalsVisibleTo Include="OcharoStudio.Tests.Unit" />
+    <InternalsVisibleTo Include="OcharoStudio.Tests.Integration" />
+    <InternalsVisibleTo Include="OcharoStudio.Tests.E2E" />
+  </ItemGroup>
+
+</Project>

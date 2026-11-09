@@ -1,8 +1,9 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using OcharoStudio.Application.Studio.State;
 
-namespace OcharoStudio.Application.Studio.State;
+namespace OcharoStudio.Infrastructure.Studio.Services;
 
 /// <summary>Coordinates state reads and optimistic replacements for a browser workspace.</summary>
 public sealed class StudioStateService(IStudioStateStore store, IStudioThumbnailStore thumbnails)

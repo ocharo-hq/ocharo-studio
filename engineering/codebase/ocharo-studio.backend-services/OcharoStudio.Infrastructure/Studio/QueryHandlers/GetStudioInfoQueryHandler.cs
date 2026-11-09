@@ -1,7 +1,8 @@
+using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
 using OcharoStudio.Domain.Studio;
 using WoW.Two.Sdk.Beta.Be.Mediator;
 
-namespace OcharoStudio.Application.Studio.Queries.GetStudioInfo;
+namespace OcharoStudio.Infrastructure.Studio.QueryHandlers;
 
 /// <summary>Describes the persisted studio contract served by this host.</summary>
 internal sealed class GetStudioInfoQueryHandler : IRequestHandler<GetStudioInfoQuery, StudioInfo>

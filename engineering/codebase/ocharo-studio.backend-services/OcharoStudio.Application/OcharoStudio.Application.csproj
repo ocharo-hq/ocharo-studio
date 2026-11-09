@@ -15,11 +15,4 @@
                       LogicalName="OcharoStudio.Application.Studio.State.catalog-contract.json" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Let the test project reach internal handlers for direct unit tests. -->
-    <InternalsVisibleTo Include="OcharoStudio.Tests.Unit" />
-    <InternalsVisibleTo Include="OcharoStudio.Tests.Integration" />
-    <InternalsVisibleTo Include="OcharoStudio.Tests.E2E" />
-  </ItemGroup>
-
 </Project>
