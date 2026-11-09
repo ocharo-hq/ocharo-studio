@@ -14,6 +14,7 @@ import type {
 } from "../../domain/studio/types";
 import { migrateLooks } from "./repository";
 import { createLocalJsonStorage } from "./storage";
+import { createStudioApi, throwIfInterrupted } from "./StudioApi";
 
 export interface StudioSnapshot {
   revision: number;
@@ -60,6 +61,7 @@ export function createServerRepository(
   fetcher: typeof fetch = fetch,
 ): ServerRepository {
   let session: StudioSession | undefined;
+  const api = createStudioApi(fetcher);
   async function request(
     method: "GET" | "PUT",
     snapshot?: StudioSnapshot,
@@ -80,41 +82,44 @@ export function createServerRepository(
       throw new Error(
         "Your Ocharo membership allows viewing only. Local edits remain in this browser.",
       );
-    const response = await fetcher("/api/studio/state", {
-      method,
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Studio-Workspace": session.workspaceId,
-        ...(method === "PUT" ? { "X-Csrf-Token": identity.csrfToken! } : {}),
-      },
-      ...(snapshot ? { body: JSON.stringify(snapshot) } : {}),
+    const scope = {
+      workspaceId: session.workspaceId,
       signal: signal ?? AbortSignal.timeout(15000),
-    });
-    if (response.status === 401) {
-      session = undefined;
-      throw handleUnauthorized();
-    }
-    if (response.status === 403) {
-      session = undefined;
-      throw new Error(
-        "Your Ocharo access changed. Sign in again; your browser recovery is preserved.",
-      );
-    }
-    if (response.status === 409) throw new StudioConflict();
-    if (response.status === 400 || response.status === 422)
-      throw new Error(
-        "Review your design settings. Your browser keeps a recovery copy.",
-      );
-    if (!response.ok)
+    };
+    const result =
+      method === "PUT"
+        ? await api.writeState(snapshot, {
+            ...scope,
+            csrfToken: identity.csrfToken,
+          })
+        : await api.readState(scope);
+    if (!result.ok) {
+      const { failure } = result;
+      throwIfInterrupted(failure, scope.signal);
+      if (failure.status === 401) {
+        session = undefined;
+        throw handleUnauthorized();
+      }
+      if (failure.status === 403) {
+        session = undefined;
+        throw new Error(
+          "Your Ocharo access changed. Sign in again; your browser recovery is preserved.",
+        );
+      }
+      if (failure.status === 409) throw new StudioConflict();
+      if (failure.status === 400 || failure.status === 422)
+        throw new Error(
+          "Review your design settings. Your browser keeps a recovery copy.",
+        );
+      if (failure.code === "protocol")
+        throw new Error("Invalid studio storage response.");
       throw new Error(
         "Studio storage is unavailable. Your browser keeps a recovery copy.",
       );
-    const value: unknown = await response.json();
-    if (!value || typeof value !== "object")
-      throw new Error("Invalid studio storage response.");
-    const raw = value as Record<string, unknown>;
-    const draft = raw.draft === null ? null : migrateDocument(raw.draft);
+    }
+    const raw = result.value;
+    // The backend drops null properties, so a workspace with no open design omits `draft`.
+    const draft = raw.draft == null ? null : migrateDocument(raw.draft);
     const looks = migrateLooks(raw.looks);
     const materials = migrateMaterialScales(raw.materials);
     if (

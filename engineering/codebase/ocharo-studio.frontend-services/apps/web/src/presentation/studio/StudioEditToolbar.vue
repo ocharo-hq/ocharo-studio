@@ -7,9 +7,9 @@ import {
   MousePointer2,
   Redo2,
   Undo2,
-} from "@lucide/vue";
+} from "lucide-vue-next";
+import { Button } from "@wow-two-beta/fe/presentation/actions";
 import type { GarmentDefinition, PartId } from "../../domain/studio/types";
-import IconButton from "./IconButton.vue";
 
 /** Multi-part selection and document history controls above the stage. */
 defineOptions({ name: "StudioEditToolbar" });
@@ -143,17 +143,27 @@ onScopeDispose(() => {
       </div>
     </div>
     <span class="toolbar-divider" />
-    <IconButton
-      :icon="Undo2"
-      label="Undo"
-      :on-click="onUndo"
-      :disabled="!canUndo"
-    />
-    <IconButton
-      :icon="Redo2"
-      label="Redo"
-      :on-click="onRedo"
-      :disabled="!canRedo"
-    />
+    <Button
+      class="icon-button"
+      variant="ghost"
+      shape="square"
+      aria-label="Undo"
+      title="Undo"
+      :is-disabled="!canUndo"
+      @click="onUndo"
+    >
+      <Undo2 :size="18" />
+    </Button>
+    <Button
+      class="icon-button"
+      variant="ghost"
+      shape="square"
+      aria-label="Redo"
+      title="Redo"
+      :is-disabled="!canRedo"
+      @click="onRedo"
+    >
+      <Redo2 :size="18" />
+    </Button>
   </div>
 </template>

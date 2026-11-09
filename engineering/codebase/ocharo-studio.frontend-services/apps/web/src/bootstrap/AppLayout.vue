@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";
-import { RefreshCw, Settings } from "@lucide/vue";
+import { RefreshCw, Settings } from "lucide-vue-next";
 import {
   TailwindBreakpoints,
   useBreakpoint,

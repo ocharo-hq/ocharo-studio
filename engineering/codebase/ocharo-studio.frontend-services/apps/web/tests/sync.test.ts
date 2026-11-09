@@ -105,15 +105,37 @@ describe("database synchronization", () => {
     const fetcher = vi
       .fn()
       .mockResolvedValue(
-        new Response(
-          JSON.stringify({ revision: 1, draft: {}, looks: [], settings: {} }),
-          { status: 200 },
-        ),
+        Response.json({ revision: 1, draft: {}, looks: [], settings: {} }),
       );
     const repo = createServerRepository(fetcher);
     await expect(repo.read()).rejects.toThrow(/Incompatible/);
-    expect(fetcher.mock.calls[0][1].headers["X-Studio-Workspace"]).toBe(
-      "d0a8c678-c27f-478f-b4e8-c9928bf88c21",
-    );
+    expect(
+      new Headers(fetcher.mock.calls[0][1].headers).get("X-Studio-Workspace"),
+    ).toBe("d0a8c678-c27f-478f-b4e8-c9928bf88c21");
+  });
+  it("reads a state without a draft or materials, as the backend sends nulls, as no open design", async () => {
+    const draft = createDesignDocument();
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(
+        Response.json({ revision: 3, looks: [], settings: {} }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({ revision: 4, draft: null, looks: [], settings: {} }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({ revision: 5, draft, looks: [], settings: {} }),
+      );
+    const repo = createServerRepository(fetcher);
+    await expect(repo.read()).resolves.toMatchObject({
+      revision: 3,
+      draft: null,
+      materials: {},
+    });
+    await expect(repo.write(snapshot())).resolves.toMatchObject({
+      revision: 4,
+      draft: null,
+    });
+    expect((await repo.read()).draft).toEqual(draft);
   });
 });

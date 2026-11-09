@@ -10,7 +10,8 @@ import {
   RotateCcw,
   RotateCw,
   SlidersHorizontal,
-} from "@lucide/vue";
+} from "lucide-vue-next";
+import { Button } from "@wow-two-beta/fe/presentation/actions";
 import { PointControl } from "@wow-two-beta/fe/presentation/forms/point-control";
 import type {
   GarmentDefinition,
@@ -18,7 +19,6 @@ import type {
   PartId,
   TexturePlacement,
 } from "../../domain/studio/types";
-import IconButton from "./IconButton.vue";
 import RangeControl from "./RangeControl.vue";
 
 /** Per-part material and pattern placement controls. */
@@ -134,12 +134,17 @@ function placeMaterialAnchor(point: { x: number; y: number }) {
       <div class="panel-divider" />
       <div class="label-row">
         <h3>Pattern placement</h3>
-        <IconButton
-          :icon="RotateCcw"
-          label="Reset pattern placement"
-          :on-click="onReset"
-          :disabled="!hasPattern"
-        />
+        <Button
+          class="icon-button"
+          variant="ghost"
+          shape="square"
+          aria-label="Reset pattern placement"
+          title="Reset pattern placement"
+          :is-disabled="!hasPattern"
+          @click="onReset"
+        >
+          <RotateCcw :size="18" />
+        </Button>
       </div>
       <template v-if="hasPattern">
         <p v-if="multiple" class="selection-hint">

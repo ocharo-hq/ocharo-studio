@@ -9,8 +9,7 @@ const session = {
   canEdit: true,
 };
 const csrfToken = "verified-server-csrf-token-123456";
-const json = (value: unknown, status = 200) =>
-  new Response(JSON.stringify(value), { status });
+const json = (value: unknown, status = 200) => Response.json(value, { status });
 const state = {
   revision: 0,
   draft: null,
@@ -54,11 +53,10 @@ describe("Studio session boundary", () => {
     });
     expect(fetcher.mock.calls[1][1]).toMatchObject({
       credentials: "same-origin",
-      headers: { "X-Studio-Workspace": workspaceId },
     });
-    expect(fetcher.mock.calls[1][1].headers).not.toHaveProperty(
-      "Authorization",
-    );
+    const headers = new Headers(fetcher.mock.calls[1][1].headers);
+    expect(headers.get("X-Studio-Workspace")).toBe(workspaceId);
+    expect(headers.has("Authorization")).toBe(false);
   });
 
   it("keeps browser-only data local and stops on revoked membership", async () => {

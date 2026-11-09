@@ -13,7 +13,7 @@ import {
   RefreshCw,
   Shirt,
   Trash2,
-} from "@lucide/vue";
+} from "lucide-vue-next";
 import { Button } from "@wow-two-beta/fe/presentation/actions";
 import {
   SkeletonState,
@@ -28,7 +28,6 @@ import type {
   SavedLook,
 } from "../../domain/studio/types";
 import GarmentGlyph from "./GarmentGlyph.vue";
-import IconButton from "./IconButton.vue";
 
 /** Keyboard-operable garment, textile, and saved-look library. */
 defineOptions({ name: "StudioLibrary" });
@@ -286,19 +285,24 @@ async function moveTab(key: string) {
                   <strong>{{ look.document.name }}</strong>
                   <small>{{ getGarment(look.document.garmentId).name }}</small>
                 </button>
-                <IconButton
-                  :icon="Trash2"
-                  :label="`Delete ${look.document.name}`"
-                  :disabled="Boolean(deleteUnavailableReason(look.document.id))"
+                <Button
+                  class="icon-button"
+                  variant="ghost"
+                  shape="square"
+                  :aria-label="`Delete ${look.document.name}`"
+                  :title="`Delete ${look.document.name}`"
+                  :is-disabled="
+                    Boolean(deleteUnavailableReason(look.document.id))
+                  "
                   :aria-describedby="
                     deleteUnavailableReason(look.document.id)
                       ? `look-delete-${look.document.id}`
                       : undefined
                   "
-                  :on-click="
-                    () => onDelete(look.document.id, look.document.name)
-                  "
-                />
+                  @click="onDelete(look.document.id, look.document.name)"
+                >
+                  <Trash2 :size="18" />
+                </Button>
                 <div
                   v-if="deleteUnavailableReason(look.document.id)"
                   class="saved-delete-recovery"

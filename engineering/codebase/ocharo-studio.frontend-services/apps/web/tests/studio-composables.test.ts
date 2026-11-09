@@ -72,7 +72,7 @@ const empty = (
   settings: {},
 });
 const response = (snapshot: StudioSnapshot) =>
-  new Response(JSON.stringify(snapshot), { status: 200 });
+  Response.json(snapshot, { status: 200 });
 const flush = async () => {
   await vi.advanceTimersByTimeAsync(0);
   await nextTick();

@@ -26,7 +26,16 @@ import {
   feedbackSessionExpiry,
   SessionExpiredNotice,
 } from "@wow-two-beta/fe/feedback";
-import { CircleHelp, MousePointer2 } from "@lucide/vue";
+import {
+  AlertModal,
+  AlertModalAction,
+  AlertModalCancel,
+  AlertModalContent,
+  ModalDescription,
+  ModalFooter,
+  ModalTitle,
+} from "@wow-two-beta/fe/presentation/overlays";
+import { CircleHelp, MousePointer2 } from "lucide-vue-next";
 
 import {
   useStudioOnboarding,
@@ -69,7 +78,6 @@ import GuidedTour, {
 import { studioGuideSteps } from "../presentation/studio/StudioGuideSteps";
 import "../presentation/studio/StudioIteration.css";
 import MaterialStudioPage from "../presentation/studio/materials/MaterialStudioPage.vue";
-import StudioConfirmationDialog from "../presentation/studio/StudioConfirmationDialog.vue";
 import { useStudioConfirmation } from "../presentation/studio/UseStudioConfirmation";
 import { seedColorMode } from "./ColorModeSeed";
 import { StudioFrameBarId, useStudioFrame } from "./StudioFrame";
@@ -807,10 +815,41 @@ function readOnboarding(value: unknown): OnboardingRecord | undefined {
       :on-complete="onboarding.complete"
       :on-skip="onboarding.skip"
     />
-    <StudioConfirmationDialog
-      :request="confirmation.request.value"
-      :on-confirm="confirmation.accept"
-      :on-cancel="confirmation.cancel"
-    />
+    <AlertModal
+      :open="confirmation.request.value !== null"
+      :can-dismiss-on-escape="true"
+      @update:open="(open) => !open && confirmation.cancel()"
+    >
+      <AlertModalContent
+        v-if="confirmation.request.value"
+        class="studio-confirmation-modal"
+        :is-blurred="true"
+        radius="lg"
+        padding="xl"
+        :elevation="4"
+        phone-layout="card"
+      >
+        <ModalTitle class="studio-confirmation-title">
+          {{ confirmation.request.value.title }}
+        </ModalTitle>
+        <ModalDescription class="studio-confirmation-description">
+          {{ confirmation.request.value.description }}
+        </ModalDescription>
+        <ModalFooter class="studio-confirmation-actions">
+          <AlertModalCancel
+            class="button secondary"
+            @click="confirmation.cancel"
+          >
+            {{ confirmation.request.value.cancelLabel ?? "Cancel" }}
+          </AlertModalCancel>
+          <AlertModalAction
+            class="button confirmation-danger"
+            @action="confirmation.accept"
+          >
+            {{ confirmation.request.value.confirmLabel }}
+          </AlertModalAction>
+        </ModalFooter>
+      </AlertModalContent>
+    </AlertModal>
   </div>
 </template>

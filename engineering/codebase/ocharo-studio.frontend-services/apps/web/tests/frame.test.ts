@@ -190,10 +190,12 @@ describe("Ocharo frame in Studio", () => {
     },
   );
 
-  it("opens the Ocharo apps from the app button with the Desk address Studio serves at runtime", async () => {
+  it("opens the Ocharo apps from the app button with the addresses Studio serves at runtime", async () => {
     await mountStudio("/studio", {
       runtimeConfig: {
         OCHARO_DESK_URL: "https://ocharo-desk-dev.example.ts.net/",
+        OCHARO_STUDIO_URL: "https://ocharo-studio-dev.example.ts.net/studio",
+        OCHARO_ATLAS_URL: "https://ocharo-atlas-dev.example.ts.net/atlas/",
       },
     });
 
@@ -212,13 +214,13 @@ describe("Ocharo frame in Studio", () => {
       )?.textContent,
     ).toContain("Desk");
     expect(
-      document.querySelector('a[href="https://localhost:8264/"]'),
-    ).toBeNull();
-    expect(
       document.querySelector(
-        'a[target="_blank"][href="https://localhost:8284/atlas/"]',
+        'a[target="_blank"][href="https://ocharo-atlas-dev.example.ts.net/atlas/"]',
       ),
     ).not.toBeNull();
+    // No address is compiled in: an app the environment does not serve is left out of the menu.
+    expect(document.querySelector('a[href^="https://localhost"]')).toBeNull();
+    expect(document.body.textContent).not.toContain("Catalogue");
   });
 
   it.each([
@@ -347,10 +349,13 @@ describe("Ocharo frame in Studio", () => {
 
     expect(fetcher).toHaveBeenCalledWith(
       "/api/identity/sign-out",
-      expect.objectContaining({
-        method: "POST",
-        headers: { "X-Csrf-Token": csrfToken },
-      }),
+      expect.objectContaining({ method: "POST" }),
+    );
+    const signOut = fetcher!.mock.calls.find(
+      ([input]) => input === "/api/identity/sign-out",
+    )!;
+    expect(new Headers(signOut[1]?.headers).get("X-Csrf-Token")).toBe(
+      csrfToken,
     );
     await vi.waitFor(() =>
       expect(document.body.textContent).toContain("Signed out of Studio."),

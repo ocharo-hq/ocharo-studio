@@ -10,9 +10,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@lucide/vue':
-        specifier: 1.48.0
-        version: 1.48.0(vue@3.5.41(typescript@5.9.3))
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@6.4.3(@types/node@24.13.6)(jiti@2.7.0)(lightningcss@1.32.0))
@@ -22,6 +19,9 @@ importers:
       '@wow-two-beta/fe':
         specifier: 0.0.31
         version: 0.0.31(@tanstack/vue-query@5.102.8(vue@3.5.41(typescript@5.9.3)))(@vue/test-utils@2.5.1(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(tailwindcss@4.3.3)(vue-router@4.6.4(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))
+      lucide-vue-next:
+        specifier: ^0.460.0
+        version: 0.460.0(vue@3.5.41(typescript@5.9.3))
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -285,11 +285,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
-
-  '@lucide/vue@1.48.0':
-    resolution: {integrity: sha512-3/Nwx/RsqQ4ZrrSML1GNsSWCSDyLnBgoF/eEr1q9G6iZymn3+WKtzIj7Dbc/Nxrt9WOPuGrJ58S+CBiamK+36w==}
-    peerDependencies:
-      vue: '>=3.0.1'
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     resolution: {integrity: sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ==}
@@ -1368,10 +1363,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
-
-  '@lucide/vue@1.48.0(vue@3.5.41(typescript@5.9.3))':
-    dependencies:
-      vue: 3.5.41(typescript@5.9.3)
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true

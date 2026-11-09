@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import { ChevronDown, House } from "@lucide/vue";
+import { ChevronDown, House } from "lucide-vue-next";
 import {
   DropdownMenu,
   DropdownMenuContent,

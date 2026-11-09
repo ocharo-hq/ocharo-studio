@@ -15,7 +15,7 @@ const snapshot = {
   materials: {},
 };
 const response = (value: unknown, status = 200) =>
-  new Response(JSON.stringify(value), { status });
+  Response.json(value, { status });
 /** A signed-in `/api/identity/session` body; `person` fields override the defaults. */
 const signedIn = (person: Record<string, unknown> = {}) => ({
   data: {
@@ -151,16 +151,18 @@ describe("shared Ocharo session", () => {
       credentials: "same-origin",
       method: "GET",
     });
-    expect(fetcher.mock.calls[1][1].headers).not.toHaveProperty("X-Csrf-Token");
+    expect(
+      new Headers(fetcher.mock.calls[1][1].headers).has("X-Csrf-Token"),
+    ).toBe(false);
     expect(fetcher.mock.calls[2][1]).toMatchObject({
       credentials: "same-origin",
-      headers: {
-        "X-Csrf-Token": csrfToken,
-        "X-Studio-Workspace": studio.workspaceId,
-      },
+      method: "PUT",
     });
+    const write = new Headers(fetcher.mock.calls[2][1].headers);
+    expect(write.get("X-Csrf-Token")).toBe(csrfToken);
+    expect(write.get("X-Studio-Workspace")).toBe(studio.workspaceId);
     for (const call of fetcher.mock.calls)
-      expect(call[1].headers ?? {}).not.toHaveProperty("Authorization");
+      expect(new Headers(call[1].headers).has("Authorization")).toBe(false);
   });
 
   it("does not sync when the account session could not be checked", async () => {
@@ -265,9 +267,12 @@ describe("shared Ocharo session", () => {
       expect.objectContaining({
         method: "POST",
         credentials: "same-origin",
-        headers: { "X-Csrf-Token": csrfToken },
+        cache: "no-store",
       }),
     );
+    expect(
+      new Headers(signOut.mock.calls[0][1].headers).get("X-Csrf-Token"),
+    ).toBe(csrfToken);
     expect(getIdentitySession()).toEqual({ authenticated: false });
     expect(seen).toHaveBeenCalledWith({ authenticated: false });
     expect(navigate).toHaveBeenCalledWith(
@@ -297,6 +302,21 @@ describe("shared Ocharo session", () => {
       );
       expect(navigate).toHaveBeenCalledWith("/");
     }
+  });
+
+  it("counts a sign-out whose success body is unreadable as ended and leaves for the app root", async () => {
+    const { getIdentitySession, initializeIdentity, signOutIdentity } =
+      await import("../src/integration/studio/IdentityAccess");
+    await initializeIdentity(vi.fn().mockResolvedValue(response(signedIn())));
+    const navigate = vi.fn();
+    expect(
+      await signOutIdentity(
+        vi.fn().mockResolvedValue(new Response("signed out", { status: 200 })),
+        navigate,
+      ),
+    ).toBe(true);
+    expect(navigate).toHaveBeenCalledWith("/");
+    expect(getIdentitySession()).toEqual({ authenticated: false });
   });
 
   it("keeps the session when Identity refuses or cannot be reached", async () => {

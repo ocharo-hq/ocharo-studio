@@ -12,7 +12,7 @@ import {
   LoaderCircle,
   Save,
   SquarePlus,
-} from "@lucide/vue";
+} from "lucide-vue-next";
 import StudioLookName from "./StudioLookName.vue";
 
 /**

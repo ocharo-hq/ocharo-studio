@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
-import { ArrowRight, Move, Palette, Save } from "@lucide/vue";
+import { ArrowRight, Move, Palette, Save } from "lucide-vue-next";
 import { GARMENTS, MATERIALS } from "../../../domain/studio/catalog";
 import BuildIdentity from "../../common/BuildIdentity.vue";
 import StudioBrand from "../../common/StudioBrand.vue";

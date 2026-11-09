@@ -25,19 +25,20 @@ import {
 export const BuildTimePrefix = "VITE_";
 
 /**
- * Every address Studio's app menu reads, keyed as `/api/runtime-config` serves it; each default is the local-run
- * address. The keys are the suite's, shared with Desk and Catalogue.
+ * Every address Studio's app menu reads, keyed as `/api/runtime-config` serves it. No address is compiled in: the
+ * served settings carry each environment's addresses, a build-time `VITE_` value may stand in, and an app with
+ * neither is left out of the menu. The keys are the suite's, shared with Desk and Catalogue.
  */
 export const OcharoAppsConfigSchema = {
-  OCHARO_DESK_URL: url({ default: "https://localhost:8264/" }),
-  OCHARO_CATALOGUE_URL: url({ default: "https://localhost:8282/catalogues" }),
-  OCHARO_STUDIO_URL: url({ default: "https://localhost:8262/studio" }),
-  OCHARO_MARKETING_URL: url({ default: "https://localhost:8358/" }),
-  OCHARO_EDITORIAL_URL: url({ default: "https://localhost:8284/studio/" }),
-  OCHARO_BRAND_URL: url({ default: "https://localhost:8288/" }),
-  OCHARO_ATLAS_URL: url({ default: "https://localhost:8284/atlas/" }),
-  OCHARO_WEAR_URL: url({ default: "https://localhost:8284/wear/" }),
-  OCHARO_BLOG_URL: url({ default: "https://localhost:8284/" }),
+  OCHARO_DESK_URL: url({ required: false }),
+  OCHARO_CATALOGUE_URL: url({ required: false }),
+  OCHARO_STUDIO_URL: url({ required: false }),
+  OCHARO_MARKETING_URL: url({ required: false }),
+  OCHARO_EDITORIAL_URL: url({ required: false }),
+  OCHARO_BRAND_URL: url({ required: false }),
+  OCHARO_ATLAS_URL: url({ required: false }),
+  OCHARO_WEAR_URL: url({ required: false }),
+  OCHARO_BLOG_URL: url({ required: false }),
 } satisfies ConfigSchema;
 
 /** The resolved addresses, one per schema key. */
@@ -59,7 +60,7 @@ const AppKeys: Readonly<Record<keyof OcharoAppsConfig, OcharoAppKey>> = {
 /** What the operator's console is told when startup could not use every source or value. */
 export const OcharoAppsProblem = {
   Unavailable:
-    "Ocharo app links could not be loaded, so the app menu uses the built-in addresses.",
+    "Ocharo app links could not be loaded, so the app menu shows only the build-time addresses.",
   Rejected:
     "Some Ocharo app links are misconfigured, so the app menu leaves them out.",
 } as const;
@@ -144,7 +145,7 @@ function resolveAddresses(sources: readonly ConfigSource[]): {
   }
 }
 
-/** Reads the served settings once, then resolves every address over the build-time values and local defaults. */
+/** Reads the served settings once, then resolves every address over the build-time values. */
 export async function loadOcharoApps(
   signal: AbortSignal = new AbortController().signal,
 ): Promise<OcharoAppsStartup> {
@@ -192,7 +193,7 @@ export function ocharoAppsPlugin(startup: OcharoAppsStartup): Plugin {
   };
 }
 
-/** The app menu's destinations: the startup resolution, or the build-time values and defaults where none is provided. */
+/** The app menu's destinations: the startup resolution, or the build-time values where none is provided. */
 export function useOcharoApps(): OcharoApp[] {
   return ocharoApps(
     inject(

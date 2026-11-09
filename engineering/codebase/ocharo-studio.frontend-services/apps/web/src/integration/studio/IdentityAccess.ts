@@ -1,3 +1,5 @@
+import { createIdentityApi } from "./IdentityApi";
+
 /** Only CSRF metadata and the person's display identity reach JavaScript; the tokens stay on the app backend. */
 export interface StudioIdentitySession {
   authenticated: boolean;
@@ -61,27 +63,15 @@ export async function signOutIdentity(
 ): Promise<boolean> {
   const current = session;
   if (!current.authenticated || !current.csrfToken) return false;
-  let destination: string | undefined;
-  try {
-    const response = await fetcher("/api/identity/sign-out", {
-      method: "POST",
-      credentials: "same-origin",
-      cache: "no-store",
-      headers: { "X-Csrf-Token": current.csrfToken },
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!response.ok) return false;
-    const body: unknown = await response.json().catch(() => null);
-    const data =
-      body && typeof body === "object" && "data" in body ? body.data : null;
-    destination = safeEndSessionUrl(
-      data && typeof data === "object" && "endSessionUrl" in data
-        ? data.endSessionUrl
-        : undefined,
-    );
-  } catch {
-    return false;
-  }
+  const result = await createIdentityApi(fetcher).signOut(current.csrfToken);
+  // A success whose body is unreadable still ended the session; it only names no end-session page.
+  const ended =
+    result.ok ||
+    (result.failure.code === "protocol" &&
+      result.failure.status >= 200 &&
+      result.failure.status < 300);
+  if (!ended) return false;
+  const destination = safeEndSessionUrl(result.ok ? result.value : undefined);
   settle({ authenticated: false });
   navigate(destination ?? "/");
   return true;
@@ -116,34 +106,25 @@ function displayable(value: unknown, maximum: number): string | undefined {
     ? text
     : undefined;
 }
-function record(value: unknown): Record<string, unknown> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : undefined;
-}
 export async function initializeIdentity(
   fetcher: typeof fetch = fetch,
 ): Promise<StudioIdentitySession> {
   unavailable = true;
-  const response = await fetcher("/api/identity/session", {
-    credentials: "same-origin",
-    cache: "no-store",
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!response.ok)
+  const result = await createIdentityApi(fetcher).readSession();
+  if (!result.ok)
     throw new Error(
-      "The account session could not be checked. Refresh to reconnect.",
+      result.failure.code === "protocol"
+        ? "Invalid account session response."
+        : "The account session could not be checked. Refresh to reconnect.",
     );
-  const value = record(record(await response.json())?.data);
-  if (!value || typeof value.isAuthenticated !== "boolean")
-    throw new Error("Invalid account session response.");
+  const value = result.value;
   if (!value.isAuthenticated) {
     unavailable = false;
     settle({ authenticated: false });
     return session;
   }
   const csrf = value.csrfToken;
-  const person = record(value.person);
+  const person = value.person;
   if (
     typeof csrf !== "string" ||
     csrf.length < 20 ||

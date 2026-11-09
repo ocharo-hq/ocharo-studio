@@ -7,7 +7,7 @@ import {
   Palette,
   PenLine,
   Shirt,
-} from "@lucide/vue";
+} from "lucide-vue-next";
 
 import type { OcharoAppKey } from "../../domain/common/OcharoApps";
 import type { StudioSection } from "../../domain/common/StudioSections";

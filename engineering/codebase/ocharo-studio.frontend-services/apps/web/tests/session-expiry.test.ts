@@ -14,8 +14,7 @@ const state = {
   settings: {},
   materials: {},
 };
-const json = (value: unknown, status = 200) =>
-  new Response(JSON.stringify(value), { status });
+const json = (value: unknown, status = 200) => Response.json(value, { status });
 
 /** Answers the session endpoint and then each state request with the next status. */
 function desk(...statuses: number[]) {

@@ -67,12 +67,17 @@ test("initial storage is acknowledged before cold WebGL preparation", async ({
         request.method === "PUT" &&
         response.ok
       ) {
-        const readBody = response.json.bind(response);
-        response.json = async () => {
-          const body = await readBody();
-          startup.push("storage-acknowledged");
-          return body;
-        };
+        // The SDK client reads the acknowledgement through `text()`; a raw reader would use `json()`.
+        for (const reader of ["json", "text"] as const) {
+          const readBody = response[reader].bind(response);
+          Object.assign(response, {
+            [reader]: async () => {
+              const body = await readBody();
+              startup.push("storage-acknowledged");
+              return body;
+            },
+          });
+        }
       }
       return response;
     };

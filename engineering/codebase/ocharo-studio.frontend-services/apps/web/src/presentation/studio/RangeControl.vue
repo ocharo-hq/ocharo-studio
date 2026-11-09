@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { Component } from "vue";
+import { SliderInput } from "@wow-two-beta/fe/presentation/forms";
 
-/** Labelled range input with coherent pointer and keyboard gesture callbacks. */
+/**
+ * The SDK slider with Studio's label row and one gesture per drag or key run, so a sweep is one undo step. Kept only
+ * for what the SDK `SliderInput` lacks: gesture start/end events (as `PointControl` has) and a value readout.
+ */
 defineOptions({ name: "RangeControl" });
 
 const props = defineProps<{
@@ -33,25 +37,24 @@ function beginFromKeyboard(event: KeyboardEvent) {
         mixed ? "Mixed" : `${step < 1 ? value.toFixed(2) : value}${suffix}`
       }}</output>
     </span>
-    <input
-      type="range"
+    <SliderInput
+      :model-value="value"
+      :min="min"
+      :max="max"
+      :step="step"
       :aria-label="label"
       :aria-valuetext="
         mixed
           ? 'Mixed values; adjusting applies to all selected parts'
           : undefined
       "
-      :value="value"
-      :min="min"
-      :max="max"
-      :step="step"
       @pointerdown="onBegin"
       @pointerup="onEnd"
       @pointercancel="onEnd"
       @blur="onEnd"
       @keydown="beginFromKeyboard"
       @keyup="onEnd"
-      @input="onChange(Number(($event.target as HTMLInputElement).value))"
+      @update:model-value="(next) => onChange(Number(next))"
     />
   </label>
 </template>

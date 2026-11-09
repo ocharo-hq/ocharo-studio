@@ -324,19 +324,16 @@ describe("material library recovery and transport", () => {
       looks: [],
       settings: {},
     };
-    const fetcher = vi.fn(async () => new Response(JSON.stringify(value)));
+    const fetcher = vi.fn(async () => Response.json(value));
     const repo = createServerRepository(fetcher);
     expect((await repo.read()).materials).toEqual({});
-    fetcher.mockImplementation(
-      async () =>
-        new Response(
-          JSON.stringify({
-            ...value,
-            materials: {
-              "atlas-rose": { scale: 20, revision: 1, updatedAt: NOW },
-            },
-          }),
-        ),
+    fetcher.mockImplementation(async () =>
+      Response.json({
+        ...value,
+        materials: {
+          "atlas-rose": { scale: 20, revision: 1, updatedAt: NOW },
+        },
+      }),
     );
     await expect(repo.read()).rejects.toThrow(/Incompatible/);
     const before = fetcher.mock.calls.length;
@@ -349,11 +346,8 @@ describe("material library recovery and transport", () => {
   it("surfaces backend validation details while retaining a fallback for invalid error bodies", async () => {
     const message =
       "Material metadata is required. Reload or upgrade the studio before saving.";
-    const fetcher = vi.fn(
-      async () =>
-        new Response(JSON.stringify({ errors: { materials: [message] } }), {
-          status: 400,
-        }),
+    const fetcher = vi.fn(async () =>
+      Response.json({ errors: { materials: [message] } }, { status: 400 }),
     );
     const repo = createServerRepository(fetcher);
     await expect(repo.read()).rejects.toThrow(

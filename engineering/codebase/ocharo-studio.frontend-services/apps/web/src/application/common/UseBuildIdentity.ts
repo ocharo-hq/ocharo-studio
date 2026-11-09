@@ -1,5 +1,5 @@
 import { onBeforeUnmount, ref } from "vue";
-import { readBuildIdentity } from "../../integration/common/BuildIdentityApi";
+import { buildIdentityApi } from "../../integration/common/BuildIdentityApi";
 
 /** Loads technical About data only on request and cancels when the view closes. */
 export function useBuildIdentity() {
@@ -10,9 +10,9 @@ export function useBuildIdentity() {
   async function refresh(): Promise<void> {
     const current = ++generation;
     backendVersion.value = "Checking…";
-    const version = await readBuildIdentity(controller.signal);
+    const version = await buildIdentityApi.getVersion(controller.signal);
     if (!controller.signal.aborted && current === generation)
-      backendVersion.value = version;
+      backendVersion.value = version.ok ? version.value : "Unavailable";
   }
   return { backendVersion, refresh };
 }

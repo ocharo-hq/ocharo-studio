@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef, watch } from "vue";
-import { Check, Grid2X2, RotateCcw, Scaling, Search } from "@lucide/vue";
+import { Check, Grid2X2, RotateCcw, Scaling, Search } from "lucide-vue-next";
 import { MATERIALS, getGarment } from "../../../domain/studio/catalog";
 import type {
   DesignDocument,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Maximize, Minus, Plus, Scan } from "@lucide/vue";
-import IconButton from "./IconButton.vue";
+import { Maximize, Minus, Plus, Scan } from "lucide-vue-next";
+import { Button } from "@wow-two-beta/fe/presentation/actions";
 
 /** Fixed camera views, zoom, framing, and detail inspection actions. */
 defineOptions({ name: "StudioCameraTools" });
@@ -24,25 +24,45 @@ defineProps<{ scene: SceneApi | null }>();
       </button>
     </div>
     <span class="toolbar-divider" />
-    <IconButton
-      :icon="Minus"
-      label="Zoom out"
-      :on-click="() => scene?.zoom(-0.3)"
-    />
-    <IconButton
-      :icon="Plus"
-      label="Zoom in"
-      :on-click="() => scene?.zoom(0.3)"
-    />
-    <IconButton
-      :icon="Maximize"
-      label="Fit garment"
-      :on-click="() => scene?.reset()"
-    />
-    <IconButton
-      :icon="Scan"
-      label="Inspect fabric detail"
-      :on-click="() => scene?.view('detail')"
-    />
+    <Button
+      class="icon-button"
+      variant="ghost"
+      shape="square"
+      aria-label="Zoom out"
+      title="Zoom out"
+      @click="scene?.zoom(-0.3)"
+    >
+      <Minus :size="18" />
+    </Button>
+    <Button
+      class="icon-button"
+      variant="ghost"
+      shape="square"
+      aria-label="Zoom in"
+      title="Zoom in"
+      @click="scene?.zoom(0.3)"
+    >
+      <Plus :size="18" />
+    </Button>
+    <Button
+      class="icon-button"
+      variant="ghost"
+      shape="square"
+      aria-label="Fit garment"
+      title="Fit garment"
+      @click="scene?.reset()"
+    >
+      <Maximize :size="18" />
+    </Button>
+    <Button
+      class="icon-button"
+      variant="ghost"
+      shape="square"
+      aria-label="Inspect fabric detail"
+      title="Inspect fabric detail"
+      @click="scene?.view('detail')"
+    >
+      <Scan :size="18" />
+    </Button>
   </div>
 </template>

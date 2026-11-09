@@ -1,11 +1,12 @@
 import { AuthStatus, createAuthBridge } from "@wow-two-beta/fe/auth";
 import { expireIdentitySession, signOutIdentity } from "./IdentityAccess";
-export interface StudioSession {
-  workspaceId: string;
-  userId: string;
-  organizationId: string;
-  canEdit: boolean;
-}
+import {
+  createStudioApi,
+  throwIfInterrupted,
+  type StudioSessionDto,
+} from "./StudioApi";
+/** The signed-in person's Ocharo membership, as `/api/studio/session` binds it. */
+export type StudioSession = StudioSessionDto;
 let connectedSession: StudioSession | undefined;
 /** The app's one session bridge: a signed-in session expires once, on its first current 401. */
 export const studioAuth = createAuthBridge<StudioSession>({
@@ -54,31 +55,22 @@ export async function loadStudioSession(
   fetcher: typeof fetch,
   signal?: AbortSignal,
 ): Promise<StudioSession> {
-  const response = await fetcher("/api/studio/session", {
-    credentials: "same-origin",
-    signal,
-  });
-  if (response.status === 401) throw handleUnauthorized();
-  if (response.status === 403)
-    throw new Error(
-      "Your Ocharo account has no role in an organization. Your designs remain in this browser.",
-    );
-  if (!response.ok)
+  const result = await createStudioApi(fetcher).readSession(signal);
+  if (!result.ok) {
+    const { failure } = result;
+    throwIfInterrupted(failure, signal);
+    if (failure.status === 401) throw handleUnauthorized();
+    if (failure.status === 403)
+      throw new Error(
+        "Your Ocharo account has no role in an organization. Your designs remain in this browser.",
+      );
+    if (failure.code === "protocol")
+      throw new Error("Invalid studio session response.");
     throw new Error(
       "Sign in to sync this workspace. Your designs remain in this browser.",
     );
-  const value = (await response.json()) as StudioSession;
-  const uuid =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  if (
-    !value ||
-    !uuid.test(value.workspaceId) ||
-    !uuid.test(value.organizationId) ||
-    typeof value.userId !== "string" ||
-    !value.userId ||
-    typeof value.canEdit !== "boolean"
-  )
-    throw new Error("Invalid studio session response.");
+  }
+  const value = result.value;
   connectedSession = value;
   studioAuth.publishSession({ status: AuthStatus.Authenticated, user: value });
   return value;

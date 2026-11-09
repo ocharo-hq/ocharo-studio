@@ -39,7 +39,9 @@ function httpsTarget(value: string): string {
 }
 
 export default defineConfig(({ command }) => {
-  const useHttps = command === "serve";
+  // Development serves HTTPS through mkcert. `VITE_HTTPS=false` serves plain HTTP for a headless preview (the
+  // workspace's `ocharo-studio-web-http` launch entry, with `VITE_PORT=8263`); Identity sign-in needs the HTTPS origin.
+  const useHttps = command === "serve" && process.env.VITE_HTTPS !== "false";
   const certFile = process.env.STUDIO_TLS_CERT;
   const keyFile = process.env.STUDIO_TLS_KEY;
   if (useHttps && Boolean(certFile) !== Boolean(keyFile))
@@ -66,7 +68,7 @@ export default defineConfig(({ command }) => {
     },
     server: {
       https,
-      port: 8262,
+      port: Number(process.env.VITE_PORT ?? 8262),
       strictPort: true,
       proxy: {
         // Every API route rides this proxy, the Identity session routes too (`/api/identity/session`, `sign-in`, the

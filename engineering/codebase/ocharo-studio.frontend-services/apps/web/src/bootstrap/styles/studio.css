@@ -379,12 +379,11 @@
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
+/* The SDK slider draws its own track and thumb; this only places it under the label row. */
 .range-control input {
   width: 100%;
-  accent-color: var(--accent);
-  height: 4px;
   cursor: pointer;
-  margin: 15px 0 5px;
+  margin: 6px 0 2px;
   display: block;
 }
 .rotation-presets {

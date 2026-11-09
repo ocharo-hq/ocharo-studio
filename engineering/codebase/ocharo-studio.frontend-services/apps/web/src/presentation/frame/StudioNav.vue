@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
-import { House, PanelLeftClose, PanelLeftOpen } from "@lucide/vue";
+import { House, PanelLeftClose, PanelLeftOpen } from "lucide-vue-next";
 import {
   SidebarMenu,
   SidebarMenuItem,
