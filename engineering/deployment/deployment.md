@@ -22,7 +22,7 @@ by digest. A short-lived branch or dispatched commit builds a candidate that rea
 no dev or test branch.
 It uses the repository's own GitHub identity; no owner, remote, or registry credentials are hardcoded.
 
-The frontend lockfile consumes published `@wow-two-beta/fe@0.0.23`; the host pins `WoW2.Sdk.Beta.Be` `10.0.98-beta`.
+The SDK pins live in the manifests: `apps/web/package.json` for the fe SDK, `Directory.Packages.props` for the be SDK.
 
 Sign-in requires HTTPS and `Identity:Client:*`, which the Compose preview does not set, so it no longer boots alone;
 browser-only editing needs no sign-in on any host that does boot.

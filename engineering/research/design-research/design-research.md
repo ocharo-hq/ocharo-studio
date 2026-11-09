@@ -1,6 +1,43 @@
 # Studio interface
 
-*Last updated: 2026-10-21*
+*Last updated: 2026-11-09*
+
+## Screens
+
+| Class | Width | Served | Layout |
+|---|---|---|---|
+| desktop | ≥ 1024px | primary | large central canvas with floating library, part, inspector and camera islands |
+| tablet | 768–1023px | yes | Canvas, Library and Edit part switch; an open sheet reserves the lower screen |
+| phone | < 768px | yes | as tablet, sheets over the lower screen; the frame drops its bottom bar (owner, 2026-10-20) |
+
+The steps answer the editor's own width, so the sidebar rail and an expanded sidebar move them as the viewport would.
+
+## Tokens
+
+Every colour comes from the fe SDK `ocharo` theme (`@wow-two-beta/fe` `themes.css`, `theme-ocharo` on `<html>`);
+`src/bootstrap/styles/tokens.css` maps Studio's short names onto it. Values below are the theme's as of fe `0.0.31`;
+the theme file wins where they differ.
+
+| Studio token | `@wow-two-beta/fe` token | Light | Dark |
+|---|---|---|---|
+| `--canvas` | `--color-background` | `#f5f6fa` | `#141416` |
+| `--paper` | `--color-card` | `#ffffff` | `#1d1d20` |
+| `--ink` | `--color-foreground` | `#181b25` | `#f4f2f5` |
+| `--muted` | `--color-muted-foreground` | `#555e72` | `#b7b3bd` |
+| `--wash` | `--color-muted` | `#eef0f6` | `#262629` |
+| `--line` | `--color-border` | `#dfe3ed` | `#3d3b42` |
+| `--accent` | `--color-primary` | `#8b2459` | `#c24783` |
+| `--on-accent` | `--color-primary-foreground` | `#ffffff` | `#ffffff` |
+| `--accent-soft` | `--color-primary-soft` | `#f8e9f0` | `#392330` |
+| `--accent-ink` | `--color-primary-soft-foreground` | `#892257` | `#e69abc` |
+| `--info` · `--info-soft` | `--color-info` · `--color-info-soft` | `#176d8b` · `#e3f1f9` | `#94c6e1` · `#20333c` |
+| `--success` · `--success-soft` | `--color-success` · `--color-success-soft` | `#426553` · `#e9f0e9` | `#a6cfb4` · `#263d30` |
+| `--warning` · `--warning-soft` | `--color-warning` · `--color-warning-soft` | `#906623` · `#f8efdd` | `#e1bd79` · `#473b25` |
+| `--danger` · `--danger-soft` | `--color-destructive` · `--color-destructive-soft` | `#a0443d` · `#fae9e6` | `#efaaa1` · `#492b28` |
+| `--shadow` | none: a scene neutral | `rgb(24 27 37 / 0.05)` island depth | `rgb(0 0 0 / 0.22)` |
+
+Type: `--font-sans` `"Avenir Next", "Segoe UI", sans-serif`, Studio's own. Shape: the theme's `--radius-md` · `-lg` ·
+`-xl` (`0.625` · `0.875` · `1.25rem`).
 
 ## Direction
 
@@ -43,13 +80,13 @@ sidebar rail and an expanded sidebar move them as the viewport would.
 ## Assets
 
 The six authored GLBs and reproducible authoring script are described in
-[garment-authoring.md](../research/garment-authoring.md). Four original textile studies were generated
+[garment-authoring.md](../garment-authoring.md). Four original textile studies were generated
 with the built-in image tool; exact prompts and provenance are preserved in
 `engineering/codebase/ocharo-studio.frontend-services/apps/web/public/assets/textures/manifest.json`.
 Original PNGs are stored through Git LFS; runtime WebPs are compressed. The current catalogue contains 46 material
-definitions; [catalogue coverage](../research/catalogue-materials.md) records the 21 additional generated texture fields.
+definitions; [catalogue coverage](../catalogue-materials.md) records the 21 additional generated texture fields.
 
-[studio-preview.png](../research/studio-preview.png) shows the verified desktop interface.
+[studio-preview.png](../studio-preview.png) shows the verified desktop interface.
 
 ## Limits
 

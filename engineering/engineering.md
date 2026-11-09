@@ -1,6 +1,6 @@
 # Engineering
 
-*Last updated: 2026-09-26*
+*Last updated: 2026-11-09*
 
 .NET 10, Vue 3, TypeScript, Vite, and Three.js form the single-host application.
 The WebGL editor runs in the browser; the API exposes capability metadata and SQLite-backed workspace state.
@@ -9,5 +9,6 @@ The WebGL editor runs in the browser; the API exposes capability metadata and SQ
 - [Codebase](codebase/codebase.md): solution and frontend package.
 - [Development](development/development.md): local workflow.
 - [Deployment](deployment/deployment.md): container and release workflow.
-- [Planning](research/previous-work/planning.md): implementation sequence.
+- [Planning](planning/backlog.md): backlog and the version track.
+- [Research](research/research.md): analyses, the design spec and preserved evidence.
 - [Operations](operations/operations.md): local runtime ownership and ports.
