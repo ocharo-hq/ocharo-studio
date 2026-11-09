@@ -105,51 +105,56 @@ function publicFiles(blobs: Map<string, Uint8Array>) {
 const listing = (dir: string) => readdir(dir).catch(() => [] as string[]);
 
 describe("garment sync from WoW2 Files", () => {
-  it("writes exactly what the local library mode writes", async () => {
-    const { root, glb, blobs, release, manifestSha } = await library();
-    const local = join(root, "local");
-    const remote = join(root, "remote");
-    await syncFromLibrary({
-      library: glb,
-      output: local,
-      pinPath: join(local, "assetRelease.ts"),
-      log: quiet,
-    });
-    const files = publicFiles(blobs);
-    await syncFromFiles({
-      files: FILES.slice(0, -1),
-      tenant: "ocharo",
-      manifest: manifestSha,
-      release: release.id,
-      output: remote,
-      pinPath: join(remote, "assetRelease.ts"),
-      fetch: files.fetch,
-      log: quiet,
-    });
+  // Both modes process all seven GLBs, which takes seconds on a CI runner.
+  it(
+    "writes exactly what the local library mode writes",
+    { timeout: 30_000 },
+    async () => {
+      const { root, glb, blobs, release, manifestSha } = await library();
+      const local = join(root, "local");
+      const remote = join(root, "remote");
+      await syncFromLibrary({
+        library: glb,
+        output: local,
+        pinPath: join(local, "assetRelease.ts"),
+        log: quiet,
+      });
+      const files = publicFiles(blobs);
+      await syncFromFiles({
+        files: FILES.slice(0, -1),
+        tenant: "ocharo",
+        manifest: manifestSha,
+        release: release.id,
+        output: remote,
+        pinPath: join(remote, "assetRelease.ts"),
+        fetch: files.fetch,
+        log: quiet,
+      });
 
-    expect(files.requested).toEqual([
-      `${FILES}t/ocharo/m/${manifestSha}`,
-      ...[
-        "och-silhouette",
-        "och-model",
-        "och-nimcha",
-        "och-baska",
-        "och-kostyum",
-        "och-korset",
-        "och-abaya",
-      ].map(
-        (id) =>
-          `${FILES}t/ocharo/m/${release.assets.find((asset) => asset.id === id)!.sha256}`,
-      ),
-    ]);
-    const written = (await readdir(local)).sort();
-    expect((await readdir(remote)).sort()).toEqual(written);
-    expect(written).toHaveLength(9);
-    for (const name of written)
-      expect(await readFile(join(remote, name))).toEqual(
-        await readFile(join(local, name)),
-      );
-  });
+      expect(files.requested).toEqual([
+        `${FILES}t/ocharo/m/${manifestSha}`,
+        ...[
+          "och-silhouette",
+          "och-model",
+          "och-nimcha",
+          "och-baska",
+          "och-kostyum",
+          "och-korset",
+          "och-abaya",
+        ].map(
+          (id) =>
+            `${FILES}t/ocharo/m/${release.assets.find((asset) => asset.id === id)!.sha256}`,
+        ),
+      ]);
+      const written = (await readdir(local)).sort();
+      expect((await readdir(remote)).sort()).toEqual(written);
+      expect(written).toHaveLength(9);
+      for (const name of written)
+        expect(await readFile(join(remote, name))).toEqual(
+          await readFile(join(local, name)),
+        );
+    },
+  );
 
   it("refuses a manifest whose bytes differ from its pinned SHA-256", async () => {
     const { root, blobs, manifestSha } = await library();
