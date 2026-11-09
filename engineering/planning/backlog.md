@@ -1,6 +1,6 @@
 # Ocharo Studio — Backlog
 
-*Last updated: 2026-11-05*
+*Last updated: 2026-11-09*
 
 ## Features
 
@@ -21,6 +21,7 @@
 | Material revisions | feature | Variants and immutable comparisons preserve source assets. |
 | Model rendering | product | Choose generated stills or rotatable scenes and exact scene IDs. |
 | Normalized storage | engineering | Design entity APIs before changing existing SQLite snapshots. |
+| PostgreSQL storage | engineering | Studio keeps workspaces in SQLite (`GET /api/studio` reports `storage: sqlite`), which `database.md` bans for products (developer, 2026-10-27); move them to PostgreSQL, with Normalized storage. |
 | Garment extensions | feature | Sizing, length, decorations and outfit composition need authored support. |
 | Production rollout | engineering | Validate actual authenticated deployment and restore procedures. |
 | Session-expiry redirect | engineering | Expiry shows one neutral notice and stays on the page; Studio works signed out. Redirect to sign-in once unsaved material edits survive navigation. |

@@ -511,13 +511,33 @@ function safeName(name: string): string {
   );
 }
 
+/** A saved look's 240×180 thumbnail, filled from the centre of the viewport, so a wide or short viewport (a narrow
+ * window, an open sheet) still frames the garment instead of leaving a thin strip. */
 function makeThumbnail(data: string): string {
   const source = document.querySelector<HTMLCanvasElement>(".viewport canvas");
-  if (!source) return data;
+  if (!source || !source.width || !source.height) return data;
   const canvas = document.createElement("canvas");
   canvas.width = 240;
-  canvas.height = Math.round((240 * source.height) / source.width);
-  canvas.getContext("2d")?.drawImage(source, 0, 0, canvas.width, canvas.height);
+  canvas.height = 180;
+  const scale = Math.max(
+    canvas.width / source.width,
+    canvas.height / source.height,
+  );
+  const width = canvas.width / scale;
+  const height = canvas.height / scale;
+  canvas
+    .getContext("2d")
+    ?.drawImage(
+      source,
+      (source.width - width) / 2,
+      (source.height - height) / 2,
+      width,
+      height,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
   return canvas.toDataURL("image/webp", 0.7);
 }
 
