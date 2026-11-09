@@ -94,12 +94,14 @@ const signedIn = computed(
     Boolean(account.session.value.csrfToken),
 );
 const accountOpen = ref(false);
-/** The person's name and email head the menu; without an email it says where they signed in. */
+/** The person's picture, name and email head the menu; without an email it says where they signed in. */
 const accountIdentity = computed(() => {
   if (!signedIn.value) return {};
-  const { name, email } = account.session.value;
+  const { name, email, picture } = account.session.value;
   return {
     ...(name ? { name } : {}),
+    // The avatar shows the person's initials until the picture loads, or when there is none.
+    avatarSrc: picture ?? null,
     description: email ?? "Signed in with your Ocharo account",
     onSignOut: signOut,
   };

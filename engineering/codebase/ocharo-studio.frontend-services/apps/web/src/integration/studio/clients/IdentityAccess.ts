@@ -8,6 +8,8 @@ export interface StudioIdentitySession {
   name?: string;
   /** The person's current email, while authenticated; absent when Identity sends none. */
   email?: string;
+  /** The person's picture, an absolute HTTPS link from the ID token's `picture`; absent when Identity sends none. */
+  picture?: string;
 }
 let session: StudioIdentitySession = { authenticated: false };
 let unavailable = false;
@@ -97,7 +99,17 @@ export function signInUrl(path: string): string {
   return `/api/identity/sign-in?returnUrl=${encodeURIComponent(url.pathname + url.search + url.hash)}`;
 }
 /** The longest name and email the menu shows, as the backend bounds them. @internal */
-const IdentityLimit = { Name: 200, Email: 256 } as const;
+const IdentityLimit = { Name: 200, Email: 256, Picture: 2048 } as const;
+/** A picture link the avatar may load: an absolute HTTPS address, bounded; anything else shows initials. */
+function pictureLink(value: unknown): string | undefined {
+  const text = displayable(value, IdentityLimit.Picture);
+  if (!text) return undefined;
+  try {
+    return new URL(text).protocol === "https:" ? text : undefined;
+  } catch {
+    return undefined;
+  }
+}
 /** A display value the session may carry: trimmed, non-empty, bounded and free of control characters. */
 function displayable(value: unknown, maximum: number): string | undefined {
   if (typeof value !== "string") return undefined;
@@ -135,12 +147,14 @@ export async function initializeIdentity(
     throw new Error("Invalid account session response.");
   const name = displayable(person.name, IdentityLimit.Name);
   const email = displayable(person.email, IdentityLimit.Email);
+  const picture = pictureLink(person.picture);
   unavailable = false;
   settle({
     authenticated: true,
     csrfToken: csrf,
     ...(name ? { name } : {}),
     ...(email ? { email } : {}),
+    ...(picture ? { picture } : {}),
   });
   return session;
 }

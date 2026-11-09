@@ -26,7 +26,7 @@
 | Pipelines tag pin | engineering | `publish-docker-image.yml` pins `delivery.yml` by SHA `e134a47` because no pipelines tag contains it yet; re-pin to the first tag that does. Covers sweep D-1. |
 | fe sdk: slider gesture events | sdk gap | `SliderInput` (0.0.31) emits no gesture start and end, which Studio's undo grouping needs, and has no labelled value readout; `RangeControl.vue` stays a thin wrapper until a `SliderField` lands. |
 | fe sdk: confirmation host | sdk gap | `useConfirmation` has no component that renders an `AlertModal` from a request; Studio composes it in its Designer page. |
-| fe sdk: re-pin past 0.0.33 | engineering | `ProblemDetailsExtensions` arrived after 0.0.33; Studio reads no problem body yet. `createApiClient` has no per-request `cache`, so Studio passes a `no-store` fetch. |
+| fe sdk: per-request cache | sdk gap | `createApiClient` (0.0.42) has no per-request `cache`, so Studio passes a `no-store` fetch for state reads. |
 | Local launch entries | engineering | The workspace's `.claude/launch.json` lacks `ocharo-studio-web-http` (`VITE_HTTPS=false`, `VITE_PORT=8263`) and the port ledger its 8263 row; both live in wow-two-ws. |
 | Garment extensions | feature | Sizing, length, decorations and outfit composition need authored support. |
 | Production rollout | engineering | Validate actual authenticated deployment and restore procedures. |

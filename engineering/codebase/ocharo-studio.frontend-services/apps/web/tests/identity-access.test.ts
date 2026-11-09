@@ -73,6 +73,35 @@ describe("shared Ocharo session", () => {
     });
   });
 
+  it("carries the person's picture only as an absolute HTTPS link", async () => {
+    const { initializeIdentity } =
+      await import("../src/integration/studio/clients/IdentityAccess");
+    const kept = await initializeIdentity(
+      vi
+        .fn()
+        .mockResolvedValue(
+          response(
+            signedIn({ picture: " https://files.ocharo.example/a.webp " }),
+          ),
+        ),
+    );
+    expect(kept.picture).toBe("https://files.ocharo.example/a.webp");
+    for (const picture of [
+      null,
+      "",
+      "http://files.ocharo.example/a.webp",
+      "javascript:alert(1)",
+      "/relative/a.webp",
+      `https://files.ocharo.example/${"a".repeat(2048)}`,
+      42,
+    ]) {
+      const session = await initializeIdentity(
+        vi.fn().mockResolvedValue(response(signedIn({ picture }))),
+      );
+      expect(session.picture).toBeUndefined();
+    }
+  });
+
   it("reads a session without a name or email, or with null ones, as unnamed", async () => {
     const { initializeIdentity } =
       await import("../src/integration/studio/clients/IdentityAccess");
