@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <!-- wow-two backend SDK (kit): mediator, Result/DomainError, IKeyedEntity, web/problem-details. On nuget.org. -->
-    <PackageVersion Include="WoW2.Sdk.Beta.Be" Version="10.0.107-beta" />
+    <PackageVersion Include="WoW2.Sdk.Beta.Be" Version="10.0.108-beta" />
     <!-- Sign-in through Ocharo's Identity instance: the BFF (session cookie, OIDC code flow with PKCE, X-Csrf-Token). -->
     <PackageVersion Include="WoW2.Sdk.Beta.Be.Identity.Client" Version="10.0.30-beta" />
     <!-- WoW2 Files: the broker contract and its HTTP client, for the saved-look thumbnails. -->
