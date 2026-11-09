@@ -14,6 +14,8 @@ sites:
   studio: {}                            # public: a domain, or Wheelhouse's sslip.io host until one is bound
 services:
   studio:
+    name: Ocharo Studio
+    description: A browser-based 3D studio for composing Uzbek garment looks with per-part textile placement on a mannequin.
     build: { dockerfile: deployment/Dockerfile }
     paths:
       - codebase/ocharo-studio.backend-services/**
