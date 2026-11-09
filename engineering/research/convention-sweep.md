@@ -84,6 +84,32 @@ Not flagged: the Three.js renderer staying framework-independent, English-only U
 | R-2 | `B/tests/` | `development/backend/dotnet/shapes/service/architecture/clean/testing.md:49` | Test folder has no lead doc for prerequisites and coverage | S | no | Add `tests/tests.md` |
 | R-3 | `AGENTS.md:1` | `~/.claude/conventions/tools.md` § AI tooling (personal rule, not WoW2) | Codex loader file; Codex dropped 2026-10-23 | S | no | Delete `AGENTS.md` |
 
+## Resolution
+
+Worked 2026-11-09 in v0.1 iterations 6–13 ([v0.1](../planning/version-track/v0.1/v0.1.md)). `fixed` rows changed code
+or docs; `excepted` rows stay with the reason; open work sits in the [backlog](../planning/backlog.md).
+
+| ids | state | how |
+|---|---|---|
+| S-1, S-2, S-10 | fixed | PostgreSQL in schema `studio` of `ocharo_{env}`, bespoke set `001-workspaces` keyed into Identity, `TimeProvider` in the store; `import-sqlite` copies the old store |
+| S-3, S-4, S-5, S-8, S-9 | fixed | `ServiceHost.RunAsync` and the boot bundle; `/health` and `/health/ready`; `SpaHosting` with `.glb`/`.gltf` types (be sdk `10.0.107-beta`); two `HostConfiguration` files |
+| S-6, S-7 | fixed | `AddControllersWithSdkJson` (the SPA reads a missing `draft` as `null`); `/api/system/version` removed |
+| S-11, S-12 | fixed | `OcharoStudio.Infrastructure` holds the handlers, service and validator; state and thumbnail requests return `AppResult` through `ISender`, collapsed with `.Match`; Files' 502 keeps its status through `StudioErrorHttpStatusCodeMapper` |
+| S-13, S-14 | fixed | controller under `Studio/Controllers/`; HTTP 8261 beside HTTPS 8260 |
+| S-15, S-16, R-2 | fixed | Unit, Integration and E2E projects on AwesomeAssertions, `tests/tests.md` |
+| F-1, F-2, F-8, F-10 | fixed | `lucide-vue-next`; the SDK client with `Result` (`ModelAssets` keeps a plain fetch for a static `.glb`); `VITE_HTTPS=false`; no compiled origins. The `-http` launch entry lives in wow-two-ws: backlog "Local launch entries" |
+| F-9 | fixed, one excepted | three wrappers removed; `RangeControl.vue` stays over `SliderInput`, which has no gesture events or readout: backlog "fe sdk: slider gesture events" |
+| F-3, F-5, F-6 | fixed | PascalCase files; the Designer page as `presentation/studio/pages/StudioPage.vue` with `DesignerView`; `bootstrap/main.ts` |
+| F-4 | fixed, one excepted | role-group folders in every slice and a barrel in `domain/studio`; integration, application and presentation keep no barrel, since importing one would run `createAuthBridge` at startup, before identity loads, instead of when `/studio` opens |
+| F-7, G-2 | fixed | `apple-touch-icon.png` linked; `product/brand/icons/short-colored-{light,dark}.svg` from the favicon artwork, for owner review |
+| D-1 | excepted | no pipelines tag contains `e134a47` yet: backlog "Pipelines tag pin" |
+| D-2, D-3, D-4, D-5 | fixed | `dotnetEnvironment: true`; a `verify` dev check; identity in `deploy.yml`; SDK versions point at the manifests |
+| P-1, P-2, P-3 | fixed | both `planning.md` files removed; `Verification` last; task lines within 75 characters |
+| P-4 | excepted | closing v0.1 needs every check passed and the developer's confirmation (`version-track.md` § Lifecycle); its owner-review checks are open |
+| G-1 | fixed | `research/design-research/design-research.md` opens with `## Screens` and token tables |
+| R-1 | fixed, one excepted | leads for `previous-work/` and `previous-version-notes/`, `previous-product-notes/` removed; `product/features/` keeps no lead, since version-track bans a `features.md` and `capabilities.md` already indexes it |
+| R-3 | fixed | `AGENTS.md` removed |
+
 ## Checked, conforming
 
 Top-level `product/` + `engineering/`; `{slug}.*-services` names; `.slnx` plus both `Directory.*.props`; central package versions; port ledger and `scripts/active.sh` entry; LFS for binaries over 1 MB; `Program.cs` three groups; `descriptor: 2`; `queue: max` without `cancel-in-progress`; `appsettings.Target.json`/`Local.json` ignored in git and docker; `BuildSpa` target and `scripts/deploy.mjs`; pnpm workspace at `apps/web` with one lockfile and `packageManager`; five frontend layers with a boundary lint; `createAppRouter` with titles and not-found; `AppShell`/`AppShellHeader`/`AccountMenu` frame with versions; `/theme.js` pre-paint script and boot splash; `/api/system/status` and `/api/runtime-config` controllers; Identity BFF through the SDK; backlog opens with `Features`.
