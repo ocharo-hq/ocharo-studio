@@ -1,11 +1,11 @@
-vi.mock("../src/integration/studio/IdentityAccess", () => ({
+vi.mock("../src/integration/studio/clients/IdentityAccess", () => ({
   getIdentitySession: () => ({
     authenticated: true,
     csrfToken: "fixture-csrf-token-1234567890",
   }),
   identityUnavailable: () => false,
 }));
-vi.mock("../src/integration/studio/access", () => ({
+vi.mock("../src/integration/studio/clients/StudioAuth", () => ({
   loadStudioSession: async () => ({
     workspaceId: "d0a8c678-c27f-478f-b4e8-c9928bf88c21",
     userId: "fixture-member",
@@ -27,22 +27,18 @@ import {
   selectPart,
   undoStudio,
   updatePlacement,
-} from "../src/application/studio/state";
-import {
-  createDesignDocument,
-  serializeDocument,
-} from "../src/domain/studio/document";
+} from "../src/application/studio/StudioState";
 import {
   countMaterialUses,
+  createDesignDocument,
+  type MaterialScaleLibrary,
   migrateMaterialScales,
-} from "../src/domain/studio/materials";
-import type {
-  MaterialScaleLibrary,
-  TexturePlacement,
-} from "../src/domain/studio/types";
-import { createStudioRepository } from "../src/integration/studio/repository";
-import { createServerRepository } from "../src/integration/studio/serverRepository";
-import { createMemoryJsonStorage } from "../src/integration/studio/storage";
+  serializeDocument,
+  type TexturePlacement,
+} from "../src/domain/studio";
+import { createStudioRepository } from "../src/integration/studio/clients/StudioRepository";
+import { createServerRepository } from "../src/integration/studio/clients/ServerRepository";
+import { createMemoryJsonStorage } from "../src/integration/studio/clients/JsonStorage";
 
 const NOW = "2026-09-26T10:00:00.000Z";
 const scales = (scale = 2): MaterialScaleLibrary => ({

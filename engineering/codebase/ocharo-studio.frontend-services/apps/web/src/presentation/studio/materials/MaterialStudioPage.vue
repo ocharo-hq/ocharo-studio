@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef, watch } from "vue";
 import { Check, Grid2X2, RotateCcw, Scaling, Search } from "lucide-vue-next";
-import { MATERIALS, getGarment } from "../../../domain/studio/catalog";
-import type {
-  DesignDocument,
-  MaterialScaleLibrary,
-  SavedLook,
-} from "../../../domain/studio/types";
-import type { StudioViewportApi } from "../../../application/studio/UseStudioViewport";
-import { useMaterialEditor } from "../../../application/studio/UseMaterialEditor";
+import {
+  type DesignDocument,
+  getGarment,
+  MATERIALS,
+  type MaterialScaleLibrary,
+  type SavedLook,
+} from "../../../domain/studio";
+import type { StudioViewportApi } from "../../../application/studio/hooks/UseStudioViewport";
+import { useMaterialEditor } from "../../../application/studio/hooks/UseMaterialEditor";
 import StudioViewport from "../StudioViewport.vue";
 import RangeControl from "../RangeControl.vue";
 import "./MaterialStudioPage.css";

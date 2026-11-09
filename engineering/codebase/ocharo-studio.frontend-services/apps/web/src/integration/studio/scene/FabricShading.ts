@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import type { AffinePlacement } from "../../../domain/studio/placement";
 import type {
+  AffinePlacement,
   MaterialDefinition,
   MaterialKind,
-} from "../../../domain/studio/types";
+} from "../../../domain/studio";
 
 /** Thread interlacing drawn as a tileable relief under the printed pattern. */
 export type Weave = "plain" | "twill" | "satin" | "rib" | "pile";

@@ -1,8 +1,8 @@
 <script lang="ts">
-import type { DesignDocument, PartId } from "../../domain/studio/types";
-import type { StudioViewportApi } from "../../application/studio/UseStudioViewport";
+import type { DesignDocument, PartId } from "../../domain/studio";
+import type { StudioViewportApi } from "../../application/studio/hooks/UseStudioViewport";
 
-export type { StudioViewportApi } from "../../application/studio/UseStudioViewport";
+export type { StudioViewportApi } from "../../application/studio/hooks/UseStudioViewport";
 
 export interface StudioViewportProps {
   readonly document: DesignDocument;
@@ -33,7 +33,7 @@ const overlayStyle = {
 </script>
 
 <script setup lang="ts">
-import { useStudioViewport } from "../../application/studio/UseStudioViewport";
+import { useStudioViewport } from "../../application/studio/hooks/UseStudioViewport";
 
 /** Renders the interactive garment scene and its loading or recovery state. */
 defineOptions({ name: "StudioViewport" });

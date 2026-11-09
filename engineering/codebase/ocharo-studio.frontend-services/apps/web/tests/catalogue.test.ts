@@ -3,16 +3,14 @@ import { readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
+  CATALOGUE_MATERIALS,
+  type GarmentId,
   GARMENTS,
-  MATERIALS,
   isMaterialApplicable,
-} from "../src/domain/studio/catalog";
-import { CATALOGUE_MATERIALS } from "../src/domain/studio/catalogueMaterialDefinitions";
-import type {
-  GarmentId,
-  MaterialDefinition,
-  MaterialKind,
-} from "../src/domain/studio/types";
+  type MaterialDefinition,
+  type MaterialKind,
+  MATERIALS,
+} from "../src/domain/studio";
 
 interface CatalogueManifest {
   materials: MaterialDefinition[];

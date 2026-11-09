@@ -1,11 +1,11 @@
-vi.mock("../src/integration/studio/IdentityAccess", () => ({
+vi.mock("../src/integration/studio/clients/IdentityAccess", () => ({
   getIdentitySession: () => ({
     authenticated: true,
     csrfToken: "fixture-csrf-token-1234567890",
   }),
   identityUnavailable: () => false,
 }));
-vi.mock("../src/integration/studio/access", () => ({
+vi.mock("../src/integration/studio/clients/StudioAuth", () => ({
   loadStudioSession: async () => ({
     workspaceId: "d0a8c678-c27f-478f-b4e8-c9928bf88c21",
     userId: "fixture-member",
@@ -19,8 +19,8 @@ import {
   StudioSyncQueue,
   createServerRepository,
   type StudioSnapshot,
-} from "../src/integration/studio/serverRepository";
-import { createDesignDocument } from "../src/domain/studio/document";
+} from "../src/integration/studio/clients/ServerRepository";
+import { createDesignDocument } from "../src/domain/studio";
 
 const snapshot = (): StudioSnapshot => ({
   revision: 0,

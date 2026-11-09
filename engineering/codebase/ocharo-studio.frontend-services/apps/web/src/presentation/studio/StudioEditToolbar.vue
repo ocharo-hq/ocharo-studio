@@ -9,7 +9,7 @@ import {
   Undo2,
 } from "lucide-vue-next";
 import { Button } from "@wow-two-beta/fe/presentation/actions";
-import type { GarmentDefinition, PartId } from "../../domain/studio/types";
+import type { GarmentDefinition, PartId } from "../../domain/studio";
 
 /** Multi-part selection and document history controls above the stage. */
 defineOptions({ name: "StudioEditToolbar" });

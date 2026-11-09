@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   shouldInvite,
   type OnboardingRecord,
-} from "../src/application/onboarding/UseStudioOnboarding";
+} from "../src/application/studio/hooks/UseStudioOnboarding";
 
 const NOW = Date.parse("2026-09-25T12:00:00.000Z");
 

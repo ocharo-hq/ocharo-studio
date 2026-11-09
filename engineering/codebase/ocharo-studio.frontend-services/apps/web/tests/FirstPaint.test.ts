@@ -3,8 +3,11 @@ import { resolve } from "node:path";
 import { runInNewContext } from "node:vm";
 import { describe, expect, it } from "vitest";
 import { colorModeScript } from "@wow-two-beta/fe/foundation/primitives";
-import { ThemeMigrationScript, ThemeStorageKey } from "../src/bootstrap/theme";
-import { seedColorMode } from "../src/bootstrap/ColorModeSeed";
+import {
+  ThemeMigrationScript,
+  ThemeStorageKey,
+} from "../src/presentation/common/Theme";
+import { seedColorMode } from "../src/presentation/common/ColorModeSeed";
 
 const root = resolve(process.cwd(), ".");
 /** The `/theme.js` the build emits: Studio's legacy-choice prelude, then the SDK pre-paint script. */

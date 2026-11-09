@@ -17,17 +17,17 @@ import {
   selectPart,
   undoStudio,
   updatePlacement,
-} from "../src/application/studio/state";
+} from "../src/application/studio/StudioState";
 import {
   DEFAULT_PLACEMENT,
   createDesignDocument,
   serializeDocument,
-} from "../src/domain/studio/document";
-import { createStudioRepository } from "../src/integration/studio/repository";
+} from "../src/domain/studio";
+import { createStudioRepository } from "../src/integration/studio/clients/StudioRepository";
 import {
   createLocalJsonStorage,
   createMemoryJsonStorage,
-} from "../src/integration/studio/storage";
+} from "../src/integration/studio/clients/JsonStorage";
 
 describe("studio state", () => {
   it("persists each valid name edit while retaining one undo step", () => {

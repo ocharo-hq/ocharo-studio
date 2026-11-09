@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { GarmentId } from "../../domain/studio/types";
+import type { GarmentId } from "../../domain/studio";
 
 /** Lightweight catalogue silhouette used when a rendered preview is unavailable. */
 defineOptions({ name: "GarmentGlyph" });

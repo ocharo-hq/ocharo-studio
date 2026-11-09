@@ -14,8 +14,8 @@ import {
   type RenderHolder,
   type RenderSize,
   type RenderView,
-} from "../../application/studio/UseFinalRender";
-import type { DesignDocument } from "../../domain/studio/types";
+} from "../../application/studio/hooks/UseFinalRender";
+import type { DesignDocument } from "../../domain/studio";
 
 /** Renders the current look offscreen at print size on the silhouette or the model. */
 defineOptions({ name: "RenderDialog" });

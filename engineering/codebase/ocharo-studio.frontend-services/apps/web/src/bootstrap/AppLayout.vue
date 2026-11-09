@@ -27,7 +27,7 @@ import {
 
 import { useBuildIdentity } from "../application/common/UseBuildIdentity";
 import { useOcharoApps } from "../application/common/UseOcharoApps";
-import { useStudioAccount } from "../application/studio/UseStudioAccount";
+import { useStudioAccount } from "../application/studio/hooks/UseStudioAccount";
 import { OcharoAppKind } from "../domain/common/OcharoApps";
 import { readStudioSection } from "../domain/common/StudioSections";
 import { AppIcons } from "../presentation/frame/ShellIcons";
@@ -37,7 +37,7 @@ import {
   provideStudioFrame,
   StudioFrameBarId,
   type StudioSessionChange,
-} from "./StudioFrame";
+} from "../presentation/common/StudioFrame";
 
 /** The sidebar's widths: full, and the icon rail. @internal */
 const SidebarWidth = { Full: "244px", Rail: "68px" } as const;

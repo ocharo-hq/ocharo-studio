@@ -26,26 +26,38 @@ function permits(from, target) {
 }
 // Guard the rule itself against permitting the forbidden edges it is meant to detect.
 assert.equal(
-  permits("presentation/studio/page.vue", "integration/studio/api.ts"),
+  permits(
+    "presentation/studio/pages/StudioPage.vue",
+    "integration/studio/endpoints/StudioApi.ts",
+  ),
   false,
 );
 assert.equal(
-  permits("domain/studio/model.ts", "application/studio/state.ts"),
+  permits(
+    "domain/studio/models/DesignDocument.ts",
+    "application/studio/StudioState.ts",
+  ),
   false,
 );
 assert.equal(
-  permits("application/studio/hook.ts", "domain/other/model.ts"),
+  permits(
+    "application/studio/hooks/UseStudio.ts",
+    "domain/other/models/Other.ts",
+  ),
   false,
 );
 assert.equal(
-  permits("application/studio/hook.ts", "integration/studio/api.ts"),
+  permits(
+    "application/studio/hooks/UseStudio.ts",
+    "integration/studio/endpoints/StudioApi.ts",
+  ),
   true,
 );
 const sourceRoot = path.resolve("src");
 let imports = 0;
 const failures = [];
 for (const entry of fs.readdirSync(sourceRoot, { recursive: true })) {
-  if (!/\.(ts|vue)$/.test(entry) || entry === "main.ts") continue;
+  if (!/\.(ts|vue)$/.test(entry)) continue;
   const content = fs.readFileSync(path.join(sourceRoot, entry), "utf8");
   const descriptor = entry.endsWith(".vue") ? parse(content).descriptor : null;
   const source = ts.createSourceFile(

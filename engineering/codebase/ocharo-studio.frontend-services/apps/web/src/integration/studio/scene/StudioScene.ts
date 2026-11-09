@@ -1,11 +1,18 @@
-import { loadVerifiedModel } from "../modelAssets";
+import { loadVerifiedModel } from "../clients/ModelAssets";
 import * as THREE from "three";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-import { DEFAULT_PLACEMENT } from "../../../domain/studio/document";
-import { materialTransform } from "../../../domain/studio/placement";
+import {
+  DEFAULT_PLACEMENT,
+  type DesignDocument,
+  getGarment,
+  getMaterial,
+  type MaterialDefinition,
+  materialTransform,
+  type PartId,
+} from "../../../domain/studio";
 import { findSurfaceAnchor, mapSurfaceCoordinates } from "./SurfaceCoordinates";
 import {
   createFabricMaterial,
@@ -21,12 +28,6 @@ import {
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import type {
-  DesignDocument,
-  MaterialDefinition,
-  PartId,
-} from "../../../domain/studio/types";
-import { getGarment, getMaterial } from "../../../domain/studio/catalog";
 
 export type ViewPreset = "front" | "back" | "side" | "detail";
 

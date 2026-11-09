@@ -21,7 +21,7 @@ const state = {
 /** Signs the cached account state in, as startup does for a returning visitor. */
 async function signIn() {
   const { initializeIdentity } =
-    await import("../src/integration/studio/IdentityAccess");
+    await import("../src/integration/studio/clients/IdentityAccess");
   await initializeIdentity(
     vi.fn().mockResolvedValue(
       json({
@@ -42,7 +42,7 @@ describe("Studio session boundary", () => {
   it("uses the server-owned workspace and the session cookie without a bearer", async () => {
     await signIn();
     const { createServerRepository } =
-      await import("../src/integration/studio/serverRepository");
+      await import("../src/integration/studio/clients/ServerRepository");
     const fetcher = vi
       .fn()
       .mockResolvedValueOnce(json(session))
@@ -61,7 +61,7 @@ describe("Studio session boundary", () => {
 
   it("keeps browser-only data local and stops on revoked membership", async () => {
     const { createServerRepository } =
-      await import("../src/integration/studio/serverRepository");
+      await import("../src/integration/studio/clients/ServerRepository");
     const fetcher = vi.fn();
     await expect(createServerRepository(fetcher).read()).rejects.toThrow(
       /Browser-only/,
@@ -79,8 +79,9 @@ describe("Studio session boundary", () => {
   it("rejects a member with no organization role without expiring the session", async () => {
     await signIn();
     const { createServerRepository } =
-      await import("../src/integration/studio/serverRepository");
-    const { studioAuth } = await import("../src/integration/studio/access");
+      await import("../src/integration/studio/clients/ServerRepository");
+    const { studioAuth } =
+      await import("../src/integration/studio/clients/StudioAuth");
     const unauthorized = vi.fn();
     studioAuth.subscribeUnauthorized(unauthorized);
     await expect(
@@ -91,7 +92,7 @@ describe("Studio session boundary", () => {
 
   it("rejects a malformed Studio session", async () => {
     const { loadStudioSession } =
-      await import("../src/integration/studio/access");
+      await import("../src/integration/studio/clients/StudioAuth");
     for (const value of [
       { ...session, workspaceId: "not-a-uuid" },
       { ...session, userId: "" },
@@ -105,7 +106,7 @@ describe("Studio session boundary", () => {
   it("aborts before a state request after cancelled authorization", async () => {
     await signIn();
     const { createServerRepository } =
-      await import("../src/integration/studio/serverRepository");
+      await import("../src/integration/studio/clients/ServerRepository");
     const abort = new AbortController();
     const fetcher = vi.fn(async () => {
       abort.abort();
@@ -119,7 +120,7 @@ describe("Studio session boundary", () => {
 
   it("settles the bridge anonymous after an Identity sign-out", async () => {
     await signIn();
-    const access = await import("../src/integration/studio/access");
+    const access = await import("../src/integration/studio/clients/StudioAuth");
     await access.loadStudioSession(vi.fn(async () => json(session)));
     expect(access.studioAuth.getSession().status).toBe(
       AuthStatus.Authenticated,

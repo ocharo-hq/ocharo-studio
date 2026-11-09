@@ -18,7 +18,7 @@ import type {
   MaterialDefinition,
   PartId,
   TexturePlacement,
-} from "../../domain/studio/types";
+} from "../../domain/studio";
 import RangeControl from "./RangeControl.vue";
 
 /** Per-part material and pattern placement controls. */

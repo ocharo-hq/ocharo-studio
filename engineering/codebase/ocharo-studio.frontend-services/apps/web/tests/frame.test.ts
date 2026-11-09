@@ -14,9 +14,9 @@ import {
   ocharoAppsPlugin,
 } from "../src/application/common/UseOcharoApps";
 import AppRouter from "../src/bootstrap/AppRouter.vue";
-import { createStudioRouter } from "../src/bootstrap/router";
-import { MATERIALS } from "../src/domain/studio/catalog";
-import { initializeIdentity } from "../src/integration/studio/IdentityAccess";
+import { createStudioRouter } from "../src/bootstrap/StudioRouter";
+import { MATERIALS } from "../src/domain/studio";
+import { initializeIdentity } from "../src/integration/studio/clients/IdentityAccess";
 
 /** The informational version the stubbed `/api/system/status` reports: a release and the commit it was built from. */
 const ApiVersion = "0.1.4+8f2c1d9e4b7a";

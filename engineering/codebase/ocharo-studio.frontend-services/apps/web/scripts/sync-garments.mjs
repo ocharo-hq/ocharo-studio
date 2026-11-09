@@ -355,9 +355,12 @@ if (
   const pinPath =
     argument("--pin") ??
     (argument("--output")
-      ? join(output, "assetRelease.ts")
+      ? join(output, "ModelRelease.ts")
       : fileURLToPath(
-          new URL("../src/domain/studio/assetRelease.ts", import.meta.url),
+          new URL(
+            "../src/domain/studio/constants/ModelRelease.ts",
+            import.meta.url,
+          ),
         ));
   const libraryRoot = argument("--from") ?? process.env.OCHARO_3D_LIBRARY;
   const files =

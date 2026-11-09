@@ -1,13 +1,11 @@
 import { describe, it, expect } from "vitest";
 import {
-  DEFAULT_PLACEMENT,
   createDesignDocument,
-  migrateDocument,
-} from "../src/domain/studio/document";
-import {
+  DEFAULT_PLACEMENT,
   materialTransform,
+  migrateDocument,
   sampleMaterial,
-} from "../src/domain/studio/placement";
+} from "../src/domain/studio";
 import {
   createStudioState,
   updatePlacement,
@@ -15,9 +13,9 @@ import {
   beginDocumentGesture,
   endDocumentGesture,
   applyMaterial,
-} from "../src/application/studio/state";
-import { createStudioRepository } from "../src/integration/studio/repository";
-import { createMemoryJsonStorage } from "../src/integration/studio/storage";
+} from "../src/application/studio/StudioState";
+import { createStudioRepository } from "../src/integration/studio/clients/StudioRepository";
+import { createMemoryJsonStorage } from "../src/integration/studio/clients/JsonStorage";
 
 describe("anchored placement", () => {
   for (const rotation of [-180, -90, 0, 45, 90, 180]) {

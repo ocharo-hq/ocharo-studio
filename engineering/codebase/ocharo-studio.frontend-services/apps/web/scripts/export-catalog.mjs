@@ -25,7 +25,7 @@ function load(file) {
   new Function("exports", "require", source)(exports, require);
   return exports;
 }
-const catalog = load(path.join(root, "src/domain/studio/catalog.ts"));
+const catalog = load(path.join(root, "src/domain/studio/constants/Catalog.ts"));
 const contract = {
   garments: catalog.GARMENTS.map((garment) => ({
     id: garment.id,

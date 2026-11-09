@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
-vi.mock("../src/integration/studio/serverRepository", () => ({
+vi.mock("../src/integration/studio/clients/ServerRepository", () => ({
   getWorkspaceId: () => "d0a8c678-c27f-478f-b4e8-c9928bf88c21",
 }));
 import {
   canonicalJson,
   contentHash,
   createCreativeHandoff,
-} from "../src/integration/studio/creativeHandoff";
-import { createDesignDocument } from "../src/domain/studio/document";
+} from "../src/integration/studio/clients/CreativeHandoff";
+import { createDesignDocument } from "../src/domain/studio";
 const png = () =>
   new Blob(
     [

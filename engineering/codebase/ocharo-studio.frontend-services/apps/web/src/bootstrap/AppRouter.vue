@@ -3,7 +3,7 @@ import { RouterView } from "vue-router";
 import { ColorModeProvider } from "@wow-two-beta/fe/foundation/primitives";
 import { AppErrorBoundary, RouteAnnouncer } from "@wow-two-beta/fe/router";
 import RouteMessage from "./RouteMessage.vue";
-import { ThemeStorageKey } from "./theme";
+import { ThemeStorageKey } from "../presentation/common/Theme";
 
 /**
  * Composes the one colour mode, shared route recovery, initial loading and accessible route announcements around the

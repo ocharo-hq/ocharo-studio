@@ -20,13 +20,14 @@ import {
   SkeletonStateGroup,
   SkeletonStateSlot,
 } from "@wow-two-beta/fe/presentation/feedback";
-import type { StudioLibraryStatus } from "../../application/studio/UseStudioPersistence";
-import { GARMENTS, getGarment } from "../../domain/studio/catalog";
-import type {
-  GarmentId,
-  MaterialDefinition,
-  SavedLook,
-} from "../../domain/studio/types";
+import type { StudioLibraryStatus } from "../../application/studio/hooks/UseStudioPersistence";
+import {
+  type GarmentId,
+  GARMENTS,
+  getGarment,
+  type MaterialDefinition,
+  type SavedLook,
+} from "../../domain/studio";
 import GarmentGlyph from "./GarmentGlyph.vue";
 
 /** Keyboard-operable garment, textile, and saved-look library. */

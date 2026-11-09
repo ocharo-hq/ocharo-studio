@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createDesignDocument } from "../src/domain/studio/document";
+import { createDesignDocument } from "../src/domain/studio";
 import {
   applyMaterial,
   beginDocumentGesture,
@@ -13,7 +13,7 @@ import {
   selectPart,
   undoStudio,
   updatePlacement,
-} from "../src/application/studio/state";
+} from "../src/application/studio/StudioState";
 
 const initial = () => createStudioState(createDesignDocument("kostyum"));
 

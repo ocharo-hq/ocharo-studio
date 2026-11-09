@@ -1,24 +1,30 @@
-vi.mock("../src/integration/studio/IdentityAccess", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/integration/studio/IdentityAccess")
-  >()),
-  getIdentitySession: () => ({
-    authenticated: true,
-    csrfToken: "fixture-csrf-token-1234567890",
+vi.mock(
+  "../src/integration/studio/clients/IdentityAccess",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("../src/integration/studio/clients/IdentityAccess")
+    >()),
+    getIdentitySession: () => ({
+      authenticated: true,
+      csrfToken: "fixture-csrf-token-1234567890",
+    }),
+    identityUnavailable: () => false,
   }),
-  identityUnavailable: () => false,
-}));
-vi.mock("../src/integration/studio/access", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/integration/studio/access")
-  >()),
-  loadStudioSession: async () => ({
-    workspaceId: "d0a8c678-c27f-478f-b4e8-c9928bf88c21",
-    userId: "fixture-member",
-    organizationId: "f74556b7-caf8-41db-a25c-030d1f7d7987",
-    canEdit: true,
+);
+vi.mock(
+  "../src/integration/studio/clients/StudioAuth",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("../src/integration/studio/clients/StudioAuth")
+    >()),
+    loadStudioSession: async () => ({
+      workspaceId: "d0a8c678-c27f-478f-b4e8-c9928bf88c21",
+      userId: "fixture-member",
+      organizationId: "f74556b7-caf8-41db-a25c-030d1f7d7987",
+      canEdit: true,
+    }),
   }),
-}));
+);
 import {
   computed,
   effectScope,
@@ -32,7 +38,7 @@ const cache = vi.hoisted(() => ({
   values: new Map<string, unknown>(),
   writable: true,
 }));
-vi.mock("../src/integration/studio/storage", () => ({
+vi.mock("../src/integration/studio/clients/JsonStorage", () => ({
   createLocalJsonStorage: () => ({
     read: <T>(key: string): T | undefined => {
       const value = cache.values.get(key);
@@ -51,15 +57,17 @@ vi.mock("../src/integration/studio/storage", () => ({
 import {
   useStudio,
   type StudioControls,
-} from "../src/application/studio/UseStudio";
+} from "../src/application/studio/hooks/UseStudio";
 import {
   useStudioOnboarding,
   type OnboardingRecord,
-} from "../src/application/onboarding/UseStudioOnboarding";
-import { createDesignDocument } from "../src/domain/studio/document";
-import type { DesignDocument } from "../src/domain/studio/types";
-import { createStudioRepository } from "../src/integration/studio/repository";
-import type { StudioSnapshot } from "../src/integration/studio/serverRepository";
+} from "../src/application/studio/hooks/UseStudioOnboarding";
+import {
+  createDesignDocument,
+  type DesignDocument,
+} from "../src/domain/studio";
+import { createStudioRepository } from "../src/integration/studio/clients/StudioRepository";
+import type { StudioSnapshot } from "../src/integration/studio/clients/ServerRepository";
 
 const scopes: EffectScope[] = [];
 const empty = (

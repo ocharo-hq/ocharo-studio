@@ -36,7 +36,7 @@ describe("shared Ocharo session", () => {
     const storage = { setItem: vi.fn(), removeItem: vi.fn() };
     vi.stubGlobal("sessionStorage", storage);
     const { initializeIdentity, getIdentitySession } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     await initializeIdentity(
       vi.fn().mockResolvedValue(
         response({
@@ -54,7 +54,7 @@ describe("shared Ocharo session", () => {
 
   it("carries the person's name and email while authenticated", async () => {
     const { initializeIdentity, getIdentitySession } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     await initializeIdentity(
       vi.fn().mockResolvedValue(
         response(
@@ -75,7 +75,7 @@ describe("shared Ocharo session", () => {
 
   it("reads a session without a name or email, or with null ones, as unnamed", async () => {
     const { initializeIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     for (const person of [{}, { name: null, email: null }]) {
       const session = await initializeIdentity(
         vi.fn().mockResolvedValue(response(signedIn(person))),
@@ -86,7 +86,7 @@ describe("shared Ocharo session", () => {
 
   it("drops a name or email that is blank, oversized, not text or holds control characters", async () => {
     const { initializeIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     for (const [name, email] of [
       ["   ", ""],
       ["a".repeat(201), `${"a".repeat(250)}@ocharo.example`],
@@ -103,7 +103,7 @@ describe("shared Ocharo session", () => {
 
   it("names no one in a session that is not signed in, and forgets the name on sign-out", async () => {
     const { getIdentitySession, initializeIdentity, signOutIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     const anonymous = await initializeIdentity(
       vi.fn().mockResolvedValue(
         response({
@@ -131,9 +131,9 @@ describe("shared Ocharo session", () => {
 
   it("adds cookie credentials and CSRF only to writes of the signed-in session", async () => {
     const { initializeIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     const { createServerRepository } =
-      await import("../src/integration/studio/serverRepository");
+      await import("../src/integration/studio/clients/ServerRepository");
     await initializeIdentity(vi.fn().mockResolvedValue(response(signedIn())));
     const fetcher = vi
       .fn()
@@ -167,9 +167,9 @@ describe("shared Ocharo session", () => {
 
   it("does not sync when the account session could not be checked", async () => {
     const { initializeIdentity, identityUnavailable } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     const { createServerRepository } =
-      await import("../src/integration/studio/serverRepository");
+      await import("../src/integration/studio/clients/ServerRepository");
     await expect(
       initializeIdentity(vi.fn().mockResolvedValue(response({}, 503))),
     ).rejects.toThrow(/checked/);
@@ -183,7 +183,7 @@ describe("shared Ocharo session", () => {
 
   it("rejects malformed sessions and authenticated sessions without a person or CSRF", async () => {
     const { initializeIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     for (const data of [
       { isAuthenticated: true, person: { sub: "user-a" } },
       { isAuthenticated: true, csrfToken },
@@ -199,9 +199,9 @@ describe("shared Ocharo session", () => {
 
   it("stays browser-only without a session", async () => {
     const { initializeIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     const { createServerRepository } =
-      await import("../src/integration/studio/serverRepository");
+      await import("../src/integration/studio/clients/ServerRepository");
     await initializeIdentity(vi.fn().mockResolvedValue(response(signedOut)));
     const fetcher = vi.fn();
     await expect(createServerRepository(fetcher).read()).rejects.toThrow(
@@ -212,11 +212,11 @@ describe("shared Ocharo session", () => {
 
   it("keeps reader work local and signs an ended account session out once", async () => {
     const { getIdentitySession, initializeIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     const { StudioSessionExpired, studioAuth } =
-      await import("../src/integration/studio/access");
+      await import("../src/integration/studio/clients/StudioAuth");
     const { createServerRepository } =
-      await import("../src/integration/studio/serverRepository");
+      await import("../src/integration/studio/clients/ServerRepository");
     await initializeIdentity(vi.fn().mockResolvedValue(response(signedIn())));
     const readerFetch = vi
       .fn()
@@ -249,7 +249,7 @@ describe("shared Ocharo session", () => {
       initializeIdentity,
       signOutIdentity,
       subscribeIdentitySession,
-    } = await import("../src/integration/studio/IdentityAccess");
+    } = await import("../src/integration/studio/clients/IdentityAccess");
     await initializeIdentity(vi.fn().mockResolvedValue(response(signedIn())));
     const seen = vi.fn();
     const stop = subscribeIdentitySession(seen);
@@ -286,7 +286,7 @@ describe("shared Ocharo session", () => {
 
   it("leaves for the app root when the end-session address is missing or unsafe", async () => {
     const { initializeIdentity, signOutIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     for (const endSessionUrl of [
       undefined,
       "javascript:alert(1)",
@@ -306,7 +306,7 @@ describe("shared Ocharo session", () => {
 
   it("counts a sign-out whose success body is unreadable as ended and leaves for the app root", async () => {
     const { getIdentitySession, initializeIdentity, signOutIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     await initializeIdentity(vi.fn().mockResolvedValue(response(signedIn())));
     const navigate = vi.fn();
     expect(
@@ -321,7 +321,7 @@ describe("shared Ocharo session", () => {
 
   it("keeps the session when Identity refuses or cannot be reached", async () => {
     const { getIdentitySession, initializeIdentity, signOutIdentity } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     await initializeIdentity(vi.fn().mockResolvedValue(response(signedIn())));
     const navigate = vi.fn();
     expect(
@@ -342,7 +342,7 @@ describe("shared Ocharo session", () => {
 
   it("returns only local destinations to the backend redirect handler", async () => {
     const { signInUrl } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     expect(signInUrl("/studio/materials?tab=fabric")).toBe(
       "/api/identity/sign-in?returnUrl=%2Fstudio%2Fmaterials%3Ftab%3Dfabric",
     );
@@ -361,7 +361,7 @@ describe("shared Ocharo session", () => {
 
   it("does not carry a failed sign-in mark into the next sign-in", async () => {
     const { signInUrl, hasSignInError } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     expect(hasSignInError("?signInError=1")).toBe(true);
     expect(hasSignInError("?tab=fabric")).toBe(false);
     expect(signInUrl("/studio?signInError=1&tab=fabric")).toBe(

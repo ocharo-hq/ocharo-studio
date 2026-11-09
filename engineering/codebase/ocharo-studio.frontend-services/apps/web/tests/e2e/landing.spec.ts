@@ -421,7 +421,7 @@ test("failed lazy editor imports expose a recoverable route error", async ({
 }) => {
   await suppressOnboarding(page);
   const editorModule =
-    /\/(?:src\/bootstrap\/App\.vue|assets\/App-[^/]+\.js)(?:\?.*)?$/;
+    /\/(?:src\/presentation\/studio\/pages\/StudioPage\.vue|assets\/StudioPage-[^/]+\.js)(?:\?.*)?$/;
   await page.route(editorModule, (route) => route.abort());
   await page.goto("/");
   await page

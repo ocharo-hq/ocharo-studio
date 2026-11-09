@@ -27,7 +27,7 @@ function desk(...statuses: number[]) {
 
 async function connect() {
   const { initializeIdentity } =
-    await import("../src/integration/studio/IdentityAccess");
+    await import("../src/integration/studio/clients/IdentityAccess");
   await initializeIdentity(
     vi.fn().mockResolvedValue(
       json({
@@ -40,9 +40,9 @@ async function connect() {
       }),
     ),
   );
-  const access = await import("../src/integration/studio/access");
+  const access = await import("../src/integration/studio/clients/StudioAuth");
   const { createServerRepository } =
-    await import("../src/integration/studio/serverRepository");
+    await import("../src/integration/studio/clients/ServerRepository");
   const expired = vi.fn();
   const unauthorized = vi.fn();
   access.studioAuth.subscribeExpired(expired);
@@ -110,7 +110,7 @@ describe("Studio session expiry", () => {
 
   it("settles an Ocharo sign-out anonymous without an expiry notice", async () => {
     const { getIdentitySession } =
-      await import("../src/integration/studio/IdentityAccess");
+      await import("../src/integration/studio/clients/IdentityAccess");
     const studio = await connect();
     await studio.loadStudioSession(vi.fn().mockResolvedValue(json(session)));
     expect(studio.studioAuth.getSession().status).toBe(

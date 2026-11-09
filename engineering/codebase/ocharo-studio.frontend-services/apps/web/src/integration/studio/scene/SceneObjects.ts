@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { PartId } from "../../../domain/studio/types";
+import type { PartId } from "../../../domain/studio";
 
 const PART_IDS = new Set<PartId>(["body", "collar", "sleeves", "trim", "belt"]);
 

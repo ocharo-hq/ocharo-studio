@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MaterialKind } from "../src/domain/studio/types";
-import { MATERIALS } from "../src/domain/studio/catalog";
+import { MaterialKind, MATERIALS } from "../src/domain/studio";
 import {
   fabricFinish,
   WEAVE_CELLS,

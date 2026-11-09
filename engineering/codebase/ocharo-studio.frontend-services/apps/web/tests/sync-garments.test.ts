@@ -116,7 +116,7 @@ describe("garment sync from WoW2 Files", () => {
       await syncFromLibrary({
         library: glb,
         output: local,
-        pinPath: join(local, "assetRelease.ts"),
+        pinPath: join(local, "ModelRelease.ts"),
         log: quiet,
       });
       const files = publicFiles(blobs);
@@ -126,7 +126,7 @@ describe("garment sync from WoW2 Files", () => {
         manifest: manifestSha,
         release: release.id,
         output: remote,
-        pinPath: join(remote, "assetRelease.ts"),
+        pinPath: join(remote, "ModelRelease.ts"),
         fetch: files.fetch,
         log: quiet,
       });
@@ -168,7 +168,7 @@ describe("garment sync from WoW2 Files", () => {
         tenant: "ocharo",
         manifest: manifestSha,
         output,
-        pinPath: join(output, "assetRelease.ts"),
+        pinPath: join(output, "ModelRelease.ts"),
         fetch: publicFiles(blobs).fetch,
         log: quiet,
       }),
@@ -187,7 +187,7 @@ describe("garment sync from WoW2 Files", () => {
         tenant: "ocharo",
         manifest: manifestSha,
         output,
-        pinPath: join(output, "assetRelease.ts"),
+        pinPath: join(output, "ModelRelease.ts"),
         fetch: publicFiles(served).fetch,
         log: quiet,
       });
@@ -216,7 +216,7 @@ describe("garment sync from WoW2 Files", () => {
         manifest: manifestSha,
         release: "ocharo-garments@3.0.0",
         output,
-        pinPath: join(output, "assetRelease.ts"),
+        pinPath: join(output, "ModelRelease.ts"),
         fetch: publicFiles(blobs).fetch,
         log: quiet,
       }),
@@ -231,7 +231,7 @@ describe("garment sync from WoW2 Files", () => {
       files: FILES,
       tenant: "ocharo",
       output,
-      pinPath: join(output, "assetRelease.ts"),
+      pinPath: join(output, "ModelRelease.ts"),
       fetch: files.fetch,
       log: quiet,
     };

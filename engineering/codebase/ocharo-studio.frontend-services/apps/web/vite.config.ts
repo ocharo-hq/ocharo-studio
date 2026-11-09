@@ -6,7 +6,10 @@ import mkcert from "vite-plugin-mkcert";
 import tailwindcss from "@tailwindcss/vite";
 import { readFileSync } from "node:fs";
 import { colorModeScript } from "@wow-two-beta/fe/foundation/primitives";
-import { ThemeMigrationScript, ThemeStorageKey } from "./src/bootstrap/theme";
+import {
+  ThemeMigrationScript,
+  ThemeStorageKey,
+} from "./src/presentation/common/Theme";
 
 /**
  * Serves and emits `/theme.js`: Studio's legacy-choice prelude, then the SDK's pre-paint colour script, so a dark

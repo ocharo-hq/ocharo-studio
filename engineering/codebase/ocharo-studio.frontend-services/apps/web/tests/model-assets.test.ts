@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it, vi } from "vitest";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { loadVerifiedModel } from "../src/integration/studio/modelAssets";
+import { loadVerifiedModel } from "../src/integration/studio/clients/ModelAssets";
 describe("pinned geometry", () => {
   it("parses only exact released bytes", async () => {
     const original = await readFile(

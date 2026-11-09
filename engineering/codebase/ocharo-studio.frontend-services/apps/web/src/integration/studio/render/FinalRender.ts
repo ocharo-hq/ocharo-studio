@@ -1,4 +1,4 @@
-import { loadVerifiedModel } from "../modelAssets";
+import { loadVerifiedModel } from "../clients/ModelAssets";
 import * as THREE from "three";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
@@ -6,10 +6,13 @@ import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { DEFAULT_PLACEMENT } from "../../../domain/studio/document";
-import { materialTransform } from "../../../domain/studio/placement";
-import { getGarment, getMaterial } from "../../../domain/studio/catalog";
-import type { DesignDocument } from "../../../domain/studio/types";
+import {
+  DEFAULT_PLACEMENT,
+  type DesignDocument,
+  getGarment,
+  getMaterial,
+  materialTransform,
+} from "../../../domain/studio";
 import {
   createFabricMaterial,
   dressHolderCloth,
