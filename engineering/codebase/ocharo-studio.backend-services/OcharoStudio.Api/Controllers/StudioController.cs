@@ -13,7 +13,8 @@ namespace OcharoStudio.Api.Controllers;
 public sealed class StudioController(
     ISender sender,
     StudioStateService stateService,
-    StudioStateValidator stateValidator) : ControllerBase
+    StudioStateValidator stateValidator,
+    IStudioThumbnailStore thumbnails) : ControllerBase
 {
     /// <summary>Returns product, document schema, storage boundary, and supported operations.</summary>
     [HttpGet]
@@ -68,7 +69,21 @@ public sealed class StudioController(
             return ValidationProblem(new ValidationProblemDetails(
                 new Dictionary<string, string[]> { ["state"] = [.. errors] }) { Status = StatusCodes.Status400BadRequest });
 
-        var result = await stateService.PutAsync(member.WorkspaceId, request, ct);
+        StudioStateWriteResult result;
+        try
+        {
+            result = await stateService.PutAsync(member.WorkspaceId, request, ct);
+        }
+        catch (StudioFilesException failure)
+        {
+            return Problem(statusCode: failure.Status, title: failure.Message);
+        }
+        if (result.Failure == StudioStateWriteFailure.ThumbnailUnknown)
+            return ValidationProblem(new ValidationProblemDetails(
+                new Dictionary<string, string[]>
+                {
+                    ["thumbnail"] = ["A thumbnail link names a file this workspace does not hold."]
+                }) { Status = StatusCodes.Status400BadRequest });
         if (result.Failure == StudioStateWriteFailure.MaterialsRequired)
             return ValidationProblem(new ValidationProblemDetails(
                 new Dictionary<string, string[]>
@@ -80,6 +95,30 @@ public sealed class StudioController(
             return Problem(statusCode: StatusCodes.Status409Conflict, title: "Revision conflict");
 
         return Ok(result.State);
+    }
+
+    /// <summary>Links to a saved look's thumbnail in WoW2 Files: a redirect to a short-lived link, for a member whose workspace
+    /// state holds the thumbnail (the same rule as the state itself), cached privately for less than the link lives.</summary>
+    [Authorize]
+    [HttpGet("thumbnails/{sha256}/{fileId:guid}")]
+    public async Task<IActionResult> GetThumbnail(string sha256, Guid fileId, CancellationToken ct)
+    {
+        if (SelectedMember(null) is not { } member) return Forbid();
+        var route = StudioThumbnailRoute.Url(sha256, fileId);
+        if (!thumbnails.Enabled || !StudioThumbnailRoute.TryParse(route, out _, out _)
+            || !await stateService.HoldsThumbnailAsync(member.WorkspaceId, route, ct))
+            return NotFound();
+
+        try
+        {
+            if (await thumbnails.LinkAsync(fileId, ct) is not { } link) return NotFound();
+            Response.Headers.CacheControl = "private, max-age=300";
+            return Redirect(link.AbsoluteUri);
+        }
+        catch (StudioFilesException failure)
+        {
+            return Problem(statusCode: failure.Status, title: failure.Message);
+        }
     }
 
     /// <summary>The session's member, unless the request names another workspace: the header selects only the authenticated one.</summary>

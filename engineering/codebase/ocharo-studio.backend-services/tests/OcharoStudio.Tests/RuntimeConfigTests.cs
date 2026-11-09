@@ -160,7 +160,7 @@ internal sealed class StudioHost : IAsyncDisposable
 
     public WebApplicationFactory<Program> Factory { get; }
 
-    public static StudioHost Create(IReadOnlyDictionary<string, string?> settings, bool realCookieScheme = false)
+    public static StudioHost Create(IReadOnlyDictionary<string, string?> settings, bool realCookieScheme = false, Action<IServiceCollection>? configure = null)
     {
         var root = Path.Combine(Path.GetTempPath(), "ocharo-studio-host-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(Path.Combine(root, "wwwroot"));
@@ -177,6 +177,7 @@ internal sealed class StudioHost : IAsyncDisposable
                 services.RemoveAll<StudioDatabaseSettings>();
                 services.AddSingleton(new StudioDatabaseSettings($"Data Source={Path.Combine(root, "studio.db")};Pooling=False"));
                 if (!realCookieScheme) StudioTestIdentity.Use(services);
+                configure?.Invoke(services);
             });
         });
         return new StudioHost(root, factory);

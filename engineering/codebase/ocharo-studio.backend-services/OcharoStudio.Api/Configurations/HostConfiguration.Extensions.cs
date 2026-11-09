@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.StaticFiles;
 using OcharoStudio.Api.RuntimeConfig.Settings;
+using OcharoStudio.Api.Studio.Thumbnails;
 using OcharoStudio.Application;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
+using WoW.Two.Sdk.Beta.Be.Files.Client;
 using WoW.Two.Sdk.Beta.Be.Foundation.Configuration;
 using WoW.Two.Sdk.Beta.Be.Foundation.Options;
 using WoW.Two.Sdk.Beta.Be.Identity.Bff;
@@ -38,9 +40,43 @@ public static partial class HostConfiguration
         builder.Services.AddSingleton(new StudioDatabaseSettings(connectionString));
         builder.Services.AddScoped<IStudioStateStore, SqliteStudioStateStore>();
         builder.Services.AddMediator(typeof(ApplicationAssembly).Assembly);
+        builder.AddStudioThumbnails();
         builder.Services.AddScoped<StudioStateService>();
         builder.Services.AddSingleton(StudioCatalogContract.LoadEmbedded());
         builder.Services.AddSingleton<StudioStateValidator>();
+        return builder;
+    }
+
+    /// <summary>Holds the root URL of the WoW2 Files instance Studio stores saved-look thumbnails in; unset, they stay data
+    /// URLs inside the state.</summary>
+    private const string FilesBaseUrlKey = "Files:BaseUrl";
+
+    /// <summary>Registers the thumbnail store: WoW2 Files over HTTP when <see cref="FilesBaseUrlKey"/> is set, by tokens of
+    /// Studio's own Identity client exchanged for the signed-in person (the BFF session), else none. Read at resolve time,
+    /// so a test host's settings decide (planning/files-adoption.md #12).</summary>
+    private static WebApplicationBuilder AddStudioThumbnails(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddFilesClient(_ => { });
+        builder.Services.AddOptions<FilesClientOptions>().Configure<IConfiguration>((files, configuration) =>
+        {
+            if (configuration[FilesBaseUrlKey] is not { Length: > 0 } url)
+                return;
+            files.BaseAddress = new Uri(url);
+            if (!Uri.TryCreate(configuration["Identity:Client:Authority"], UriKind.Absolute, out var authority))
+                return;
+            files.Identity = new FilesClientIdentityOptions
+            {
+                TokenEndpoint = new Uri(authority, "connect/token"),
+                ClientId = configuration["Identity:Client:ClientId"] ?? string.Empty,
+                ClientSecret = configuration["Identity:Client:ClientSecret"] ?? string.Empty,
+            };
+        });
+        builder.Services.AddScoped<FilesStudioThumbnailStore>();
+        builder.Services.AddSingleton<DisabledStudioThumbnailStore>();
+        builder.Services.AddScoped<IStudioThumbnailStore>(provider =>
+            provider.GetRequiredService<IConfiguration>()[FilesBaseUrlKey] is { Length: > 0 }
+                ? provider.GetRequiredService<FilesStudioThumbnailStore>()
+                : provider.GetRequiredService<DisabledStudioThumbnailStore>());
         return builder;
     }
 

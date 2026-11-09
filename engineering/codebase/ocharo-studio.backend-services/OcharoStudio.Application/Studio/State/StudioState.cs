@@ -18,5 +18,6 @@ public sealed record StudioStateWriteResult(
 public enum StudioStateWriteFailure
 {
     RevisionConflict,
-    MaterialsRequired
+    MaterialsRequired,
+    ThumbnailUnknown
 }

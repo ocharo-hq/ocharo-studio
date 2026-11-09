@@ -31,6 +31,9 @@ services:
         Identity:Client:CookieName: { default: __Host-ocharo-studio }
         Identity:Client:SignalUrl: { from: { repository: platform, key: Identity:Server:Clients:5:SignalUrl } }
         Identity:Client:PostSignOutRedirectPath: { default: "/" }
+        # Saved-look thumbnails live in WoW2 Files, tenant `ocharo` on the shared files host, reached with the same client
+        # through the member's exchanged token; linked to the Uri ocharo-platform types for its Files resource.
+        Files:BaseUrl: { from: { repository: platform, key: Identity:Server:Resources:2:Uri } }
         # The Ocharo app menu, served anonymously at /api/runtime-config; an unset key leaves that app out.
         OcharoApps:Desk: { type: url }
         OcharoApps:Catalogue: { type: url }
