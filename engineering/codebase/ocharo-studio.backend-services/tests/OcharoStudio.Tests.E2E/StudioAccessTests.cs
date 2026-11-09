@@ -11,6 +11,9 @@ using AwesomeAssertions;
 using Xunit;
 using static OcharoStudio.Tests.E2E.StudioTestIdentity;
 
+using OcharoStudio.Persistence;
+using Microsoft.Extensions.Caching.Distributed;
+using WoW.Two.Sdk.Beta.Be.Caching.Postgres;
 namespace OcharoStudio.Tests.E2E;
 
 /// <summary>
@@ -290,17 +293,19 @@ public sealed class StudioAccessTests
     }
 
     [Fact]
-    public async Task KeyRing_ShouldLiveBesideTheDatabase_UnlessKeysPathNamesAnother()
+    public async Task KeyRingAndSessions_ShouldLiveInTheProductDatabase_SoARestartKeepsThem()
     {
-        await using var byDefault = StudioHost.Create(new Dictionary<string, string?>());
-        var elsewhere = Path.Combine(Path.GetTempPath(), "ocharo-studio-keys", Guid.NewGuid().ToString("N"));
-        await using var named = StudioHost.Create(new Dictionary<string, string?> { ["DataProtection:KeysPath"] = elsewhere });
+        var settings = StudioTestIdentity.Settings();
+        await using var first = StudioHost.Create(settings);
+        await using var restarted = StudioHost.Create(settings);
 
-        KeyRingFolder(byDefault).Should().Be(Path.Combine(byDefault.Root, "keys"));
-        KeyRingFolder(named).Should().Be(elsewhere);
-        // The first session's CSRF token creates the key, on disk.
-        using var client = await SignedIn(byDefault.Factory, Editor);
-        Directory.GetFiles(Path.Combine(byDefault.Root, "keys"), "key-*.xml").Should().NotBeEmpty();
+        first.Factory.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.XmlRepository.Should().BeOfType<PostgresXmlRepository>();
+        first.Factory.Services.GetRequiredService<IDistributedCache>().Should().BeOfType<PostgresDistributedCache>();
+        // The first session's CSRF token creates the key, in the database the next host reads.
+        using var client = await SignedIn(first.Factory, Editor);
+        restarted.Factory.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.XmlRepository.GetAllElements().Should().NotBeEmpty();
+        await first.Factory.Services.GetRequiredService<IDistributedCache>().SetStringAsync("session-probe", "kept");
+        (await restarted.Factory.Services.GetRequiredService<IDistributedCache>().GetStringAsync("session-probe")).Should().Be("kept");
     }
 
     [Theory]
@@ -337,11 +342,6 @@ public sealed class StudioAccessTests
         string.IsNullOrWhiteSpace(problem.GetProperty("requestId").GetString()).Should().BeFalse();
     }
 
-    private static string KeyRingFolder(StudioHost host)
-    {
-        var repository = host.Factory.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.XmlRepository;
-        return repository.Should().BeOfType<FileSystemXmlRepository>().Which.Directory.FullName;
-    }
 
     private static Task<HttpResponseMessage> Forged(HttpClient client, string token)
     {

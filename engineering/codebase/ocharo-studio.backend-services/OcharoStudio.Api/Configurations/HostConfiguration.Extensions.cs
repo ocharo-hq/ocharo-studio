@@ -1,12 +1,17 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.AspNetCore.DataProtection.Repositories;
-using Microsoft.Extensions.Logging.Abstractions;
 using OcharoStudio.Api.RuntimeConfig.Settings;
 using OcharoStudio.Api.Studio.Thumbnails;
 using OcharoStudio.Application;
 using OcharoStudio.Application.Studio.State;
+using Npgsql;
+using OcharoStudio.Api.Studio.Health;
 using OcharoStudio.Persistence;
+using OcharoStudio.Persistence.Import;
+using WoW.Two.Sdk.Beta.Be.Caching.Postgres;
+using WoW.Two.Sdk.Beta.Be.Data.Abstractions;
+using WoW.Two.Sdk.Beta.Be.Data.EntityFrameworkCore;
+using WoW.Two.Sdk.Beta.Be.Data.Migrations.Bespoke;
 using WoW.Two.Sdk.Beta.Be.Files.Client;
 using WoW.Two.Sdk.Beta.Be.Foundation.Options;
 using WoW.Two.Sdk.Beta.Be.Identity.Bff;
@@ -31,6 +36,7 @@ public static partial class HostConfiguration
         {
             options.ServiceName = "OcharoStudio";
             options.TrustProxiesFrom(builder.Configuration.GetSection("Deployment"));
+            options.ReadinessEndpointPath = "/health/ready";
             options.SpaHosting = spa =>
             {
                 spa.ImmutableAssetsPath = string.Empty;
@@ -39,15 +45,39 @@ public static partial class HostConfiguration
             };
         });
 
-    /// <summary>Registers Studio state storage, document capabilities, services and validation.</summary>
+    /// <summary>Registers Studio's PostgreSQL storage in the product database (<c>ConnectionStrings:Database</c>, filled per
+    /// target by Wheelhouse): the <c>studio</c> migration set, keyed into Identity's accounts and organizations, the state
+    /// store, its readiness check, and the import of the retired SQLite store; then the state services and validation.</summary>
     private static WebApplicationBuilder AddStudio(this WebApplicationBuilder builder)
     {
-        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION")
-            ?? builder.Configuration.GetConnectionString("Studio")
-            ?? "Data Source=appdata/ocharo-studio.db;Cache=Shared;Default Timeout=5";
+        // The configured string, not the data source's: a data source drops the password from its own copy.
+        static string ConnectionString(IServiceProvider provider) =>
+            provider.GetRequiredService<IConfiguration>().GetConnectionString(StudioDatabaseConstants.ConnectionStringName)
+            ?? throw new InvalidOperationException($"ConnectionStrings:{StudioDatabaseConstants.ConnectionStringName} is required.");
+        builder.Services.AddSingleton(provider => NpgsqlDataSource.Create(ConnectionString(provider)));
+        builder.Services.AddKeyedSingleton<IDbConnectionFactory>(StudioDatabaseConstants.MigrationSetName, static (provider, _) =>
+            new DataSourceConnectionFactory(provider.GetRequiredService<NpgsqlDataSource>()));
+        builder.Services.AddKeyedSingleton(StudioDatabaseConstants.MigrationSetName, static (provider, _) =>
+            new DatabaseSettings { ConnectionString = ConnectionString(provider) });
+        builder.Services.AddDatabaseBespokeMigrationSet(
+            StudioDatabaseConstants.MigrationSetName,
+            static _ => new EmbeddedResourceMigrationBroker(typeof(PostgresStudioStateStore).Assembly, StudioDatabaseConstants.MigrationResourcePrefix),
+            static migration =>
+            {
+                migration.SchemaName = StudioDatabaseConstants.Schema;
+                migration.SchemaOwner = "product";
+                migration.AdvisoryLockId = StudioDatabaseConstants.AdvisoryLockId;
+                migration.Version = BuildIdentity.MigrationVersion;
+                migration.Release = BuildIdentity.MigrationRelease;
+                migration.DependsOn(StudioDatabaseConstants.IdentitySetName, StudioDatabaseConstants.IdentityLevel);
+            });
+        builder.Services.AddSingleton<IStudioStateStore, PostgresStudioStateStore>();
+        builder.Services.AddHealthChecks().AddCheck<StudioDatabaseReadinessCheck>("studio-database", tags: ["ready"]);
 
-        builder.Services.AddSingleton(new StudioDatabaseSettings(connectionString));
-        builder.Services.AddScoped<IStudioStateStore, SqliteStudioStateStore>();
+        builder.Services.AddSingleton(provider =>
+            provider.GetRequiredService<IConfiguration>().GetSection(LegacySqliteSettings.SectionName).Get<LegacySqliteSettings>() ?? new LegacySqliteSettings());
+        builder.Services.AddSingleton<LegacySqliteImport>();
+
         builder.Services.AddMediator(typeof(ApplicationAssembly).Assembly);
         builder.AddStudioThumbnails();
         builder.Services.AddScoped<StudioStateService>();
@@ -57,21 +87,22 @@ public static partial class HostConfiguration
     }
 
     /// <summary>Registers sign-in through Ocharo's Identity instance (BFF, section <c>Identity:Client</c>, required at boot)
-    /// and the Data Protection key ring that encrypts the sessions.</summary>
-    /// <remarks>The BFF keeps sessions in the SDK default, the in-memory distributed cache: Studio stores in SQLite and no
-    /// SQLite <c>IDistributedCache</c> exists, so a restart or deploy signs everyone out once. The key ring persists to
-    /// <c>DataProtection:KeysPath</c>, else <c>keys</c> beside the SQLite database, on a deployed host's data volume.</remarks>
+    /// and the Data Protection key ring that encrypts the sessions, both in the product database, so a restart or deploy
+    /// keeps everyone signed in.</summary>
+    /// <remarks>The BFF keeps sessions in <c>IDistributedCache</c>: the be sdk's PostgreSQL cache in schema
+    /// <c>studio_cache</c>, apart from Desk's <c>cache</c>, its <c>distributed_cache</c> set migrating beside Studio's own.
+    /// The key ring lives in <c>studio.data_protection_keys</c>.</remarks>
     private static WebApplicationBuilder AddStudioAccess(this WebApplicationBuilder builder)
     {
         builder.Services.AddIdentityBff();
-        // Resolve final configuration after test/deployment overrides have been applied.
-        builder.Services.AddDataProtection();
-        builder.Services.AddOptions<KeyManagementOptions>().Configure<IConfiguration, StudioDatabaseSettings>((options, configuration, database) =>
+        builder.Services.AddPostgresDistributedCache(options =>
         {
-            var path = configuration["DataProtection:KeysPath"];
-            if (string.IsNullOrWhiteSpace(path)) path = Path.Combine(database.DataDirectory ?? "appdata", "keys");
-            options.XmlRepository = new FileSystemXmlRepository(new DirectoryInfo(Path.GetFullPath(path)), NullLoggerFactory.Instance);
+            options.ConnectionString = builder.Configuration.GetConnectionString(StudioDatabaseConstants.ConnectionStringName) ?? string.Empty;
+            options.Schema = StudioDatabaseConstants.CacheSchema;
         });
+        builder.Services.AddDataProtection();
+        builder.Services.AddOptions<KeyManagementOptions>().Configure<NpgsqlDataSource>((options, dataSource) =>
+            options.XmlRepository = new PostgresXmlRepository(dataSource));
         builder.Services.AddOptions<DataProtectionOptions>().Configure<IConfiguration, IHostEnvironment>((options, configuration, environment) =>
             options.ApplicationDiscriminator = configuration["DataProtection:ApplicationName"] ?? $"ocharo-studio:{environment.EnvironmentName}");
         return builder;

@@ -2,7 +2,6 @@ using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -156,7 +155,7 @@ internal sealed class StudioHost : IAsyncDisposable
         Factory = factory;
     }
 
-    /// <summary>The host's content root, beside its database and key ring.</summary>
+    /// <summary>The host's content root, holding its SPA shell.</summary>
     public string Root { get; }
 
     public WebApplicationFactory<Program> Factory { get; }
@@ -175,8 +174,6 @@ internal sealed class StudioHost : IAsyncDisposable
             builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(configuration));
             builder.ConfigureServices(services =>
             {
-                services.RemoveAll<StudioDatabaseSettings>();
-                services.AddSingleton(new StudioDatabaseSettings($"Data Source={Path.Combine(root, "studio.db")};Pooling=False"));
                 if (!realCookieScheme) StudioTestIdentity.Use(services);
                 configure?.Invoke(services);
             });
@@ -187,7 +184,6 @@ internal sealed class StudioHost : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await Factory.DisposeAsync();
-        SqliteConnection.ClearAllPools();
         try { Directory.Delete(Root, true); } catch (IOException) { }
     }
 }

@@ -92,7 +92,7 @@ definitions; [catalogue coverage](../catalogue-materials.md) records the 21 addi
 
 These garments are fixed-size visual interpretations. Physical cloth simulation, fit guarantees, pattern drafting,
 sizing, length editing, decorative overlays, and arbitrary attachment placement are outside this release.
-Looks are stored in SQLite under a browser-held workspace UUID with a local recovery cache. JSON files provide
+Looks are stored in PostgreSQL under a browser-held workspace UUID with a local recovery cache. JSON files provide
 transfer and backup. The UUID grants no account identity or authorization; collaborative editing is not implemented.
 
 ## Landing and editor separation

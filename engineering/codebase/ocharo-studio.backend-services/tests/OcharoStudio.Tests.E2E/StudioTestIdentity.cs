@@ -11,6 +11,9 @@ using Microsoft.Extensions.Options;
 using WoW.Two.Sdk.Beta.Be.Identity.Bff;
 using WoW.Two.Sdk.Beta.Be.Identity.Core.Organizations;
 
+using OcharoStudio.Tests.Support;
+using WoW.Two.Sdk.Beta.Be.Data.Migrations.Bespoke;
+
 namespace OcharoStudio.Tests.E2E;
 
 /// <summary>
@@ -47,12 +50,15 @@ internal static class StudioTestIdentity
     private static readonly Dictionary<string, Person> People = new[] { Editor, SecondEditor, EditorElsewhere, Viewer, Pinned, Unaffiliated, RoleLess, RoleElsewhere }
         .ToDictionary(person => person.Key, StringComparer.Ordinal);
 
-    /// <summary>Settings that satisfy <c>Identity:Client</c> validation without any network call to the authority.</summary>
+    /// <summary>Settings that satisfy <c>Identity:Client</c> validation without any network call to the authority, and a
+    /// fresh product database per call, migrated as the deploy step leaves it.</summary>
     public static Dictionary<string, string?> Settings() => new()
     {
         ["Identity:Client:Authority"] = "https://identity.example.test/",
         ["Identity:Client:ClientId"] = "studio",
         ["Identity:Client:CookieName"] = CookieName,
+        ["ConnectionStrings:Database"] = StudioTestDatabase.CreateAsync().GetAwaiter().GetResult(),
+        [MigrationConstants.OwnerInstanceConfigurationKey] = StudioTestDatabase.OwnerInstance,
     };
 
     /// <summary>Replaces the BFF cookie scheme's handler with the cookie-driven test handler.</summary>

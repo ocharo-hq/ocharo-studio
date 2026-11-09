@@ -1,7 +1,6 @@
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.IdentityModel.JsonWebTokens;
+using OcharoStudio.Application.Studio.State;
 using WoW.Two.Sdk.Beta.Be.Identity.Core.Organizations;
 
 namespace OcharoStudio.Api.Studio.Access;
@@ -28,8 +27,7 @@ public static class StudioAccess
     }
 
     /// <summary>Separates each member's designs inside their authorized organization.</summary>
-    public static Guid WorkspaceFor(Guid organizationId, string userId) => new(
-        SHA256.HashData(Encoding.UTF8.GetBytes($"ocharo-studio/v1\n{organizationId:D}\n{userId}")).AsSpan(0, 16));
+    public static Guid WorkspaceFor(Guid organizationId, string userId) => StudioWorkspace.IdFor(organizationId, userId);
 }
 
 /// <summary>A session's member of its active organization, with the workspace that holds their designs.</summary>

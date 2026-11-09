@@ -1,6 +1,6 @@
 # Ocharo Studio
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-11-09*
 
 A 3D creative studio for exploring Uzbek clothing on a mannequin with selectable garment parts and editable fabric placement.
 
@@ -11,7 +11,7 @@ The repository contains a running browser studio with one fixed mannequin and fi
 built-in details. The generated catalogue supports per-part material choice, rotation, scale, offsets, and anchored
 pattern placement.
 
-Signed-in looks persist in SQLite under the session's organization and member, with browser recovery.
+Signed-in looks persist in PostgreSQL under the session's organization and member, with browser recovery.
 Without signing in, the editor keeps designs in this browser and supports explicit JSON backup.
 They can be saved as independent copies, reopened, exported as portable JSON, or captured as PNG previews.
 The responsive editor uses floating island controls around a WebGL canvas. The `/` landing page introduces the
@@ -103,7 +103,7 @@ organization; saving needs `studio:edit`. A supplied `X-Studio-Workspace` UUID m
 ## Boundaries
 
 Garment assets are authored visual interpretations, not exact catalogue replicas. The app does not simulate cloth,
-prove fit, resize garments, or generate sewing patterns. SQLite remains unencrypted. Platform owns identity;
+prove fit, resize garments, or generate sewing patterns. Studio does not encrypt stored state. Platform owns identity;
 Studio validates current access and owns independently editable designs. Collaborative editing is outside this build.
 Portable JSON remains the user-controlled transfer format. No source catalogue media or secrets are copied into this repository.
 

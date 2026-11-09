@@ -1,34 +1,60 @@
 using System.Text.Json;
-using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.DependencyInjection;
+using AwesomeAssertions;
+using Npgsql;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
-using AwesomeAssertions;
+using OcharoStudio.Tests.Support;
 using Xunit;
 
 namespace OcharoStudio.Tests.Integration;
 
-/// <summary>Exercises durable, isolated optimistic state storage against a real SQLite file.</summary>
-public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
+/// <summary>Exercises durable, isolated optimistic state storage against a real PostgreSQL database.</summary>
+public sealed class PostgresStudioStateStoreTests : IAsyncLifetime
 {
-    private readonly string path = Path.Combine(
-        Path.GetTempPath(),
-        $"ocharo-studio-{Guid.NewGuid():N}.db");
-    private ServiceProvider services = null!;
-    private StudioDatabaseSettings settings = null!;
+    private NpgsqlDataSource dataSource = null!;
 
-    public async Task InitializeAsync()
+    public async Task InitializeAsync() => dataSource = NpgsqlDataSource.Create(await StudioTestDatabase.CreateAsync());
+
+    public async Task DisposeAsync() => await dataSource.DisposeAsync();
+
+    private PostgresStudioStateStore Store() => new(dataSource, TimeProvider.System);
+
+    /// <summary>A workspace in a seeded Identity organization, by a subject that is no Identity account id.</summary>
+    private static StudioWorkspace Owned(Guid workspace) => new(workspace, StudioTestDatabase.Organizations[0], "member-sub");
+
+    [Fact]
+    public async Task PutAsync_ShouldKeyTheWorkspaceToItsIdentityOrganizationAndAccount()
     {
-        settings = new StudioDatabaseSettings($"Data Source={path};Pooling=False");
-        services = new ServiceCollection().AddSingleton(settings).BuildServiceProvider();
-        await services.InitializeStudioDatabaseAsync();
+        var workspace = StudioWorkspace.For(StudioTestDatabase.Organizations[2], StudioTestDatabase.Users[0].ToString("D"));
+
+        (await Store().PutAsync(workspace, State(0, "keyed"), CancellationToken.None)).State.Should().NotBeNull();
+
+        await using var command = dataSource.CreateCommand("SELECT organization_id, user_id FROM studio.workspaces WHERE workspace_id = $1");
+        command.Parameters.AddWithValue(workspace.Id);
+        await using var reader = await command.ExecuteReaderAsync();
+        (await reader.ReadAsync()).Should().BeTrue();
+        reader.GetGuid(0).Should().Be(StudioTestDatabase.Organizations[2]);
+        reader.GetGuid(1).Should().Be(StudioTestDatabase.Users[0]);
     }
 
-    public Task DisposeAsync()
+    [Fact]
+    public async Task PutAsync_ShouldRefuseAnOrganizationIdentityDoesNotHold()
     {
-        services.Dispose();
-        if (File.Exists(path)) File.Delete(path);
-        return Task.CompletedTask;
+        var act = () => Store().PutAsync(new StudioWorkspace(Guid.NewGuid(), Guid.NewGuid(), "member-sub"), State(0, "orphan"), CancellationToken.None);
+
+        (await act.Should().ThrowAsync<PostgresException>()).Which.SqlState.Should().Be(PostgresErrorCodes.ForeignKeyViolation);
+    }
+
+    [Fact]
+    public async Task DataProtectionKeys_ShouldRoundTripAndKeepTheFirstCopyOfAName()
+    {
+        var keys = new PostgresXmlRepository(dataSource);
+
+        keys.StoreElement(System.Xml.Linq.XElement.Parse("<key id=\"a\"/>"), "key-a");
+        keys.StoreElement(System.Xml.Linq.XElement.Parse("<key id=\"a2\"/>"), "key-a");
+        keys.StoreElement(System.Xml.Linq.XElement.Parse("<key id=\"b\"/>"), "key-b");
+
+        keys.GetAllElements().Select(element => element.Attribute("id")!.Value).Should().Equal("a", "b");
     }
 
     [Fact]
@@ -36,20 +62,20 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
     {
         var workspace = Guid.NewGuid();
         var initial = State(0, "first");
-        var saved = await new SqliteStudioStateStore(settings)
-            .PutAsync(workspace, initial, CancellationToken.None);
+        var saved = await Store()
+            .PutAsync(Owned(workspace), initial, CancellationToken.None);
 
         (saved.State?.Revision).Should().Be(1);
-        var reloaded = await new SqliteStudioStateStore(settings)
+        var reloaded = await Store()
             .GetAsync(workspace, CancellationToken.None);
         reloaded.Settings.GetProperty("theme").GetString().Should().Be("first");
         reloaded.Materials.Should().NotBeNull();
         reloaded.Materials.Value.GetProperty("catalogue-atlas-paisley-ivory-on-black").GetProperty("scale").GetDouble().Should().Be(1.5);
 
-        var conflict = await new SqliteStudioStateStore(settings)
-            .PutAsync(workspace, State(0, "stale"), CancellationToken.None);
+        var conflict = await Store()
+            .PutAsync(Owned(workspace), State(0, "stale"), CancellationToken.None);
         conflict.State.Should().BeNull();
-        var preserved = await new SqliteStudioStateStore(settings)
+        var preserved = await Store()
             .GetAsync(workspace, CancellationToken.None);
         preserved.Revision.Should().Be(1);
         preserved.Settings.GetProperty("theme").GetString().Should().Be("first");
@@ -62,8 +88,8 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
     {
         var firstWorkspace = Guid.NewGuid();
         var secondWorkspace = Guid.NewGuid();
-        var store = new SqliteStudioStateStore(settings);
-        await store.PutAsync(firstWorkspace, State(0, "private"), CancellationToken.None);
+        var store = Store();
+        await store.PutAsync(Owned(firstWorkspace), State(0, "private"), CancellationToken.None);
 
         var isolated = await store.GetAsync(secondWorkspace, CancellationToken.None);
 
@@ -80,8 +106,8 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
     {
         var legacy = State(0, "legacy") with { Materials = null };
 
-        var saved = await new SqliteStudioStateStore(settings)
-            .PutAsync(Guid.NewGuid(), legacy, CancellationToken.None);
+        var saved = await Store()
+            .PutAsync(Owned(Guid.NewGuid()), legacy, CancellationToken.None);
 
         (saved.State?.Materials).Should().NotBeNull();
         saved.State.Materials.Value.EnumerateObject().Should().BeEmpty();
@@ -91,15 +117,15 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
     public async Task PutAsync_ShouldRejectLegacyWriteWithoutErasingExistingMaterials()
     {
         var workspace = Guid.NewGuid();
-        var store = new SqliteStudioStateStore(settings);
-        var saved = await store.PutAsync(workspace, State(0, "current"), CancellationToken.None);
+        var store = Store();
+        var saved = await store.PutAsync(Owned(workspace), State(0, "current"), CancellationToken.None);
         var legacyWrite = saved.State! with
         {
             Settings = JsonSerializer.SerializeToElement(new { theme = "legacy-write" }),
             Materials = null
         };
 
-        var rejected = await store.PutAsync(workspace, legacyWrite, CancellationToken.None);
+        var rejected = await store.PutAsync(Owned(workspace), legacyWrite, CancellationToken.None);
         var preserved = await store.GetAsync(workspace, CancellationToken.None);
 
         rejected.State.Should().BeNull();
@@ -109,43 +135,6 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
                 .GetProperty("catalogue-atlas-paisley-ivory-on-black")
                 .GetProperty("scale")
                 .GetDouble().Should().Be(1.5);
-    }
-
-    [Fact]
-    public async Task InitializeStudioDatabaseAsync_ShouldAddMaterialsWithoutChangingExistingRows()
-    {
-        await services.DisposeAsync();
-        if (File.Exists(path)) File.Delete(path);
-        await using (var connection = new SqliteConnection(settings.ConnectionString))
-        {
-            await connection.OpenAsync();
-            await using var command = connection.CreateCommand();
-            command.CommandText =
-                """
-                CREATE TABLE studio_workspaces (
-                    workspace_id TEXT PRIMARY KEY NOT NULL,
-                    revision INTEGER NOT NULL,
-                    state_json TEXT NOT NULL,
-                    updated_at TEXT NOT NULL
-                );
-                INSERT INTO studio_workspaces (workspace_id, revision, state_json, updated_at)
-                VALUES ('0c645d1c-576a-43b8-a8d2-b75eb892014d', 7,
-                    '{"draft":null,"looks":[],"settings":{"theme":"legacy"}}',
-                    '2026-09-25T00:00:00.000Z');
-                """;
-            await command.ExecuteNonQueryAsync();
-        }
-        services = new ServiceCollection().AddSingleton(settings).BuildServiceProvider();
-
-        await services.InitializeStudioDatabaseAsync();
-        var state = await new SqliteStudioStateStore(settings).GetAsync(
-            Guid.Parse("0c645d1c-576a-43b8-a8d2-b75eb892014d"),
-            CancellationToken.None);
-
-        state.Revision.Should().Be(7);
-        state.Settings.GetProperty("theme").GetString().Should().Be("legacy");
-        state.Materials.Should().NotBeNull();
-        state.Materials.Value.EnumerateObject().Should().BeEmpty();
     }
 
     private static StudioState State(long revision, string theme) => new(

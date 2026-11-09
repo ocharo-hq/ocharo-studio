@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\OcharoStudio.Application\OcharoStudio.Application.csproj" />
     <ProjectReference Include="..\..\OcharoStudio.Persistence\OcharoStudio.Persistence.csproj" />
+    <ProjectReference Include="..\OcharoStudio.Tests.Support\OcharoStudio.Tests.Support.csproj" />
   </ItemGroup>
 
 </Project>

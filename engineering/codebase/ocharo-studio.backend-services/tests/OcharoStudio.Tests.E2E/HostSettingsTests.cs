@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -72,11 +71,6 @@ public sealed class HostSettingsTests : IDisposable
             if (deployed is not null) builder.UseSetting("DEPLOY_ENVIRONMENT", deployed);
             foreach (var (key, value) in StudioTestIdentity.Settings())
                 builder.UseSetting(key, value);
-            builder.ConfigureServices(services =>
-            {
-                services.RemoveAll<StudioDatabaseSettings>();
-                services.AddSingleton(new StudioDatabaseSettings($"Data Source={Path.Combine(_root, "studio.db")};Pooling=False"));
-            });
         });
         using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://studio.test") });
 
@@ -92,10 +86,11 @@ public sealed class HostSettingsTests : IDisposable
         File.WriteAllText(Path.Combine(root, "wwwroot", "index.html"), "<!doctype html><title>studio-shell</title>");
         Directory.CreateDirectory(Path.Combine(root, "wwwroot", "assets", "models"));
         File.WriteAllText(Path.Combine(root, "wwwroot", "assets", "models", "nimcha.glb"), "glTF");
-        var database = Path.Combine(root, "appdata", "ocharo-studio.db");
+        var settings = StudioTestIdentity.Settings();
         File.WriteAllText(Path.Combine(root, "appsettings.Target.json"), $$"""
             {
-              "ConnectionStrings": { "Studio": "Data Source={{database}};Pooling=False" },
+              "ConnectionStrings": { "Database": "{{settings["ConnectionStrings:Database"]}}" },
+              "Migrations": { "OwnerInstance": "{{settings["Migrations:OwnerInstance"]}}" },
               "Identity": { "Client": { "Authority": "{{TargetAuthority}}", "ClientId": "studio", "CookieName": "__Host-ocharo-studio" } },
               "Deployment": { "TrustedProxies": [ "172.30.0.2" ] }
             }
@@ -122,9 +117,8 @@ public sealed class HostSettingsTests : IDisposable
         environment.EnvironmentName.Should().Be(Environments.Production);
         environment.IsLocalRun(configuration).Should().BeFalse();
         configuration["Identity:Client:Authority"].Should().Be(TargetAuthority);
-        File.Exists(database).Should().BeTrue();
         var keyRing = factory.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.XmlRepository;
-        keyRing.Should().BeOfType<FileSystemXmlRepository>().Which.Directory.FullName.Should().Be(Path.Combine(root, "appdata", "keys"));
+        keyRing.Should().BeOfType<PostgresXmlRepository>();
     }
 
     /// <summary>The API project folder, found above the test output, so the deployed test reads its checked-in settings.</summary>
@@ -141,7 +135,6 @@ public sealed class HostSettingsTests : IDisposable
 
     public void Dispose()
     {
-        SqliteConnection.ClearAllPools();
         Directory.Delete(_root, true);
     }
 }

@@ -50,7 +50,7 @@ public sealed class ThumbnailTests
         var old = DataUrl("old");
         var workspace = StudioAccess_WorkspaceFor(Editor);
         await using (var scope = host.Factory.Services.CreateAsyncScope())
-            await scope.ServiceProvider.GetRequiredService<IStudioStateStore>().PutAsync(workspace, StateOf(0, Look(Guid.Parse(Id(1)), old)), default);
+            await scope.ServiceProvider.GetRequiredService<IStudioStateStore>().PutAsync(new StudioWorkspace(workspace, Editor.OrganizationId!.Value, Editor.Subject), StateOf(0, Look(Guid.Parse(Id(1)), old)), default);
         using var editor = await SignedIn(host.Factory, Editor);
 
         var saved = await PutAsync(editor, 1, Look(Guid.Parse(Id(1)), old), Look(Guid.Parse(Id(2)), DataUrl("new")));

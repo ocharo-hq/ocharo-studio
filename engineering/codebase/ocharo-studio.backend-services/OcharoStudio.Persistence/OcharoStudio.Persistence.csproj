@@ -1,12 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Npgsql" />
+    <!-- Read once, by the import of the retired SQLite store. -->
     <PackageReference Include="Microsoft.Data.Sqlite" />
     <PackageReference Include="WoW2.Sdk.Beta.Be" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OcharoStudio.Application\OcharoStudio.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The `studio` migration set; StudioDatabaseConstants.MigrationResourcePrefix names the folder. -->
+    <EmbeddedResource Include="Migrations/**/*.sql">
+      <LogicalName>OcharoStudio/Migrations/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

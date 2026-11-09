@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -72,8 +71,6 @@ public sealed class IngressTests : IDisposable
 
             builder.ConfigureServices(services =>
             {
-                services.RemoveAll<StudioDatabaseSettings>();
-                services.AddSingleton(new StudioDatabaseSettings($"Data Source={Path.Combine(_root, "studio.db")};Pooling=False"));
                 services.Configure<OpenIdConnectOptions>(BffAuthenticationSchemeConstants.OpenIdConnect, options =>
                     options.Configuration = new OpenIdConnectConfiguration { AuthorizationEndpoint = AuthorizeEndpoint });
             });
@@ -96,7 +93,6 @@ public sealed class IngressTests : IDisposable
 
     public void Dispose()
     {
-        SqliteConnection.ClearAllPools();
         Directory.Delete(_root, true);
     }
 }

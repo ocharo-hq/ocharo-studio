@@ -3,6 +3,7 @@ using OcharoStudio.Api.Studio.Access;
 using Microsoft.AspNetCore.Mvc;
 using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
 using OcharoStudio.Application.Studio.State;
+using OcharoStudio.Persistence.Import;
 using WoW.Two.Sdk.Beta.Be.Mediator;
 
 namespace OcharoStudio.Api.Studio.Controllers;
@@ -14,8 +15,17 @@ public sealed class StudioController(
     ISender sender,
     StudioStateService stateService,
     StudioStateValidator stateValidator,
-    IStudioThumbnailStore thumbnails) : ControllerBase
+    IStudioThumbnailStore thumbnails,
+    LegacySqliteSettings legacy) : ControllerBase
 {
+    /// <summary>Answers state routes 503 while the retired SQLite store waits for <c>import-sqlite</c>, so no write lands in
+    /// PostgreSQL before the copy and members keep their browser recovery copy meanwhile.</summary>
+    private IActionResult? StorageMoving() =>
+        System.IO.File.Exists(Path.GetFullPath(legacy.Path))
+            ? Problem(statusCode: StatusCodes.Status503ServiceUnavailable, title: "Studio storage is moving",
+                detail: "Your browser keeps a recovery copy until the move finishes.")
+            : null;
+
     /// <summary>Returns product, document schema, storage boundary, and supported operations.</summary>
     [HttpGet]
     public async Task<ActionResult<StudioInfo>> Get(CancellationToken ct)
@@ -42,12 +52,13 @@ public sealed class StudioController(
     /// <summary>Returns state belonging to the member the session names.</summary>
     [Authorize]
     [HttpGet("state")]
-    public async Task<ActionResult<StudioState>> GetState(
+    public async Task<IActionResult> GetState(
         [FromHeader(Name = "X-Studio-Workspace")] string? workspace,
         CancellationToken ct)
     {
         Response.Headers.CacheControl = "no-store";
         if (SelectedMember(workspace) is not { } member) return Forbid();
+        if (StorageMoving() is { } moving) return moving;
 
         return Ok(await stateService.GetAsync(member.WorkspaceId, ct));
     }
@@ -56,13 +67,14 @@ public sealed class StudioController(
     [Authorize]
     [HttpPut("state")]
     [RequestSizeLimit(5 * 1024 * 1024)]
-    public async Task<ActionResult<StudioState>> PutState(
+    public async Task<IActionResult> PutState(
         [FromHeader(Name = "X-Studio-Workspace")] string? workspace,
         [FromBody] StudioState request,
         CancellationToken ct)
     {
         Response.Headers.CacheControl = "no-store";
         if (SelectedMember(workspace) is not { CanEdit: true } member) return Forbid();
+        if (StorageMoving() is { } moving) return moving;
 
         var errors = stateValidator.Validate(request);
         if (errors.Count > 0)
@@ -72,7 +84,7 @@ public sealed class StudioController(
         StudioStateWriteResult result;
         try
         {
-            result = await stateService.PutAsync(member.WorkspaceId, request, ct);
+            result = await stateService.PutAsync(new StudioWorkspace(member.WorkspaceId, member.OrganizationId, member.UserId), request, ct);
         }
         catch (StudioFilesException failure)
         {
@@ -104,6 +116,7 @@ public sealed class StudioController(
     public async Task<IActionResult> GetThumbnail(string sha256, Guid fileId, CancellationToken ct)
     {
         if (SelectedMember(null) is not { } member) return Forbid();
+        if (StorageMoving() is { } moving) return moving;
         var route = StudioThumbnailRoute.Url(sha256, fileId);
         if (!thumbnails.Enabled || !StudioThumbnailRoute.TryParse(route, out _, out _)
             || !await stateService.HoldsThumbnailAsync(member.WorkspaceId, route, ct))

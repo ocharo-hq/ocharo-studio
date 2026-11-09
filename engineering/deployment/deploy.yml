@@ -3,18 +3,27 @@
 # Format and rules: wow-two-ws/conventions/deployment/descriptor/deploy-descriptor.md. Hostnames, secrets and
 # environments live in Wheelhouse targets, never here. Paths are relative to engineering/.
 #
-# Ocharo Studio is one image: the .NET API serving the Vue 3D editor, with its SQLite state on the data volume. It is a
-# repository of the one `ocharo` product (Wheelhouse decision 70), so its site and volume carry its own name.
+# Ocharo Studio is one image: the .NET API serving the Vue 3D editor, its state in schema `studio` of the product
+# database (`ocharo_{env}`, shared with Desk and Identity). It is a repository of the one `ocharo` product (Wheelhouse
+# decision 70), so its site and volume carry its own name.
 # Dev runs as .NET Development, prod as Production (dotnetEnvironment). Signing in is optional: the editor works in the
 # browser for anyone, and server state needs a session from Ocharo's Identity, which ocharo-platform's descriptor declares.
-# Sessions live in memory, so a restart or deploy signs everyone out once; the key ring stays on the data volume.
+# Sessions (schema `studio_cache`) and the Data Protection key ring (`studio.data_protection_keys`) live in that database,
+# so a restart or deploy keeps everyone signed in.
 descriptor: 2
 product: ocharo
 dotnetEnvironment: true                 # dev runs as .NET Development, prod as Production
 verify:                                 # after a dev rollout: the host answers, then reports its build
   service: studio
-  command: [sh, -c, 'curl --fail --silent --show-error --header "Host: localhost" "$VERIFY_SERVICE_STUDIO/health" > /dev/null && curl --fail --silent --show-error --header "Host: localhost" "$VERIFY_SERVICE_STUDIO/api/system/status"']
+  command: [sh, -c, 'curl --fail --silent --show-error --header "Host: localhost" "$VERIFY_SERVICE_STUDIO/health/ready" > /dev/null && curl --fail --silent --show-error --header "Host: localhost" "$VERIFY_SERVICE_STUDIO/api/system/status"']
   timeout: 2m
+# Studio's image applies its `studio` set (keyed into Identity's published accounts and organizations, so ocharo-platform's
+# identity item runs first) and its session cache's `distributed_cache` set, before Studio restarts; Wheelhouse fills
+# Migrations:ConnectionString from the target's database.
+migrate:
+  - service: studio
+    command: [dotnet, OcharoStudio.Api.dll, migrate]
+    timeout: 5m
 sites:
   studio: {}                            # public: a domain, or Wheelhouse's sslip.io host until one is bound
 services:
@@ -25,10 +34,12 @@ services:
     paths:
       - codebase/ocharo-studio.backend-services/**
       - codebase/ocharo-studio.frontend-services/**
-    health: /health
+    health: /health/ready                 # the database and the studio schema answer
+    needs: [postgres]
     settings:                           # mounted at /app/appsettings.Target.json
-      # Wheelhouse derives Deployment:TrustedProxies (the ingress address) and AllowedHosts; nobody types them.
-      required: [Deployment:TrustedProxies]
+      # Wheelhouse derives Deployment:TrustedProxies (the ingress address) and AllowedHosts, and fills
+      # ConnectionStrings:Database from the target's own PostgreSQL; nobody types them.
+      required: [ConnectionStrings:Database, Deployment:TrustedProxies]
       keys:
         # Sign-in through Ocharo's Identity as client 5, whose keys ocharo-platform's descriptor declares. Studio binds no
         # organization: each member's workspace derives from the session's organization and subject, and saving needs studio:edit.
@@ -51,6 +62,8 @@ services:
         OcharoApps:Atlas: { type: url }
         OcharoApps:Wear: { type: url }
         OcharoApps:Blog: { type: url }
+    # The retired SQLite store and file key ring wait here until `import-sqlite` copies them once per environment
+    # (engineering/deployment/deployment.md § PostgreSQL move); the volume then holds only the retired copies.
     volumes:
       studio-data: /app/appdata
     sites:

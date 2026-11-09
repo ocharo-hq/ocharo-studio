@@ -8,14 +8,14 @@ namespace OcharoStudio.Tests.Unit;
 public sealed class GetStudioInfoQueryHandlerTests
 {
     [Fact]
-    public async Task HandleAsync_ReturnsSqliteSchemaTwoContract()
+    public async Task HandleAsync_ReturnsPostgresqlSchemaTwoContract()
     {
         var result = await new GetStudioInfoQueryHandler()
             .HandleAsync(new GetStudioInfoQuery(), CancellationToken.None);
 
         result.Product.Should().Be("Ocharo Studio");
         result.DocumentSchemaVersion.Should().Be(2);
-        result.Storage.Should().Be("sqlite");
+        result.Storage.Should().Be("postgresql");
         result.Capabilities.Should().Equal(["edit", "save", "import", "export"]);
     }
 }

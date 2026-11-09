@@ -1,12 +1,12 @@
 # Architecture
 
-*Last updated: 2026-10-21*
+*Last updated: 2026-11-09*
 
 ## Runtime
 
 A single .NET host serves the studio API and built Vue SPA. Development uses Vite HMR with a same-origin API proxy.
 The backend has API, Application, Domain, Persistence, and test projects. Application owns portable-document
-validation; Persistence owns SQLite storage; the host composes both and initializes the additive schema before serving.
+validation; Persistence owns PostgreSQL storage; the host composes both and verifies the migration levels before serving.
 
 The frontend follows domain, application, integration, presentation, and bootstrap layers. Vue owns application
 orchestration and controls; a lifecycle composable adapts the renderer at the application-to-integration boundary.
@@ -92,7 +92,12 @@ Material decoration overlays, accurate cloth simulation, resizing, and sewing-pa
 ## Persistence
 
 A versioned JSON design document contains garment and asset versions, every declared part assignment, and per-part
-texture transforms. SQLite stores one draft, saved looks, settings, and shared material scales per authenticated workspace.
+texture transforms. PostgreSQL stores one draft, saved looks, settings, and shared material scales per authenticated workspace:
+one `studio.workspaces` row per member workspace, in the product database `ocharo_{env}`, schema `studio`, owned by
+Studio's SQL migration set `studio`. `organization_id` and `user_id` key into Identity's published `identity_organizations`
+and `identity_users`; state and material JSON stay text, byte for byte. `studio.data_protection_keys` holds the Data
+Protection key ring, and BFF sign-in sessions live in the be sdk's distributed cache (schema `studio_cache`), so a
+restart keeps everyone signed in.
 The API derives that workspace deterministically from the session's organization id and Identity subject.
 Optimistic revisions serialize writes and return a conflict rather than overwriting newer state. Per-tab browser
 recovery protects unsynchronized edits. Users can update a look, save a copy with a new identity, import or export
@@ -106,7 +111,7 @@ migrate to schema 2 in the client.
 
 One state request may contain at most 100 looks and 4 MiB total; settings are capped at 128 KiB and each thumbnail at
 1 MiB. The total budget still applies when many looks contain thumbnails. Invalid or oversized state returns `400`,
-does not change SQLite, and leaves the browser recovery copy available.
+does not change stored state, and leaves the browser recovery copy available.
 
 Sign-in is optional and runs through Ocharo's Identity as BFF client `studio`: the API keeps the tokens, the browser a
 secure session cookie and an in-memory `X-Csrf-Token`. Session and state need a role in the session's organization;
@@ -123,7 +128,7 @@ unsaved material edits would not survive navigation.
 Browser-only designs remain usable without signing in. Recovery binds
 to the authenticated workspace; switching members or organizations requires preserving recovery and explicitly
 loading the destination workspace rather than silently uploading existing local work. Portable JSON is the explicit
-transfer and backup format. SQLite and browser storage are unencrypted local development stores.
+transfer and backup format. PostgreSQL rows and browser storage are not encrypted by Studio.
 
 ## Reviewed creative handoff
 

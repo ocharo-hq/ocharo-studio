@@ -5,5 +5,6 @@ public interface IStudioStateStore
 {
     Task<StudioState> GetAsync(Guid workspaceId, CancellationToken ct);
 
-    Task<StudioStateWriteResult> PutAsync(Guid workspaceId, StudioState state, CancellationToken ct);
+    /// <summary>Replaces the workspace's state when <see cref="StudioState.Revision"/> is current, recording its owner.</summary>
+    Task<StudioStateWriteResult> PutAsync(StudioWorkspace workspace, StudioState state, CancellationToken ct);
 }

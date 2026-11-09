@@ -15,7 +15,7 @@ internal sealed class GetStudioInfoQueryHandler : IRequestHandler<GetStudioInfoQ
         return ValueTask.FromResult(new StudioInfo(
             Product: "Ocharo Studio",
             DocumentSchemaVersion: 2,
-            Storage: "sqlite",
+            Storage: "postgresql",
             Capabilities: capabilities));
     }
 }

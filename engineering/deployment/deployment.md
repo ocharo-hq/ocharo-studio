@@ -4,8 +4,8 @@
 
 The Dockerfile packages the Vue SPA and .NET API into one image.
 Its build context is `engineering/codebase/`. Compose mounts the named `ocharo-studio-data` volume at
-`/app/appdata`; SQLite stores workspace state in `ocharo-studio.db`. The container does not encrypt that volume.
-Back up the volume before replacing or removing the deployment.
+`/app/appdata`, which now holds only the retired SQLite store for the one-time import. Workspace state lives in PostgreSQL
+(database `ocharo_{env}`, schema `studio`); see `## PostgreSQL move`. Back up the database before replacing or removing the deployment.
 
 ```sh
 docker compose -f engineering/deployment/docker-compose.yml config
@@ -24,8 +24,9 @@ It uses the repository's own GitHub identity; no owner, remote, or registry cred
 
 The SDK pins live in the manifests: `apps/web/package.json` for the fe SDK, `Directory.Packages.props` for the be SDK.
 
-Sign-in requires HTTPS and `Identity:Client:*`, which the Compose preview does not set, so it no longer boots alone;
-browser-only editing needs no sign-in on any host that does boot.
+Sign-in requires HTTPS and `Identity:Client:*`, and the host needs `ConnectionStrings:Database` on a database that holds
+Identity's migration set; the Compose preview sets neither of the Identity parts, so it does not boot alone.
+Browser-only editing needs no sign-in on any host that does boot.
 
 ## Settings
 
@@ -50,15 +51,22 @@ browser-only editing needs no sign-in on any host that does boot.
   The checked-in default trusts no proxy; another workload's forged headers are ignored.
 - `dotnetEnvironment` is on: deployed dev runs as .NET `Development`, prod as `Production`, and
   `appsettings.Development.json` holds deployable defaults only. The runner sets `DEPLOY_ENVIRONMENT`, so a deployed
-  host is never a local run: it skips `appsettings.Local.json` and maps no OpenAPI document. `DB_CONNECTION` still
-  overrides the SQLite connection string.
-- The dev check (`verify`) runs after each dev rollout: `/health`, then `/api/system/status` from the release image.
+  host is never a local run: it skips `appsettings.Local.json` and maps no OpenAPI document. A local run needs
+  `ConnectionStrings:Database` in the gitignored `appsettings.Local.json`, pointing at a database that already holds
+  Identity's set (a local Identity instance's database).
+- The dev check (`verify`) runs after each dev rollout: `/health/ready`, then `/api/system/status` from the release image.
   A failure holds the auto-promote to prod.
-- Startup creates or extends the SQLite schema on the data volume before serving; a failure aborts startup. Studio
-  has no EF migrations.
+- State lives in PostgreSQL: the product database `ocharo_{env}` (shared with Desk and Identity), schema `studio`, owned
+  by Studio's bespoke SQL migration set `studio` (`OcharoStudio.Persistence/Migrations/001-workspaces`), which depends
+  on Identity's set (`DependsOn("identity", 1)`). `ConnectionStrings:Database` is filled per target by Wheelhouse
+  (`needs: [postgres]`).
+- The deploy's `migrate:` item runs `dotnet OcharoStudio.Api.dll migrate` before Studio restarts, connected through
+  `Migrations:ConnectionString`. A deployed boot only verifies migration levels; a local run (`Development` without
+  `DEPLOY_ENVIRONMENT`) applies them at boot.
 - Identity client 5's `RedirectUris:0` `{site}/api/identity/callback` and `PostSignOutRedirectUris:0` `{site}/` are owner
-  keys on `identity`, typed per environment. Sign-in sessions live in memory, so a restart or deploy signs everyone out
-  once; the Data Protection key ring stays at `/app/appdata/keys`.
+  keys on `identity`, typed per environment. Sign-in sessions live in the be sdk's PostgreSQL distributed cache (schema `studio_cache`, set
+  `distributed_cache`) and the Data Protection key ring in `studio.data_protection_keys`, so a restart or deploy keeps
+  everyone signed in.
 - `appsettings.Local.json`, `appsettings.Target.json` and the retired `appsettings.Machine.json` are gitignored and
   excluded from the Docker build context.
 
@@ -67,8 +75,25 @@ browser-only editing needs no sign-in on any host that does boot.
 `deploy.yml` lists the one `studio` service on the public `app` site; Wheelhouse deploys its bundle. Remaining differences from the shared
 startup defaults:
 
-- Studio's `/health` is hand-mapped, not the SDK boot bundle's endpoint.
+- Studio's `/health` (liveness) and `/health/ready` (adds the database and the `studio` schema) are hand-mapped, not the
+  SDK boot bundle's endpoints.
 - The host composes SDK parts (`AddSettingsFiles`, `AddProxyAwareHosting`, HTTP ProblemDetails) rather than the
   `AddApiDefaults` boot floor.
 
 See `../research/convention-audit.md` for the earlier verified checks.
+
+## PostgreSQL move
+
+The retired store is `appdata/ocharo-studio.db` plus the key ring in `appdata/keys`, on the `studio-data` volume.
+The image's `import-sqlite [--dry-run]` verb copies it once per environment, after the deploy that carries the move.
+
+1. Run `import-sqlite --dry-run` as an operator job on the target's image with the `studio-data` volume mounted. It
+   writes nothing.
+2. Run `import-sqlite` the same way. It reads `LegacySqlite:Path` (default `appdata/ocharo-studio.db`) and
+   `LegacySqlite:KeysPath` (default `appdata/keys`), copies every workspace and key PostgreSQL lacks, verifies every row
+   (revision plus SHA-256 of state and materials), recovers each workspace's Identity organization and account by
+   matching its derived id, then renames the file to `ocharo-studio.db.imported-{UTC stamp}`.
+3. Read the last stdout line, `import-result {json}`: counts and digests only.
+
+Exit `0` means copied or nothing to copy; `1` means refused, a diverged row keeps the SQLite file untouched; `2` means
+failed. Until it runs, the state and thumbnail routes answer 503 and members keep their browser recovery copy.

@@ -1,6 +1,6 @@
 # Operations
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-11-09*
 
 ## Isolated review
 
@@ -9,7 +9,8 @@ Studio review API uses HTTPS `8348` / HTTP `8349`; frontend uses HTTPS `8356`.
 The preexisting Studio ports remain `8260` / `8261` / `8262`; inspect ownership before any restart.
 Required runtimes belong in managed terminals. Existing databases and runtime processes remain isolated.
 
-- `DB_CONNECTION` selects a dedicated SQLite file, for example `Data Source=<review-directory>/studio.db;Cache=Shared`.
+- `ConnectionStrings__Database` selects a dedicated PostgreSQL database that already holds Identity's migration set,
+  for example the review Identity instance's database.
 - `Identity__Client__Authority=https://localhost:8404` selects the Identity instance, beside the rest of `Identity:Client`.
 - `STUDIO_API_URL=https://localhost:8348` selects Vite's API proxy with certificate verification enabled.
 - `STUDIO_TLS_CERT` and `STUDIO_TLS_KEY` reuse an existing trusted certificate pair and skip mkcert.
@@ -32,8 +33,8 @@ sign-in returns to the page.
 `PUT` preserves atomic optimistic revisions and returns `409` for stale writes. Browser recovery binds to its
 workspace, remains available after expiry, and stops automatic upload when another member or organization connects.
 The browser-only editor works without signing in. Designs can be transferred explicitly through portable JSON.
-The default database remains `appdata/ocharo-studio.db`; review runs must select their isolated file.
-Normal Docker Compose preserves `/app/appdata` in `ocharo-studio-data`.
+Review runs must select their isolated database. Normal Docker Compose keeps `ocharo-studio-data` at `/app/appdata` only
+for the one-time `import-sqlite`.
 
 ## Creative packages
 

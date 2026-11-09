@@ -1,6 +1,6 @@
 # 3D Creative Studio
 
-*Last updated: 2026-09-28*
+*Last updated: 2026-11-09*
 
 ## Outcome
 
@@ -49,7 +49,7 @@ The mannequin and current garment remain the visual focus. A left menu exposes g
 ## Implementation status
 
 The local application implements the five garment-family selectors, per-part materials, pattern placement, camera controls, undo and redo, named saved looks,
-save-as-copy, SQLite persistence with optimistic revisions, per-tab browser recovery, schema-1 migration, validated
+save-as-copy, PostgreSQL persistence with optimistic revisions, per-tab browser recovery, schema-1 migration, validated
 schema-2 JSON import, and JSON and preview export. Authored interpretation meshes and generated textile studies are
 present for the current local build.
 

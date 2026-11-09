@@ -16,15 +16,15 @@ public sealed class StudioStateService(IStudioStateStore store, IStudioThumbnail
     /// keeps its route URL; a thumbnail the stored state already holds stays as it is, a data URL included.</summary>
     /// <exception cref="StudioFilesException">Files refused a thumbnail.</exception>
     public async Task<StudioStateWriteResult> PutAsync(
-        Guid workspaceId,
+        StudioWorkspace workspace,
         StudioState state,
         CancellationToken ct)
     {
-        if (!thumbnails.Enabled) return await store.PutAsync(workspaceId, state, ct);
+        if (!thumbnails.Enabled) return await store.PutAsync(workspace, state, ct);
 
-        var previous = await store.GetAsync(workspaceId, ct);
+        var previous = await store.GetAsync(workspace.Id, ct);
         var held = ThumbnailsOf(previous.Looks).ToHashSet(StringComparer.Ordinal);
-        if (JsonNode.Parse(state.Looks.GetRawText()) is not JsonArray looks) return await store.PutAsync(workspaceId, state, ct);
+        if (JsonNode.Parse(state.Looks.GetRawText()) is not JsonArray looks) return await store.PutAsync(workspace, state, ct);
 
         var uploaded = new Dictionary<string, string>(StringComparer.Ordinal);
         var changed = false;
@@ -48,7 +48,7 @@ public sealed class StudioStateService(IStudioStateStore store, IStudioThumbnail
             changed = true;
         }
 
-        return await store.PutAsync(workspaceId,
+        return await store.PutAsync(workspace,
             changed ? state with { Looks = JsonSerializer.SerializeToElement(looks) } : state, ct);
     }
 

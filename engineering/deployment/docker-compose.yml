@@ -2,7 +2,8 @@
 #
 #   docker compose up -d --build
 #
-# Studio state is persisted in the mounted SQLite data volume.
+# Studio state lives in PostgreSQL (the `postgres` service below). The database must also hold Identity's migration
+# set, so this preview still does not boot alone. `ocharo-studio-data` stays mounted for the one-time `import-sqlite`.
 services:
   ocharo-studio:
     build:
@@ -14,9 +15,21 @@ services:
     ports:
       - "127.0.0.1:18260:8080"
     environment:
-      DB_CONNECTION: "Data Source=/app/appdata/ocharo-studio.db;Cache=Shared;Default Timeout=5"
+      ConnectionStrings__Database: "Host=postgres;Port=5432;Database=ocharo_local;Username=postgres;Password=studio-local"
+    depends_on:
+      - postgres
     volumes:
       - ocharo-studio-data:/app/appdata
 
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ocharo_local
+      POSTGRES_PASSWORD: studio-local
+    volumes:
+      - ocharo-studio-pgdata:/var/lib/postgresql
+
 volumes:
   ocharo-studio-data:
+  ocharo-studio-pgdata:
