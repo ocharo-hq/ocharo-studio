@@ -43,8 +43,9 @@ Browser-only editing needs no sign-in on any host that does boot.
   | `Deployment:TrustedProxies` | required | derived by Wheelhouse: the ingress's address on the server's `platform` network |
   | `AllowedHosts` | — | derived by Wheelhouse: the site's hosts, the service's platform name and `localhost` |
   | `OcharoApps:{Desk,Catalogue,Brand}` | linked with `from` | `Sites:{desk,catalogue,brand}:Url` in `ocharo-platform`'s descriptor: the app menu served at `/api/runtime-config` |
+  | `OcharoApps:{Marketing,Blog}` | linked with `from` | `Sites:{marketing,blog}:Url` in `ocharo-marketing`'s descriptor |
   | `OcharoApps:Studio` | linked with `from` | Studio's own `Sites:studio:Url` |
-  | `OcharoApps:{Marketing,Editorial,Atlas,Wear,Blog}` | `url`, optional | the owner, until Marketing deploys its sites; Editorial, Atlas and Wear sit under a path of the blog site; an unset key leaves that app out |
+  | `OcharoApps:{Editorial,Atlas,Wear}` | `url`, optional | the owner: the blog site's `/studio/`, `/atlas/` and `/wear/`, since a link takes no path; an unset key leaves that app out |
 
 - The one site, `app`, is public; Wheelhouse binds its host per environment.
 
