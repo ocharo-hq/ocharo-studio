@@ -1,6 +1,6 @@
 # Deployment
 
-*Last updated: 2026-11-05*
+*Last updated: 2026-11-09*
 
 The Dockerfile packages the Vue SPA and .NET API into one image.
 Its build context is `engineering/codebase/`. Compose mounts the named `ocharo-studio-data` volume at
@@ -48,9 +48,12 @@ browser-only editing needs no sign-in on any host that does boot.
 - Forwarded `X-Forwarded-Proto`, `-Host` and `-For` apply only from loopback and those proxies (the be sdk's
   `AddProxyAwareHosting`), so the sign-in sees `https` and the public host behind Traefik.
   The checked-in default trusts no proxy; another workload's forged headers are ignored.
-- `dotnetEnvironment` stays off: deployed dev and prod both run as .NET `Production`. The runner sets
-  `DEPLOY_ENVIRONMENT`, so a deployed host is never a local run: it skips `appsettings.Local.json` and maps no
-  OpenAPI document. `DB_CONNECTION` still overrides the SQLite connection string.
+- `dotnetEnvironment` is on: deployed dev runs as .NET `Development`, prod as `Production`, and
+  `appsettings.Development.json` holds deployable defaults only. The runner sets `DEPLOY_ENVIRONMENT`, so a deployed
+  host is never a local run: it skips `appsettings.Local.json` and maps no OpenAPI document. `DB_CONNECTION` still
+  overrides the SQLite connection string.
+- The dev check (`verify`) runs after each dev rollout: `/health`, then `/api/system/status` from the release image.
+  A failure holds the auto-promote to prod.
 - Startup creates or extends the SQLite schema on the data volume before serving; a failure aborts startup. Studio
   has no EF migrations.
 - Identity client 5's `RedirectUris:0` `{site}/api/identity/callback` and `PostSignOutRedirectUris:0` `{site}/` are owner

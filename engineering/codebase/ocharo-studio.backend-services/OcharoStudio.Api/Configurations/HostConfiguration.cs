@@ -1,6 +1,5 @@
 using OcharoStudio.Persistence;
-using WoW.Two.Sdk.Beta.Be.Foundation.Configuration;
-using WoW.Two.Sdk.Beta.Be.Web.ProblemDetails;
+using WoW.Two.Sdk.Beta.Be.Meta;
 
 namespace OcharoStudio.Api.Configurations;
 
@@ -11,8 +10,7 @@ public static partial class HostConfiguration
     public static WebApplicationBuilder Configure(this WebApplicationBuilder builder)
     {
         return builder
-            .AddSettingsFiles()
-            .AddIngress()
+            .AddStudioDefaults()
             .AddStudio()
             .AddStudioAccess()
             .AddRuntimeConfig()
@@ -20,19 +18,12 @@ public static partial class HostConfiguration
     }
 
     /// <summary>Runs startup tasks, then configures middleware and endpoints.</summary>
-    public static async Task<WebApplication> ConfigureAsync(this WebApplication app)
+    public static async Task ConfigureAsync(this WebApplication app)
     {
         await app.Services.InitializeStudioDatabaseAsync(app.Lifetime.ApplicationStopping);
-
-        app.UseHttpProblemDetails();
         app.WarnAboutRejectedRuntimeConfig();
 
-        return app
-            .UseIngress()
-            .UseApiDocumentation()
-            .UseStudioAssets()
-            .UseStudioAccess()
-            .MapStudioEndpoints()
-            .MapSpaFallback();
+        app.UseApiDefaults(pipeline => pipeline.UseStudioAccess())
+            .MapStudioEndpoints();
     }
 }

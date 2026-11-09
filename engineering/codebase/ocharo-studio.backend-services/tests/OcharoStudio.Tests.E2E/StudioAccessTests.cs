@@ -100,7 +100,6 @@ public sealed class StudioAccessTests
 
     [Theory]
     [InlineData("/health")]
-    [InlineData("/api/system/version")]
     [InlineData("/api/system/status")]
     [InlineData("/api/runtime-config")]
     [InlineData("/api/studio")]

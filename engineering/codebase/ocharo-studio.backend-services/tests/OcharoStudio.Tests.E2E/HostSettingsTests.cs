@@ -90,6 +90,8 @@ public sealed class HostSettingsTests : IDisposable
         Directory.CreateDirectory(Path.Combine(root, "wwwroot"));
         File.Copy(Path.Combine(ApiProject(), "appsettings.json"), Path.Combine(root, "appsettings.json"));
         File.WriteAllText(Path.Combine(root, "wwwroot", "index.html"), "<!doctype html><title>studio-shell</title>");
+        Directory.CreateDirectory(Path.Combine(root, "wwwroot", "assets", "models"));
+        File.WriteAllText(Path.Combine(root, "wwwroot", "assets", "models", "nimcha.glb"), "glTF");
         var database = Path.Combine(root, "appdata", "ocharo-studio.db");
         File.WriteAllText(Path.Combine(root, "appsettings.Target.json"), $$"""
             {
@@ -107,9 +109,14 @@ public sealed class HostSettingsTests : IDisposable
         using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://studio.test") });
 
         (await client.GetAsync("/health")).StatusCode.Should().Be(HttpStatusCode.OK);
-        (await client.GetAsync("/api/system/version")).StatusCode.Should().Be(HttpStatusCode.OK);
+        (await client.GetAsync("/api/system/status")).StatusCode.Should().Be(HttpStatusCode.OK);
         (await client.GetAsync("/openapi/v1.json")).StatusCode.Should().Be(HttpStatusCode.NotFound);
         (await client.GetStringAsync("/studio")).Should().Contain("studio-shell");
+        using (var model = await client.GetAsync("/assets/models/nimcha.glb"))
+        {
+            model.Content.Headers.ContentType!.MediaType.Should().Be("model/gltf-binary");
+            model.Headers.CacheControl?.MaxAge.Should().BeNull("unhashed garment models must not take the year-long cache");
+        }
         var environment = factory.Services.GetRequiredService<IHostEnvironment>();
         var configuration = factory.Services.GetRequiredService<IConfiguration>();
         environment.EnvironmentName.Should().Be(Environments.Production);

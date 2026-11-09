@@ -49,7 +49,7 @@ The descriptor declares a private studio site, persistent SQLite volume and requ
 
 - Product v0.1 remains in progress; all developer verification checkboxes remain open.
 - Product package versions are 0.0.0 placeholders. Local apps/services report dev; CI accepts APP_VERSION.
-- Full assembly informational identity remains available at `/api/system/version`; About loads it on demand.
+- Full assembly informational identity is the `version` of `/api/system/status`; About loads it on demand.
 - No Git index, commit, remote, deployment target, real user data or existing runtime changed in this lane.
 - Preserved pre-consolidation notes under research are evidence, not active plans or current permissions.
 - The proposed shared publisher v0.1.0 does not hydrate Git LFS assets and does not inject VCS_REF.

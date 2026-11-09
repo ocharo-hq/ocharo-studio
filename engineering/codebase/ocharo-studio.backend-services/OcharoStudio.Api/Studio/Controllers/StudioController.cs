@@ -5,7 +5,7 @@ using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
 using OcharoStudio.Application.Studio.State;
 using WoW.Two.Sdk.Beta.Be.Mediator;
 
-namespace OcharoStudio.Api.Controllers;
+namespace OcharoStudio.Api.Studio.Controllers;
 
 /// <summary>Exposes the host's stable studio capability contract.</summary>
 [ApiController]

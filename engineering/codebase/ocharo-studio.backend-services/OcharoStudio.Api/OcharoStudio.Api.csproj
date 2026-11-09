@@ -8,7 +8,6 @@
     <!-- Saved-look thumbnails: WoW2 Files over HTTP, by tokens of the same `studio` Identity client. -->
     <PackageReference Include="WoW2.Sdk.Beta.Be.Files.Client" />
     <PackageReference Include="WoW2.Sdk.Beta.Be.Files.Abstractions" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
   </ItemGroup>
 
   <ItemGroup>

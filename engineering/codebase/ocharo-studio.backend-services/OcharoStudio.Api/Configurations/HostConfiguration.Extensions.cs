@@ -1,15 +1,18 @@
-using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.DataProtection.Repositories;
+using Microsoft.Extensions.Logging.Abstractions;
 using OcharoStudio.Api.RuntimeConfig.Settings;
 using OcharoStudio.Api.Studio.Thumbnails;
 using OcharoStudio.Application;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
 using WoW.Two.Sdk.Beta.Be.Files.Client;
-using WoW.Two.Sdk.Beta.Be.Foundation.Configuration;
 using WoW.Two.Sdk.Beta.Be.Foundation.Options;
 using WoW.Two.Sdk.Beta.Be.Identity.Bff;
 using WoW.Two.Sdk.Beta.Be.Mediator;
-using WoW.Two.Sdk.Beta.Be.Web.Hosting;
+using WoW.Two.Sdk.Beta.Be.Meta;
+using WoW.Two.Sdk.Beta.Be.Web.Json;
 using WoW.Two.Sdk.Beta.Be.Web.ProblemDetails;
 
 namespace OcharoStudio.Api.Configurations;
@@ -17,18 +20,24 @@ namespace OcharoStudio.Api.Configurations;
 /// <summary>Extends the host builder and the web application for startup wiring.</summary>
 public static partial class HostConfiguration
 {
-    /// <summary>Registers proxy-aware hosting: forwarded headers apply only from loopback and the ingress addresses listed
-    /// under <c>Deployment:TrustedProxies</c>, which a deployed target supplies; the checked-in default trusts no proxy.</summary>
-    private static WebApplicationBuilder AddIngress(this WebApplicationBuilder builder)
-    {
-        var proxies = builder.Configuration.GetSection("Deployment:TrustedProxies").Get<string[]>() ?? [];
-        builder.Services.AddProxyAwareHosting(o =>
+    /// <summary>Registers the be sdk boot bundle: settings files, logging, telemetry, health, problem details, secure
+    /// headers and the SPA bundle with its garment model types. Forwarded headers apply only from loopback and the ingress
+    /// addresses under <c>Deployment:TrustedProxies</c>, which a deployed target supplies; the checked-in default trusts no
+    /// proxy.</summary>
+    /// <remarks>The long immutable cache stays off: <c>/assets</c> holds the unhashed garment models, textures and brand
+    /// files beside Vite's hashed bundle, so a year-long cache would pin a changed model.</remarks>
+    private static WebApplicationBuilder AddStudioDefaults(this WebApplicationBuilder builder) =>
+        builder.AddApiDefaults(options =>
         {
-            foreach (var proxy in proxies)
-                o.TrustedProxies.Add(proxy);
+            options.ServiceName = "OcharoStudio";
+            options.TrustProxiesFrom(builder.Configuration.GetSection("Deployment"));
+            options.SpaHosting = spa =>
+            {
+                spa.ImmutableAssetsPath = string.Empty;
+                spa.ContentTypes[".glb"] = "model/gltf-binary";
+                spa.ContentTypes[".gltf"] = "model/gltf+json";
+            };
         });
-        return builder;
-    }
 
     /// <summary>Registers Studio state storage, document capabilities, services and validation.</summary>
     private static WebApplicationBuilder AddStudio(this WebApplicationBuilder builder)
@@ -44,6 +53,27 @@ public static partial class HostConfiguration
         builder.Services.AddScoped<StudioStateService>();
         builder.Services.AddSingleton(StudioCatalogContract.LoadEmbedded());
         builder.Services.AddSingleton<StudioStateValidator>();
+        return builder;
+    }
+
+    /// <summary>Registers sign-in through Ocharo's Identity instance (BFF, section <c>Identity:Client</c>, required at boot)
+    /// and the Data Protection key ring that encrypts the sessions.</summary>
+    /// <remarks>The BFF keeps sessions in the SDK default, the in-memory distributed cache: Studio stores in SQLite and no
+    /// SQLite <c>IDistributedCache</c> exists, so a restart or deploy signs everyone out once. The key ring persists to
+    /// <c>DataProtection:KeysPath</c>, else <c>keys</c> beside the SQLite database, on a deployed host's data volume.</remarks>
+    private static WebApplicationBuilder AddStudioAccess(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddIdentityBff();
+        // Resolve final configuration after test/deployment overrides have been applied.
+        builder.Services.AddDataProtection();
+        builder.Services.AddOptions<KeyManagementOptions>().Configure<IConfiguration, StudioDatabaseSettings>((options, configuration, database) =>
+        {
+            var path = configuration["DataProtection:KeysPath"];
+            if (string.IsNullOrWhiteSpace(path)) path = Path.Combine(database.DataDirectory ?? "appdata", "keys");
+            options.XmlRepository = new FileSystemXmlRepository(new DirectoryInfo(Path.GetFullPath(path)), NullLoggerFactory.Instance);
+        });
+        builder.Services.AddOptions<DataProtectionOptions>().Configure<IConfiguration, IHostEnvironment>((options, configuration, environment) =>
+            options.ApplicationDiscriminator = configuration["DataProtection:ApplicationName"] ?? $"ocharo-studio:{environment.EnvironmentName}");
         return builder;
     }
 
@@ -96,62 +126,40 @@ public static partial class HostConfiguration
             app.Logger.LogWarning("Runtime config leaves out {Settings}: each must be a plain HTTPS address.", string.Join(", ", rejected));
     }
 
-    /// <summary>Registers the HTTP boundary, controllers and OpenAPI documentation.</summary>
+    /// <summary>Registers the controllers on the be sdk JSON contract and the full HTTP problem boundary: status pages,
+    /// MVC error-result normalization and <c>no-store</c> on every error, whatever the client accepts.</summary>
     private static WebApplicationBuilder AddControllers(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpProblemDetails();
-        builder.Services.AddControllers();
-        builder.Services.AddOpenApi();
+        builder.Services.AddControllersWithSdkJson();
         return builder;
     }
 
-    /// <summary>Configures forwarded headers before Studio access reads the effective scheme and host.</summary>
-    private static WebApplication UseIngress(this WebApplication app)
+    /// <summary>Configures the session pipeline inside the boot bundle, after routing: HTTPS for the session routes, then
+    /// the BFF (authentication, the <c>X-Csrf-Token</c> check, authorization). No fallback policy: only <c>[Authorize]</c>
+    /// routes need a session, so Studio stays usable in the browser without signing in.</summary>
+    private static IApplicationBuilder UseStudioAccess(this IApplicationBuilder app)
     {
-        app.UseProxyAwareHosting();
+        app.Use(async (context, next) =>
+        {
+            if (context.Request.Path.StartsWithSegments("/api/identity") && !context.Request.IsHttps)
+            {
+                await Results.Problem(statusCode: 400, title: "HTTPS is required",
+                    extensions: new Dictionary<string, object?> { ["code"] = "https_required" }).ExecuteAsync(context);
+                return;
+            }
+            await next(context);
+        });
+        app.UseIdentityBff();
         return app;
     }
 
-    /// <summary>Configures API documentation on a local run only.</summary>
-    private static WebApplication UseApiDocumentation(this WebApplication app)
-    {
-        if (app.Environment.IsLocalRun(app.Configuration))
-            app.MapOpenApi();
-        return app;
-    }
-
-    /// <summary>Configures SPA assets and garment model content types.</summary>
-    private static WebApplication UseStudioAssets(this WebApplication app)
-    {
-        app.UseDefaultFiles();
-        var contentTypes = new FileExtensionContentTypeProvider();
-        contentTypes.Mappings[".glb"] = "model/gltf-binary";
-        contentTypes.Mappings[".gltf"] = "model/gltf+json";
-        app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = contentTypes });
-        return app;
-    }
-
-    /// <summary>Configures controllers, the Identity session routes, build identity, health and missing API routes.</summary>
+    /// <summary>Configures controllers and the Identity session routes; the boot bundle maps health, the API 404 and the
+    /// SPA fallback.</summary>
     private static WebApplication MapStudioEndpoints(this WebApplication app)
     {
         app.MapControllers();
         app.MapIdentityBffEndpoints();
-        app.MapGet("/api/system/version", (HttpContext context) =>
-        {
-            context.Response.Headers.CacheControl = "no-store";
-            return Results.Ok(new { service = "OcharoStudio", version = BuildIdentity.Version });
-        }).AllowAnonymous();
-        app.MapGet("/health", () => Results.Ok(new { status = "healthy", service = "OcharoStudio" }));
-        app.MapFallback("/api/{**slug}", () => Results.Problem(
-            statusCode: StatusCodes.Status404NotFound,
-            title: "Not Found")).AllowAnonymous();
-        return app;
-    }
-
-    /// <summary>Configures anonymous SPA navigation after API route mapping.</summary>
-    private static WebApplication MapSpaFallback(this WebApplication app)
-    {
-        app.MapFallbackToFile("index.html").AllowAnonymous();
         return app;
     }
 }

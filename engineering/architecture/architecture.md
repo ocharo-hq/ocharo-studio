@@ -16,10 +16,10 @@ and the React SDK package are absent from the application. Immutable reducer ope
 Vue composables expose live getters and own persistence, onboarding, and renderer teardown.
 
 Besides the studio API, the host serves the suite's fixed public endpoints: `GET /api/system/status`
-(`{service, status, version}`, anonymous, `no-store`) beside the retained `/api/system/version`, and
+(`{service, status, version}`, anonymous, `no-store`), and
 `GET /api/runtime-config` (anonymous, `no-store`), which maps the optional `OcharoApps:*` settings onto the
 `OCHARO_*_URL` keys and leaves out, with one startup warning, any value that is not a plain absolute HTTPS address.
-Both, with `/health` and `/api/system/version`, answer before an Ocharo session.
+Both, with the boot bundle's `/health`, answer before an Ocharo session.
 
 ## Browser studio
 

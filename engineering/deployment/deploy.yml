@@ -5,11 +5,16 @@
 #
 # Ocharo Studio is one image: the .NET API serving the Vue 3D editor, with its SQLite state on the data volume. It is a
 # repository of the one `ocharo` product (Wheelhouse decision 70), so its site and volume carry its own name.
-# Both environments run as .NET Production (no dotnetEnvironment). Signing in is optional: the editor works in the
+# Dev runs as .NET Development, prod as Production (dotnetEnvironment). Signing in is optional: the editor works in the
 # browser for anyone, and server state needs a session from Ocharo's Identity, which ocharo-platform's descriptor declares.
 # Sessions live in memory, so a restart or deploy signs everyone out once; the key ring stays on the data volume.
 descriptor: 2
 product: ocharo
+dotnetEnvironment: true                 # dev runs as .NET Development, prod as Production
+verify:                                 # after a dev rollout: the host answers, then reports its build
+  service: studio
+  command: [sh, -c, 'curl --fail --silent --show-error --header "Host: localhost" "$VERIFY_SERVICE_STUDIO/health" > /dev/null && curl --fail --silent --show-error --header "Host: localhost" "$VERIFY_SERVICE_STUDIO/api/system/status"']
+  timeout: 2m
 sites:
   studio: {}                            # public: a domain, or Wheelhouse's sslip.io host until one is bound
 services:

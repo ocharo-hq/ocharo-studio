@@ -6,7 +6,7 @@ using Xunit;
 
 namespace OcharoStudio.Tests.E2E;
 
-/// <summary>The conventional status endpoint reports the running version, anonymously, beside the retained version route.</summary>
+/// <summary>The conventional status endpoint reports the running version, anonymously; the retired version route is gone.</summary>
 public sealed class SystemStatusTests
 {
     [Fact]
@@ -24,8 +24,8 @@ public sealed class SystemStatusTests
         body.GetProperty("service").GetString().Should().Be("OcharoStudio");
         body.GetProperty("status").GetString().Should().Be("live");
         string.IsNullOrWhiteSpace(body.GetProperty("version").GetString()).Should().BeFalse();
-        version.StatusCode.Should().Be(HttpStatusCode.OK);
-        (await version.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("version").GetString().Should().Be(body.GetProperty("version").GetString());
+        version.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        version.Content.Headers.ContentType!.MediaType.Should().Be("application/problem+json");
         (await client.GetAsync("/api/studio/state")).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }
