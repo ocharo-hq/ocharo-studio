@@ -1,18 +1,14 @@
 import { format } from "prettier";
 // Imports the Ocharo 3D library (authored in Blender, kept in the Ocharo workspace) into the studio.
 // Usage: node scripts/sync-garments.mjs --from <library>/glb   (or OCHARO_3D_LIBRARY=<library>)
+// From WoW2 Files: node scripts/sync-garments.mjs --files <Files root>   (or OCHARO_FILES_URL=<Files root>)
+//   fetches the release manifest pinned in garments-release.lock.json (or --manifest <sha256>) from /m/{sha256},
+//   then every listed GLB by its SHA-256, and writes what the library mode writes.
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-const argument = (name) => {
-  const index = process.argv.indexOf(name);
-  return index < 0 ? undefined : process.argv[index + 1];
-};
-const OUTPUT =
-  argument("--output") ??
-  fileURLToPath(new URL("../public/assets/models/", import.meta.url));
 const ASSETS = {
   mannequin: { source: "och-silhouette", parts: [] },
   // The catalogue model holds garments in studio renders only.
@@ -31,15 +27,9 @@ const LIMITS = { triangles: 60000, bytes: 3_000_000, top: 1.8 };
 const PART_IDS = ["belt", "body", "collar", "sleeves", "trim"];
 // Holders carry fixed materials only; garments carry parts and fixed attachments.
 const HOLDERS = ["mannequin", "model"];
+const SHA256 = /^[0-9a-f]{64}$/;
 
-function libraryDir() {
-  const flag = process.argv.indexOf("--from");
-  const root =
-    flag > 0 ? process.argv[flag + 1] : process.env.OCHARO_3D_LIBRARY;
-  if (!root)
-    throw new Error("Pass --from <library>/glb or set OCHARO_3D_LIBRARY.");
-  return root.endsWith("glb") ? root : join(root, "glb");
-}
+const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
 function parseGlb(bytes, name) {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -133,21 +123,7 @@ function inspect(glb, id, expectedParts) {
   };
 }
 
-const library = libraryDir();
-const libraryManifest = JSON.parse(
-  await readFile(join(library, "och-3d-manifest.json"), "utf8"),
-);
-const release = JSON.parse(
-  await readFile(
-    argument("--release") ??
-      join(
-        library,
-        `../../releases/ocharo-garments-${libraryManifest.assetVersion}.json`,
-      ),
-    "utf8",
-  ),
-);
-function canonical(value) {
+export function canonical(value) {
   if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
   if (value && typeof value === "object")
     return `{${Object.keys(value)
@@ -156,90 +132,258 @@ function canonical(value) {
       .join(",")}}`;
   return JSON.stringify(value);
 }
-const { sha256: releaseHash, ...releasePayload } = release;
-if (
-  release.schemaVersion !== 1 ||
-  release.id !== `ocharo-garments@${libraryManifest.assetVersion}` ||
-  createHash("sha256").update(canonical(releasePayload)).digest("hex") !==
-    releaseHash
-)
-  throw new Error("The immutable asset release is invalid.");
-const manifest = {
-  release: { id: release.id, version: release.version, sha256: releaseHash },
-  assetVersion: libraryManifest.assetVersion,
-  source:
-    "ocharo-ws/workbench/ocharo-assets/engineering/codebase/ocharo-assets.library/garments (Blender build: source/build.py)",
-  importer: "scripts/sync-garments.mjs",
-  provenance:
-    "authored 3D interpretation of the Ocharo brand silhouette and garment references; not a scan or sewing pattern",
-  coordinates: {
-    units: "metres",
-    up: "+Y",
-    front: "+Z",
-    origin: "floor centre",
-    waistY: 1.12,
-  },
-  assets: {},
-};
-const imports = [];
-for (const [id, { source, parts }] of Object.entries(ASSETS)) {
-  const file = join(library, `${source}.glb`);
-  const bytes = new Uint8Array(await readFile(file));
-  const sha256 = createHash("sha256").update(bytes).digest("hex");
-  const expected = libraryManifest.assets[source];
-  const released = release.assets.find((asset) => asset.id === source);
+
+function verifyRelease(release, assetVersion) {
+  const { sha256: releaseHash, ...releasePayload } = release;
   if (
-    !released ||
-    released.sha256 !== sha256 ||
-    released.bytes !== bytes.byteLength ||
-    released.file !== `${source}.glb`
+    release.schemaVersion !== 1 ||
+    release.id !== `ocharo-garments@${assetVersion}` ||
+    sha256(canonical(releasePayload)) !== releaseHash
   )
-    throw new Error(`${source}: content does not match the immutable release`);
-  if (!expected || expected.sha256 !== sha256)
-    throw new Error(`${source}: hash differs from the library manifest`);
-  if (bytes.byteLength > LIMITS.bytes)
-    throw new Error(`${source}: ${bytes.byteLength} bytes exceed the limit`);
-  const details = inspect(parseGlb(bytes, source), id, parts);
-  imports.push({ file, id });
-  manifest.assets[id] = {
-    file: `${id}.glb`,
-    librarySource: `${source}.glb`,
-    bytes: bytes.byteLength,
-    sha256,
-    ...details,
-  };
-  console.log(
-    `${id}.glb ← ${source}.glb (${details.triangles} triangles, ${bytes.byteLength} bytes)`,
-  );
+    throw new Error("The immutable asset release is invalid.");
 }
-// No destination changes until every model, semantic part map and release hash passes.
-await mkdir(OUTPUT, { recursive: true });
-for (const { file, id } of imports)
-  await copyFile(file, join(OUTPUT, `${id}.glb`));
-const pin = {
-  release: manifest.release,
-  assets: Object.fromEntries(
-    Object.entries(manifest.assets).map(([id, asset]) => [
-      id,
-      { file: asset.file, bytes: asset.bytes, sha256: asset.sha256 },
-    ]),
-  ),
-};
-const pinPath =
-  argument("--pin") ??
-  (argument("--output")
-    ? join(OUTPUT, "assetRelease.ts")
-    : fileURLToPath(
-        new URL("../src/domain/studio/assetRelease.ts", import.meta.url),
-      ));
-await writeFile(
+
+// Checks every model against the release, then writes the models, the manifest and the pin.
+async function importRelease({
+  release,
+  assetVersion,
+  libraryAssets,
+  readModel,
+  output,
   pinPath,
-  await format(
-    `// Generated by scripts/sync-garments.mjs from the immutable Ocharo Assets release.\nexport const MODEL_RELEASE = ${JSON.stringify(pin, null, 2)} as const;\n`,
-    { parser: "typescript" },
-  ),
-);
-await writeFile(
-  join(OUTPUT, "asset-manifest.json"),
-  `${JSON.stringify(manifest, null, 2)}\n`,
-);
+  log,
+}) {
+  const manifest = {
+    release: {
+      id: release.id,
+      version: release.version,
+      sha256: release.sha256,
+    },
+    assetVersion,
+    source:
+      "ocharo-ws/workbench/ocharo-assets/engineering/codebase/ocharo-assets.library/garments (Blender build: source/build.py)",
+    importer: "scripts/sync-garments.mjs",
+    provenance:
+      "authored 3D interpretation of the Ocharo brand silhouette and garment references; not a scan or sewing pattern",
+    coordinates: {
+      units: "metres",
+      up: "+Y",
+      front: "+Z",
+      origin: "floor centre",
+      waistY: 1.12,
+    },
+    assets: {},
+  };
+  const imports = [];
+  for (const [id, { source, parts }] of Object.entries(ASSETS)) {
+    const released = release.assets.find((asset) => asset.id === source);
+    const bytes = await readModel(source, released);
+    const sha = sha256(bytes);
+    if (
+      !released ||
+      released.sha256 !== sha ||
+      released.bytes !== bytes.byteLength ||
+      released.file !== `${source}.glb`
+    )
+      throw new Error(
+        `${source}: content does not match the immutable release`,
+      );
+    if (libraryAssets && libraryAssets[source]?.sha256 !== sha)
+      throw new Error(`${source}: hash differs from the library manifest`);
+    if (bytes.byteLength > LIMITS.bytes)
+      throw new Error(`${source}: ${bytes.byteLength} bytes exceed the limit`);
+    const details = inspect(parseGlb(bytes, source), id, parts);
+    imports.push({ bytes, id });
+    manifest.assets[id] = {
+      file: `${id}.glb`,
+      librarySource: `${source}.glb`,
+      bytes: bytes.byteLength,
+      sha256: sha,
+      ...details,
+    };
+    log(
+      `${id}.glb ← ${source}.glb (${details.triangles} triangles, ${bytes.byteLength} bytes)`,
+    );
+  }
+  // No destination changes until every model, semantic part map and release hash passes.
+  await mkdir(output, { recursive: true });
+  for (const { bytes, id } of imports)
+    await writeFile(join(output, `${id}.glb`), bytes);
+  const pin = {
+    release: manifest.release,
+    assets: Object.fromEntries(
+      Object.entries(manifest.assets).map(([id, asset]) => [
+        id,
+        { file: asset.file, bytes: asset.bytes, sha256: asset.sha256 },
+      ]),
+    ),
+  };
+  await writeFile(
+    pinPath,
+    await format(
+      `// Generated by scripts/sync-garments.mjs from the immutable Ocharo Assets release.\nexport const MODEL_RELEASE = ${JSON.stringify(pin, null, 2)} as const;\n`,
+      { parser: "typescript" },
+    ),
+  );
+  await writeFile(
+    join(output, "asset-manifest.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+  );
+  return manifest;
+}
+
+/** Imports from a local library checkout: `<library>/glb` beside its committed release. */
+export async function syncFromLibrary({
+  library,
+  release: releasePath,
+  output,
+  pinPath,
+  log = console.log,
+}) {
+  const libraryManifest = JSON.parse(
+    await readFile(join(library, "och-3d-manifest.json"), "utf8"),
+  );
+  const release = JSON.parse(
+    await readFile(
+      releasePath ??
+        join(
+          library,
+          `../../releases/ocharo-garments-${libraryManifest.assetVersion}.json`,
+        ),
+      "utf8",
+    ),
+  );
+  verifyRelease(release, libraryManifest.assetVersion);
+  return importRelease({
+    release,
+    assetVersion: libraryManifest.assetVersion,
+    libraryAssets: libraryManifest.assets,
+    readModel: async (source) =>
+      new Uint8Array(await readFile(join(library, `${source}.glb`))),
+    output,
+    pinPath,
+    log,
+  });
+}
+
+/** Normalises the Files root to end in a slash, so `m/{sha256}` resolves below it. */
+function filesRoot(value) {
+  const url = new URL(value);
+  if (!url.pathname.endsWith("/")) url.pathname += "/";
+  url.search = "";
+  url.hash = "";
+  return url.href;
+}
+
+// Reads one public Files file by content hash and checks its bytes before anything uses them.
+async function fetchPublic(fetch, root, sha, bytes, what) {
+  const response = await fetch(new URL(`m/${sha}`, root));
+  if (!response.ok)
+    throw new Error(`${what}: Files answered ${response.status} for /m/${sha}`);
+  const body = new Uint8Array(await response.arrayBuffer());
+  if (bytes !== undefined && body.byteLength !== bytes)
+    throw new Error(`${what}: ${body.byteLength} bytes, expected ${bytes}`);
+  if (sha256(body) !== sha)
+    throw new Error(`${what}: content differs from its SHA-256 ${sha}`);
+  return body;
+}
+
+/** Imports from WoW2 Files: the release manifest by its SHA-256, then every listed GLB by its own. */
+export async function syncFromFiles({
+  files,
+  manifest: manifestSha,
+  release: releaseId,
+  output,
+  pinPath,
+  fetch = globalThis.fetch,
+  log = console.log,
+}) {
+  if (!SHA256.test(manifestSha ?? ""))
+    throw new Error("The release manifest SHA-256 must be 64 lowercase hex.");
+  const root = filesRoot(files);
+  const release = JSON.parse(
+    new TextDecoder().decode(
+      await fetchPublic(
+        fetch,
+        root,
+        manifestSha,
+        undefined,
+        "release manifest",
+      ),
+    ),
+  );
+  if (releaseId !== undefined && release.id !== releaseId)
+    throw new Error(`The release manifest is ${release.id}, not ${releaseId}.`);
+  verifyRelease(release, release.version);
+  log(`${release.id} ← ${root}m/${manifestSha}`);
+  return importRelease({
+    release,
+    assetVersion: release.version,
+    readModel: async (source, released) => {
+      if (!released || !SHA256.test(released.sha256))
+        throw new Error(
+          `${source}: content does not match the immutable release`,
+        );
+      if (released.bytes > LIMITS.bytes)
+        throw new Error(`${source}: ${released.bytes} bytes exceed the limit`);
+      return fetchPublic(fetch, root, released.sha256, released.bytes, source);
+    },
+    output,
+    pinPath,
+    log,
+  });
+}
+
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href
+) {
+  const argument = (name) => {
+    const index = process.argv.indexOf(name);
+    return index < 0 ? undefined : process.argv[index + 1];
+  };
+  const output =
+    argument("--output") ??
+    fileURLToPath(new URL("../public/assets/models/", import.meta.url));
+  const pinPath =
+    argument("--pin") ??
+    (argument("--output")
+      ? join(output, "assetRelease.ts")
+      : fileURLToPath(
+          new URL("../src/domain/studio/assetRelease.ts", import.meta.url),
+        ));
+  const libraryRoot = argument("--from") ?? process.env.OCHARO_3D_LIBRARY;
+  const files =
+    argument("--files") ??
+    (libraryRoot ? undefined : process.env.OCHARO_FILES_URL);
+  if (files) {
+    const lock = argument("--manifest")
+      ? { manifestSha256: argument("--manifest") }
+      : JSON.parse(
+          await readFile(
+            new URL("./garments-release.lock.json", import.meta.url),
+            "utf8",
+          ),
+        );
+    await syncFromFiles({
+      files,
+      manifest: lock.manifestSha256,
+      release: lock.release,
+      output,
+      pinPath,
+    });
+  } else {
+    if (!libraryRoot)
+      throw new Error(
+        "Pass --from <library>/glb or set OCHARO_3D_LIBRARY, or pass --files <Files root>.",
+      );
+    await syncFromLibrary({
+      library: libraryRoot.endsWith("glb")
+        ? libraryRoot
+        : join(libraryRoot, "glb"),
+      release: argument("--release"),
+      output,
+      pinPath,
+    });
+  }
+}
