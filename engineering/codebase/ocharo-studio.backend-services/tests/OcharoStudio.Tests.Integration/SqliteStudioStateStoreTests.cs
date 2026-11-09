@@ -3,9 +3,10 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
+using AwesomeAssertions;
 using Xunit;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.Integration;
 
 /// <summary>Exercises durable, isolated optimistic state storage against a real SQLite file.</summary>
 public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
@@ -38,22 +39,22 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
         var saved = await new SqliteStudioStateStore(settings)
             .PutAsync(workspace, initial, CancellationToken.None);
 
-        Assert.Equal(1, saved.State?.Revision);
+        (saved.State?.Revision).Should().Be(1);
         var reloaded = await new SqliteStudioStateStore(settings)
             .GetAsync(workspace, CancellationToken.None);
-        Assert.Equal("first", reloaded.Settings.GetProperty("theme").GetString());
-        Assert.NotNull(reloaded.Materials);
-        Assert.Equal(1.5, reloaded.Materials.Value.GetProperty("catalogue-atlas-paisley-ivory-on-black").GetProperty("scale").GetDouble());
+        reloaded.Settings.GetProperty("theme").GetString().Should().Be("first");
+        reloaded.Materials.Should().NotBeNull();
+        reloaded.Materials.Value.GetProperty("catalogue-atlas-paisley-ivory-on-black").GetProperty("scale").GetDouble().Should().Be(1.5);
 
         var conflict = await new SqliteStudioStateStore(settings)
             .PutAsync(workspace, State(0, "stale"), CancellationToken.None);
-        Assert.Null(conflict.State);
+        conflict.State.Should().BeNull();
         var preserved = await new SqliteStudioStateStore(settings)
             .GetAsync(workspace, CancellationToken.None);
-        Assert.Equal(1, preserved.Revision);
-        Assert.Equal("first", preserved.Settings.GetProperty("theme").GetString());
-        Assert.NotNull(preserved.Materials);
-        Assert.Equal(1, preserved.Materials.Value.GetProperty("catalogue-atlas-paisley-ivory-on-black").GetProperty("revision").GetInt64());
+        preserved.Revision.Should().Be(1);
+        preserved.Settings.GetProperty("theme").GetString().Should().Be("first");
+        preserved.Materials.Should().NotBeNull();
+        preserved.Materials.Value.GetProperty("catalogue-atlas-paisley-ivory-on-black").GetProperty("revision").GetInt64().Should().Be(1);
     }
 
     [Fact]
@@ -66,12 +67,12 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
 
         var isolated = await store.GetAsync(secondWorkspace, CancellationToken.None);
 
-        Assert.Equal(0, isolated.Revision);
-        Assert.Equal(JsonValueKind.Null, isolated.Draft?.ValueKind ?? JsonValueKind.Null);
-        Assert.Empty(isolated.Looks.EnumerateArray());
-        Assert.Empty(isolated.Settings.EnumerateObject());
-        Assert.NotNull(isolated.Materials);
-        Assert.Empty(isolated.Materials.Value.EnumerateObject());
+        isolated.Revision.Should().Be(0);
+        (isolated.Draft?.ValueKind ?? JsonValueKind.Null).Should().Be(JsonValueKind.Null);
+        isolated.Looks.EnumerateArray().Should().BeEmpty();
+        isolated.Settings.EnumerateObject().Should().BeEmpty();
+        isolated.Materials.Should().NotBeNull();
+        isolated.Materials.Value.EnumerateObject().Should().BeEmpty();
     }
 
     [Fact]
@@ -82,8 +83,8 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
         var saved = await new SqliteStudioStateStore(settings)
             .PutAsync(Guid.NewGuid(), legacy, CancellationToken.None);
 
-        Assert.NotNull(saved.State?.Materials);
-        Assert.Empty(saved.State.Materials.Value.EnumerateObject());
+        (saved.State?.Materials).Should().NotBeNull();
+        saved.State.Materials.Value.EnumerateObject().Should().BeEmpty();
     }
 
     [Fact]
@@ -101,15 +102,13 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
         var rejected = await store.PutAsync(workspace, legacyWrite, CancellationToken.None);
         var preserved = await store.GetAsync(workspace, CancellationToken.None);
 
-        Assert.Null(rejected.State);
-        Assert.Equal(StudioStateWriteFailure.MaterialsRequired, rejected.Failure);
-        Assert.Equal("current", preserved.Settings.GetProperty("theme").GetString());
-        Assert.Equal(
-            1.5,
-            preserved.Materials!.Value
+        rejected.State.Should().BeNull();
+        rejected.Failure.Should().Be(StudioStateWriteFailure.MaterialsRequired);
+        preserved.Settings.GetProperty("theme").GetString().Should().Be("current");
+        preserved.Materials!.Value
                 .GetProperty("catalogue-atlas-paisley-ivory-on-black")
                 .GetProperty("scale")
-                .GetDouble());
+                .GetDouble().Should().Be(1.5);
     }
 
     [Fact]
@@ -143,10 +142,10 @@ public sealed class SqliteStudioStateStoreTests : IAsyncLifetime
             Guid.Parse("0c645d1c-576a-43b8-a8d2-b75eb892014d"),
             CancellationToken.None);
 
-        Assert.Equal(7, state.Revision);
-        Assert.Equal("legacy", state.Settings.GetProperty("theme").GetString());
-        Assert.NotNull(state.Materials);
-        Assert.Empty(state.Materials.Value.EnumerateObject());
+        state.Revision.Should().Be(7);
+        state.Settings.GetProperty("theme").GetString().Should().Be("legacy");
+        state.Materials.Should().NotBeNull();
+        state.Materials.Value.EnumerateObject().Should().BeEmpty();
     }
 
     private static StudioState State(long revision, string theme) => new(

@@ -13,9 +13,10 @@ using Microsoft.Extensions.Options;
 using OcharoStudio.Api.Configurations;
 using OcharoStudio.Persistence;
 using WoW.Two.Sdk.Beta.Be.Foundation.Configuration;
+using AwesomeAssertions;
 using Xunit;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.E2E;
 
 /// <summary>
 /// The host's settings rules: only a local run — Development without the runner's <c>DEPLOY_ENVIRONMENT</c> — reads this
@@ -57,7 +58,7 @@ public sealed class HostSettingsTests : IDisposable
 
         builder.Configure();
 
-        Assert.Equal(expected, builder.Configuration["Identity:Client:Authority"]);
+        builder.Configuration["Identity:Client:Authority"].Should().Be(expected);
     }
 
     [Theory]
@@ -79,7 +80,7 @@ public sealed class HostSettingsTests : IDisposable
         });
         using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://studio.test") });
 
-        Assert.Equal(expected, (await client.GetAsync("/openapi/v1.json")).StatusCode);
+        (await client.GetAsync("/openapi/v1.json")).StatusCode.Should().Be(expected);
     }
 
     [Fact]
@@ -105,18 +106,18 @@ public sealed class HostSettingsTests : IDisposable
         });
         using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://studio.test") });
 
-        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/health")).StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/system/version")).StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/openapi/v1.json")).StatusCode);
-        Assert.Contains("studio-shell", await client.GetStringAsync("/studio"));
+        (await client.GetAsync("/health")).StatusCode.Should().Be(HttpStatusCode.OK);
+        (await client.GetAsync("/api/system/version")).StatusCode.Should().Be(HttpStatusCode.OK);
+        (await client.GetAsync("/openapi/v1.json")).StatusCode.Should().Be(HttpStatusCode.NotFound);
+        (await client.GetStringAsync("/studio")).Should().Contain("studio-shell");
         var environment = factory.Services.GetRequiredService<IHostEnvironment>();
         var configuration = factory.Services.GetRequiredService<IConfiguration>();
-        Assert.Equal(Environments.Production, environment.EnvironmentName);
-        Assert.False(environment.IsLocalRun(configuration));
-        Assert.Equal(TargetAuthority, configuration["Identity:Client:Authority"]);
-        Assert.True(File.Exists(database), "startup initializes the target's SQLite schema before serving");
+        environment.EnvironmentName.Should().Be(Environments.Production);
+        environment.IsLocalRun(configuration).Should().BeFalse();
+        configuration["Identity:Client:Authority"].Should().Be(TargetAuthority);
+        File.Exists(database).Should().BeTrue();
         var keyRing = factory.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.XmlRepository;
-        Assert.Equal(Path.Combine(root, "appdata", "keys"), Assert.IsType<FileSystemXmlRepository>(keyRing).Directory.FullName);
+        keyRing.Should().BeOfType<FileSystemXmlRepository>().Which.Directory.FullName.Should().Be(Path.Combine(root, "appdata", "keys"));
     }
 
     /// <summary>The API project folder, found above the test output, so the deployed test reads its checked-in settings.</summary>

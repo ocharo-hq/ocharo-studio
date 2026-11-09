@@ -1,7 +1,8 @@
 using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
+using AwesomeAssertions;
 using Xunit;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.Unit;
 
 /// <summary>Protects the portable-document and browser-storage compatibility contract.</summary>
 public sealed class GetStudioInfoQueryHandlerTests
@@ -12,9 +13,9 @@ public sealed class GetStudioInfoQueryHandlerTests
         var result = await new GetStudioInfoQueryHandler()
             .HandleAsync(new GetStudioInfoQuery(), CancellationToken.None);
 
-        Assert.Equal("Ocharo Studio", result.Product);
-        Assert.Equal(2, result.DocumentSchemaVersion);
-        Assert.Equal("sqlite", result.Storage);
-        Assert.Equal(["edit", "save", "import", "export"], result.Capabilities);
+        result.Product.Should().Be("Ocharo Studio");
+        result.DocumentSchemaVersion.Should().Be(2);
+        result.Storage.Should().Be("sqlite");
+        result.Capabilities.Should().Equal(["edit", "save", "import", "export"]);
     }
 }

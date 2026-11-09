@@ -9,9 +9,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using OcharoStudio.Persistence;
 using WoW.Two.Sdk.Beta.Be.Identity.Bff;
+using AwesomeAssertions;
 using Xunit;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.E2E;
 
 /// <summary>
 /// Behind the ingress, TLS ends at Traefik and the container sees plain HTTP from its address. Forwarded scheme and
@@ -37,7 +38,7 @@ public sealed class IngressTests : IDisposable
 
         var response = await SendAsync(factory, sender, "/api/identity/session", _ => { });
 
-        Assert.Equal(expected, response.Response.StatusCode);
+        response.Response.StatusCode.Should().Be(expected);
     }
 
     [Theory]
@@ -50,13 +51,13 @@ public sealed class IngressTests : IDisposable
         var response = await SendAsync(factory, sender, "/api/identity/sign-in", http =>
             http.Request.QueryString = new QueryString("?returnUrl=%2Fstudio"));
 
-        Assert.Equal(expected, response.Response.StatusCode);
+        response.Response.StatusCode.Should().Be(expected);
         if (expected == StatusCodes.Status302Found)
         {
             var location = response.Response.Headers.Location.ToString();
-            Assert.StartsWith(AuthorizeEndpoint + "?", location);
-            Assert.Contains(Uri.EscapeDataString($"https://{PublicHost}/api/identity/callback"), location);
-            Assert.Contains(".AspNetCore.Correlation.", response.Response.Headers.SetCookie.ToString());
+            location.Should().StartWith(AuthorizeEndpoint + "?");
+            location.Should().Contain(Uri.EscapeDataString($"https://{PublicHost}/api/identity/callback"));
+            response.Response.Headers.SetCookie.ToString().Should().Contain(".AspNetCore.Correlation.");
         }
     }
 

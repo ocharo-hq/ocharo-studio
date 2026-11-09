@@ -8,9 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OcharoStudio.Api.RuntimeConfig.Settings;
 using OcharoStudio.Persistence;
+using AwesomeAssertions;
 using Xunit;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.E2E;
 
 /// <summary>Studio serves the Ocharo app addresses as public runtime settings, anonymously and uncached.</summary>
 public sealed class RuntimeConfigTests
@@ -36,10 +37,10 @@ public sealed class RuntimeConfigTests
 
         using var response = await client.GetAsync("/api/runtime-config");
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal("application/json", response.Content.Headers.ContentType!.MediaType);
-        Assert.True(response.Headers.CacheControl!.NoStore);
-        Assert.Equal(new Dictionary<string, string>
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType!.MediaType.Should().Be("application/json");
+        response.Headers.CacheControl!.NoStore.Should().BeTrue();
+        (await ReadAsync(response)).Should().Equal(new Dictionary<string, string>
         {
             ["OCHARO_DESK_URL"] = "https://ocharo-desk-dev.example.ts.net/",
             ["OCHARO_CATALOGUE_URL"] = "https://ocharo-catalogue-dev.example.ts.net/catalogues",
@@ -50,7 +51,7 @@ public sealed class RuntimeConfigTests
             ["OCHARO_ATLAS_URL"] = "https://ocharo-atlas-dev.example.ts.net/",
             ["OCHARO_WEAR_URL"] = "https://ocharo-wear-dev.example.ts.net/",
             ["OCHARO_BLOG_URL"] = "https://ocharo-blog-dev.example.ts.net/",
-        }, await ReadAsync(response));
+        });
     }
 
     [Fact]
@@ -63,13 +64,13 @@ public sealed class RuntimeConfigTests
 
         using var response = await client.SendAsync(request);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.True(response.Headers.CacheControl!.NoStore);
-        Assert.Contains("OCHARO_DESK_URL", (await ReadAsync(response)).Keys);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Headers.CacheControl!.NoStore.Should().BeTrue();
+        (await ReadAsync(response)).Keys.Should().Contain("OCHARO_DESK_URL");
         // The session boundary still holds for the private API, the forged cookie included.
         using var state = new HttpRequestMessage(HttpMethod.Get, "/api/studio/state");
         state.Headers.Add("Cookie", $"{StudioTestIdentity.CookieName}=forged");
-        Assert.Equal(HttpStatusCode.Unauthorized, (await client.SendAsync(state)).StatusCode);
+        (await client.SendAsync(state)).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
@@ -91,8 +92,8 @@ public sealed class RuntimeConfigTests
 
         using var response = await client.GetAsync("/api/runtime-config");
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal(new Dictionary<string, string> { ["OCHARO_ATLAS_URL"] = "https://ocharo-atlas-dev.example.ts.net/" }, await ReadAsync(response));
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await ReadAsync(response)).Should().Equal(new Dictionary<string, string> { ["OCHARO_ATLAS_URL"] = "https://ocharo-atlas-dev.example.ts.net/" });
     }
 
     [Fact]
@@ -103,9 +104,9 @@ public sealed class RuntimeConfigTests
 
         using var response = await client.GetAsync("/api/runtime-config");
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.True(response.Headers.CacheControl!.NoStore);
-        Assert.Equal("{}", await response.Content.ReadAsStringAsync());
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Headers.CacheControl!.NoStore.Should().BeTrue();
+        (await response.Content.ReadAsStringAsync()).Should().Be("{}");
     }
 
     [Theory]
@@ -124,7 +125,7 @@ public sealed class RuntimeConfigTests
     [InlineData(null, false)]
     public void IsPublicAddress_ShouldAcceptOnlyPlainAbsoluteHttpsLinks(string? value, bool accepted)
     {
-        Assert.Equal(accepted, OcharoAppsSettingsExtensions.IsPublicAddress(value));
+        OcharoAppsSettingsExtensions.IsPublicAddress(value).Should().Be(accepted);
     }
 
     [Fact]
@@ -132,7 +133,7 @@ public sealed class RuntimeConfigTests
     {
         var settings = new OcharoAppsSettings { Desk = "http://desk.example.com/", Atlas = "https://atlas.example.com/", Wear = " " };
 
-        Assert.Equal(["OcharoApps:Desk"], settings.RejectedSettings());
+        settings.RejectedSettings().Should().Equal(["OcharoApps:Desk"]);
     }
 
     private static async Task<Dictionary<string, string>> ReadAsync(HttpResponseMessage response)

@@ -9,7 +9,7 @@ using WoW.Two.Sdk.Beta.Be.Files.Store;
 using WoW.Two.Sdk.Beta.Be.Files.Uploads;
 using WoW.Two.Sdk.Beta.Be.Files.Urls;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.E2E;
 
 /// <summary>An in-memory Files tenant: uploads keep their bytes, idempotency key and app; references attach; links
 /// name the file and the asked width; a file can be corrupted or removed to exercise the release check.</summary>

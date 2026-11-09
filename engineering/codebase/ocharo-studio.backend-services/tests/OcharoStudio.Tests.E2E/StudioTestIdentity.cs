@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using WoW.Two.Sdk.Beta.Be.Identity.Bff;
 using WoW.Two.Sdk.Beta.Be.Identity.Core.Organizations;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.E2E;
 
 /// <summary>
 /// What the Studio test hosts replace for sign-in: a stand-in for the Identity BFF cookie scheme. A request whose session

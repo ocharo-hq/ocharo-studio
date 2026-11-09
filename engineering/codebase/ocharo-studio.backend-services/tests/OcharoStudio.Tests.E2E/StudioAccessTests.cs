@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OcharoStudio.Api.Studio.Access;
+using AwesomeAssertions;
 using Xunit;
-using static OcharoStudio.Tests.StudioTestIdentity;
+using static OcharoStudio.Tests.E2E.StudioTestIdentity;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.E2E;
 
 /// <summary>
 /// Studio signs in through Ocharo's Identity BFF and stays usable without signing in: only the session and state routes need
@@ -25,9 +26,7 @@ public sealed class StudioAccessTests
     public void WorkspaceFor_ShouldKeepItsExactBytes()
     {
         // Computed by the Desk-ticket build before the move; a change here orphans every saved design.
-        Assert.Equal(
-            Guid.Parse("909a2adc-3737-2513-de34-a7bb6f29a55d"),
-            StudioAccess.WorkspaceFor(Guid.Parse("11111111-1111-1111-1111-111111111111"), "22222222-2222-2222-2222-222222222222"));
+        StudioAccess.WorkspaceFor(Guid.Parse("11111111-1111-1111-1111-111111111111"), "22222222-2222-2222-2222-222222222222").Should().Be(Guid.Parse("909a2adc-3737-2513-de34-a7bb6f29a55d"));
     }
 
     [Fact]
@@ -35,9 +34,9 @@ public sealed class StudioAccessTests
     {
         var first = StudioAccess.WorkspaceFor(Organization, "a");
 
-        Assert.Equal(first, StudioAccess.WorkspaceFor(Organization, "a"));
-        Assert.NotEqual(first, StudioAccess.WorkspaceFor(Organization, "b"));
-        Assert.NotEqual(first, StudioAccess.WorkspaceFor(OtherOrganization, "a"));
+        StudioAccess.WorkspaceFor(Organization, "a").Should().Be(first);
+        StudioAccess.WorkspaceFor(Organization, "b").Should().NotBe(first);
+        StudioAccess.WorkspaceFor(OtherOrganization, "a").Should().NotBe(first);
     }
 
     [Fact]
@@ -49,11 +48,11 @@ public sealed class StudioAccessTests
         using var response = await client.GetAsync(Session);
         var session = await response.Content.ReadFromJsonAsync<JsonElement>();
 
-        Assert.True(response.Headers.CacheControl!.NoStore);
-        Assert.Equal(new[] { "canEdit", "organizationId", "userId", "workspaceId" }, session.EnumerateObject().Select(item => item.Name).Order().ToArray());
-        Assert.Equal("909a2adc-3737-2513-de34-a7bb6f29a55d", session.GetProperty("workspaceId").GetString());
-        Assert.Equal("22222222-2222-2222-2222-222222222222", session.GetProperty("userId").GetString());
-        Assert.Equal("11111111-1111-1111-1111-111111111111", session.GetProperty("organizationId").GetString());
+        response.Headers.CacheControl!.NoStore.Should().BeTrue();
+        session.EnumerateObject().Select(item => item.Name).Order().ToArray().Should().Equal(new[] { "canEdit", "organizationId", "userId", "workspaceId" });
+        session.GetProperty("workspaceId").GetString().Should().Be("909a2adc-3737-2513-de34-a7bb6f29a55d");
+        session.GetProperty("userId").GetString().Should().Be("22222222-2222-2222-2222-222222222222");
+        session.GetProperty("organizationId").GetString().Should().Be("11111111-1111-1111-1111-111111111111");
     }
 
     [Fact]
@@ -64,7 +63,7 @@ public sealed class StudioAccessTests
 
         var response = await client.PostAsJsonAsync("/api/identity/signal", new { });
 
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
@@ -75,11 +74,11 @@ public sealed class StudioAccessTests
 
         var session = await IdentitySessionAsync(client);
 
-        Assert.True(session.GetProperty("isAuthenticated").GetBoolean());
-        Assert.Equal("editor-sub", session.GetProperty("person").GetProperty("sub").GetString());
-        Assert.Equal(new string?[] { StudioAccess.EditPermission }, session.GetProperty("permissions").EnumerateArray().Select(p => p.GetString()));
-        Assert.False(string.IsNullOrEmpty(session.GetProperty("csrfToken").GetString()));
-        Assert.True(session.GetProperty("expiresAt").GetDateTimeOffset() > DateTimeOffset.UtcNow);
+        session.GetProperty("isAuthenticated").GetBoolean().Should().BeTrue();
+        session.GetProperty("person").GetProperty("sub").GetString().Should().Be("editor-sub");
+        session.GetProperty("permissions").EnumerateArray().Select(p => p.GetString()).Should().Equal(new string?[] { StudioAccess.EditPermission });
+        string.IsNullOrEmpty(session.GetProperty("csrfToken").GetString()).Should().BeFalse();
+        (session.GetProperty("expiresAt").GetDateTimeOffset() > DateTimeOffset.UtcNow).Should().BeTrue();
     }
 
     [Theory]
@@ -94,8 +93,8 @@ public sealed class StudioAccessTests
 
         foreach (var response in new[] { await client.GetAsync(Session), await client.GetAsync(State), await client.PutAsJsonAsync(State, EmptyState()) })
         {
-            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-            if (realCookieScheme) Assert.Equal("SignInRequired", await CodeAsync(response));
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            if (realCookieScheme) (await CodeAsync(response)).Should().Be("SignInRequired");
         }
     }
 
@@ -110,7 +109,7 @@ public sealed class StudioAccessTests
         await using var host = StudioHost.Create(new Dictionary<string, string?>(), realCookieScheme: true);
         using var client = Anonymous(host.Factory);
 
-        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync(path)).StatusCode);
+        (await client.GetAsync(path)).StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Theory]
@@ -126,8 +125,8 @@ public sealed class StudioAccessTests
 
         using var response = await client.SendAsync(request);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains(StudioHost.SpaShell, await response.Content.ReadAsStringAsync());
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await response.Content.ReadAsStringAsync()).Should().Contain(StudioHost.SpaShell);
     }
 
     [Fact]
@@ -137,7 +136,7 @@ public sealed class StudioAccessTests
         await File.WriteAllTextAsync(Path.Combine(host.Root, "wwwroot", "app.js"), "// app");
         using var client = Anonymous(host.Factory);
 
-        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/app.js")).StatusCode);
+        (await client.GetAsync("/app.js")).StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -151,11 +150,11 @@ public sealed class StudioAccessTests
         using var write = await editor.PutAsJsonAsync(State, EmptyState());
         var saved = await editor.GetFromJsonAsync<JsonElement>(State);
 
-        Assert.True(session.GetProperty("canEdit").GetBoolean());
-        Assert.Equal(StudioAccess.WorkspaceFor(Organization, Editor.Subject), session.GetProperty("workspaceId").GetGuid());
-        Assert.Equal(0, empty.GetProperty("revision").GetInt64());
-        Assert.Equal(HttpStatusCode.OK, write.StatusCode);
-        Assert.Equal(1, saved.GetProperty("revision").GetInt64());
+        session.GetProperty("canEdit").GetBoolean().Should().BeTrue();
+        session.GetProperty("workspaceId").GetGuid().Should().Be(StudioAccess.WorkspaceFor(Organization, Editor.Subject));
+        empty.GetProperty("revision").GetInt64().Should().Be(0);
+        write.StatusCode.Should().Be(HttpStatusCode.OK);
+        saved.GetProperty("revision").GetInt64().Should().Be(1);
     }
 
     [Fact]
@@ -168,9 +167,9 @@ public sealed class StudioAccessTests
         using var read = await viewer.GetAsync(State);
         using var write = await viewer.PutAsJsonAsync(State, EmptyState());
 
-        Assert.False(session.GetProperty("canEdit").GetBoolean());
-        Assert.Equal(HttpStatusCode.OK, read.StatusCode);
-        Assert.Equal(HttpStatusCode.Forbidden, write.StatusCode);
+        session.GetProperty("canEdit").GetBoolean().Should().BeFalse();
+        read.StatusCode.Should().Be(HttpStatusCode.OK);
+        write.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -181,12 +180,12 @@ public sealed class StudioAccessTests
         {
             using var client = await SignedIn(host.Factory, person);
 
-            Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync(Session)).StatusCode);
-            Assert.Equal(HttpStatusCode.Forbidden, (await client.GetAsync(State)).StatusCode);
-            Assert.Equal(HttpStatusCode.Forbidden, (await client.PutAsJsonAsync(State, EmptyState())).StatusCode);
+            (await client.GetAsync(Session)).StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            (await client.GetAsync(State)).StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            (await client.PutAsJsonAsync(State, EmptyState())).StatusCode.Should().Be(HttpStatusCode.Forbidden);
             // Signed in all the same, and everything anonymous still answers.
-            Assert.True((await IdentitySessionAsync(client)).GetProperty("isAuthenticated").GetBoolean());
-            Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/studio")).StatusCode);
+            (await IdentitySessionAsync(client)).GetProperty("isAuthenticated").GetBoolean().Should().BeTrue();
+            (await client.GetAsync("/api/studio")).StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
 
@@ -204,12 +203,12 @@ public sealed class StudioAccessTests
 
         foreach (var refused in new[] { missing, foreign, wrong })
         {
-            Assert.Equal(HttpStatusCode.BadRequest, refused.StatusCode);
-            Assert.Equal("AntiforgeryValidationFailed", await CodeAsync(refused));
+            refused.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            (await CodeAsync(refused)).Should().Be("AntiforgeryValidationFailed");
         }
 
-        Assert.Equal(0, (await forger.GetFromJsonAsync<JsonElement>(State)).GetProperty("revision").GetInt64());
-        Assert.Equal(HttpStatusCode.OK, (await editor.PutAsJsonAsync(State, EmptyState())).StatusCode);
+        (await forger.GetFromJsonAsync<JsonElement>(State)).GetProperty("revision").GetInt64().Should().Be(0);
+        (await editor.PutAsJsonAsync(State, EmptyState())).StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -221,13 +220,13 @@ public sealed class StudioAccessTests
         using var other = await SignedIn(host.Factory, SecondEditor);
         var others = (await other.GetFromJsonAsync<JsonElement>(Session)).GetProperty("workspaceId").GetString()!;
 
-        Assert.NotEqual(own, others);
-        Assert.Equal(HttpStatusCode.OK, (await SendAsync(editor, HttpMethod.Get, own)).StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await SendAsync(editor, HttpMethod.Put, own)).StatusCode);
+        others.Should().NotBe(own);
+        (await SendAsync(editor, HttpMethod.Get, own)).StatusCode.Should().Be(HttpStatusCode.OK);
+        (await SendAsync(editor, HttpMethod.Put, own)).StatusCode.Should().Be(HttpStatusCode.OK);
         foreach (var selected in new[] { others, Guid.NewGuid().ToString(), "not-a-guid" })
         {
-            Assert.Equal(HttpStatusCode.Forbidden, (await SendAsync(editor, HttpMethod.Get, selected)).StatusCode);
-            Assert.Equal(HttpStatusCode.Forbidden, (await SendAsync(editor, HttpMethod.Put, selected)).StatusCode);
+            (await SendAsync(editor, HttpMethod.Get, selected)).StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            (await SendAsync(editor, HttpMethod.Put, selected)).StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
     }
 
@@ -239,14 +238,14 @@ public sealed class StudioAccessTests
         using var sameOrganization = await SignedIn(host.Factory, SecondEditor);
         using var sameSubject = await SignedIn(host.Factory, EditorElsewhere);
 
-        Assert.Equal(HttpStatusCode.OK, (await editor.PutAsJsonAsync(State, EmptyState())).StatusCode);
+        (await editor.PutAsJsonAsync(State, EmptyState())).StatusCode.Should().Be(HttpStatusCode.OK);
 
-        Assert.Equal(1, (await editor.GetFromJsonAsync<JsonElement>(State)).GetProperty("revision").GetInt64());
-        Assert.Equal(0, (await sameOrganization.GetFromJsonAsync<JsonElement>(State)).GetProperty("revision").GetInt64());
+        (await editor.GetFromJsonAsync<JsonElement>(State)).GetProperty("revision").GetInt64().Should().Be(1);
+        (await sameOrganization.GetFromJsonAsync<JsonElement>(State)).GetProperty("revision").GetInt64().Should().Be(0);
         var elsewhere = await sameSubject.GetFromJsonAsync<JsonElement>(Session);
-        Assert.Equal(OtherOrganization, elsewhere.GetProperty("organizationId").GetGuid());
-        Assert.Equal(StudioAccess.WorkspaceFor(OtherOrganization, Editor.Subject), elsewhere.GetProperty("workspaceId").GetGuid());
-        Assert.Equal(0, (await sameSubject.GetFromJsonAsync<JsonElement>(State)).GetProperty("revision").GetInt64());
+        elsewhere.GetProperty("organizationId").GetGuid().Should().Be(OtherOrganization);
+        elsewhere.GetProperty("workspaceId").GetGuid().Should().Be(StudioAccess.WorkspaceFor(OtherOrganization, Editor.Subject));
+        (await sameSubject.GetFromJsonAsync<JsonElement>(State)).GetProperty("revision").GetInt64().Should().Be(0);
     }
 
     [Theory]
@@ -258,10 +257,10 @@ public sealed class StudioAccessTests
         using var client = Anonymous(host.Factory);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "editor");
 
-        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync(Session)).StatusCode);
-        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync(State)).StatusCode);
-        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PutAsJsonAsync(State, EmptyState())).StatusCode);
-        Assert.False((await IdentitySessionAsync(client)).GetProperty("isAuthenticated").GetBoolean());
+        (await client.GetAsync(Session)).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        (await client.GetAsync(State)).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        (await client.PutAsJsonAsync(State, EmptyState())).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        (await IdentitySessionAsync(client)).GetProperty("isAuthenticated").GetBoolean().Should().BeFalse();
     }
 
     [Theory]
@@ -271,9 +270,9 @@ public sealed class StudioAccessTests
     {
         await using var host = StudioHost.Create(new Dictionary<string, string?> { [key] = null });
 
-        var failure = Assert.ThrowsAny<Exception>(() => Anonymous(host.Factory));
+        var failure = FluentActions.Invoking(() => Anonymous(host.Factory)).Should().Throw<Exception>().Which;
 
-        Assert.Contains(key, failure.Message);
+        failure.Message.Should().Contain(key);
     }
 
     [Theory]
@@ -287,8 +286,8 @@ public sealed class StudioAccessTests
 
         using var response = await client.SendAsync(new HttpRequestMessage(new HttpMethod(method), path));
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Equal("https_required", await CodeAsync(response));
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        (await CodeAsync(response)).Should().Be("https_required");
     }
 
     [Fact]
@@ -298,11 +297,11 @@ public sealed class StudioAccessTests
         var elsewhere = Path.Combine(Path.GetTempPath(), "ocharo-studio-keys", Guid.NewGuid().ToString("N"));
         await using var named = StudioHost.Create(new Dictionary<string, string?> { ["DataProtection:KeysPath"] = elsewhere });
 
-        Assert.Equal(Path.Combine(byDefault.Root, "keys"), KeyRingFolder(byDefault));
-        Assert.Equal(elsewhere, KeyRingFolder(named));
+        KeyRingFolder(byDefault).Should().Be(Path.Combine(byDefault.Root, "keys"));
+        KeyRingFolder(named).Should().Be(elsewhere);
         // The first session's CSRF token creates the key, on disk.
         using var client = await SignedIn(byDefault.Factory, Editor);
-        Assert.NotEmpty(Directory.GetFiles(Path.Combine(byDefault.Root, "keys"), "key-*.xml"));
+        Directory.GetFiles(Path.Combine(byDefault.Root, "keys"), "key-*.xml").Should().NotBeEmpty();
     }
 
     [Theory]
@@ -327,22 +326,22 @@ public sealed class StudioAccessTests
 
         using var response = await client.SendAsync(request);
 
-        Assert.Equal(expected, (int)response.StatusCode);
-        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
-        Assert.True(response.Headers.CacheControl?.NoStore);
+        ((int)response.StatusCode).Should().Be(expected);
+        (response.Content.Headers.ContentType?.MediaType).Should().Be("application/problem+json");
+        (response.Headers.CacheControl?.NoStore).Should().BeTrue();
         var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
-        Assert.Equal(expected, problem.GetProperty("status").GetInt32());
-        Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("type").GetString()));
-        Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("title").GetString()));
-        Assert.Equal(path, problem.GetProperty("instance").GetString());
-        Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("traceId").GetString()));
-        Assert.False(string.IsNullOrWhiteSpace(problem.GetProperty("requestId").GetString()));
+        problem.GetProperty("status").GetInt32().Should().Be(expected);
+        string.IsNullOrWhiteSpace(problem.GetProperty("type").GetString()).Should().BeFalse();
+        string.IsNullOrWhiteSpace(problem.GetProperty("title").GetString()).Should().BeFalse();
+        problem.GetProperty("instance").GetString().Should().Be(path);
+        string.IsNullOrWhiteSpace(problem.GetProperty("traceId").GetString()).Should().BeFalse();
+        string.IsNullOrWhiteSpace(problem.GetProperty("requestId").GetString()).Should().BeFalse();
     }
 
     private static string KeyRingFolder(StudioHost host)
     {
         var repository = host.Factory.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.XmlRepository;
-        return Assert.IsType<FileSystemXmlRepository>(repository).Directory.FullName;
+        return repository.Should().BeOfType<FileSystemXmlRepository>().Which.Directory.FullName;
     }
 
     private static Task<HttpResponseMessage> Forged(HttpClient client, string token)

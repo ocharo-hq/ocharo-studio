@@ -11,6 +11,8 @@
     <Project Path="OcharoStudio.Persistence/OcharoStudio.Persistence.csproj" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="tests/OcharoStudio.Tests/OcharoStudio.Tests.csproj" />
+    <Project Path="tests/OcharoStudio.Tests.E2E/OcharoStudio.Tests.E2E.csproj" />
+    <Project Path="tests/OcharoStudio.Tests.Integration/OcharoStudio.Tests.Integration.csproj" />
+    <Project Path="tests/OcharoStudio.Tests.Unit/OcharoStudio.Tests.Unit.csproj" />
   </Folder>
 </Solution>

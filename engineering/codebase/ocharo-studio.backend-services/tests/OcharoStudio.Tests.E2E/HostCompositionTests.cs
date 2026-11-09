@@ -7,9 +7,10 @@ using OcharoStudio.Application.Studio.Queries.GetStudioInfo;
 using OcharoStudio.Application.Studio.State;
 using OcharoStudio.Persistence;
 using WoW.Two.Sdk.Beta.Be.Mediator;
+using AwesomeAssertions;
 using Xunit;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.E2E;
 
 /// <summary>Verifies the real host resolves application handlers and initializes overridden state storage.</summary>
 public sealed class HostCompositionTests
@@ -35,19 +36,19 @@ public sealed class HostCompositionTests
             using var first = factory.Services.CreateScope();
             using var second = factory.Services.CreateScope();
             var service = first.ServiceProvider.GetRequiredService<StudioStateService>();
-            Assert.Same(service, first.ServiceProvider.GetRequiredService<StudioStateService>());
-            Assert.NotSame(service, second.ServiceProvider.GetRequiredService<StudioStateService>());
-            Assert.NotSame(first.ServiceProvider.GetRequiredService<IStudioStateStore>(), second.ServiceProvider.GetRequiredService<IStudioStateStore>());
-            Assert.Same(first.ServiceProvider.GetRequiredService<StudioCatalogContract>(), second.ServiceProvider.GetRequiredService<StudioCatalogContract>());
-            Assert.Same(first.ServiceProvider.GetRequiredService<StudioStateValidator>(), second.ServiceProvider.GetRequiredService<StudioStateValidator>());
+            first.ServiceProvider.GetRequiredService<StudioStateService>().Should().BeSameAs(service);
+            second.ServiceProvider.GetRequiredService<StudioStateService>().Should().NotBeSameAs(service);
+            second.ServiceProvider.GetRequiredService<IStudioStateStore>().Should().NotBeSameAs(first.ServiceProvider.GetRequiredService<IStudioStateStore>());
+            second.ServiceProvider.GetRequiredService<StudioCatalogContract>().Should().BeSameAs(first.ServiceProvider.GetRequiredService<StudioCatalogContract>());
+            second.ServiceProvider.GetRequiredService<StudioStateValidator>().Should().BeSameAs(first.ServiceProvider.GetRequiredService<StudioStateValidator>());
 
             var state = await service.GetAsync(Guid.NewGuid(), CancellationToken.None);
-            Assert.Equal(0, state.Revision);
-            Assert.True(File.Exists(Path.Combine(root, "studio.db")));
+            state.Revision.Should().Be(0);
+            File.Exists(Path.Combine(root, "studio.db")).Should().BeTrue();
             var info = await first.ServiceProvider.GetRequiredService<ISender>().SendAsync(new GetStudioInfoQuery(), CancellationToken.None);
-            Assert.Equal("Ocharo Studio", info.Product);
-            Assert.Equal("sqlite", info.Storage);
-            Assert.Equal(2, info.DocumentSchemaVersion);
+            info.Product.Should().Be("Ocharo Studio");
+            info.Storage.Should().Be("sqlite");
+            info.DocumentSchemaVersion.Should().Be(2);
         }
         finally
         {

@@ -3,10 +3,11 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using OcharoStudio.Application.Studio.State;
+using AwesomeAssertions;
 using Xunit;
-using static OcharoStudio.Tests.StudioTestIdentity;
+using static OcharoStudio.Tests.E2E.StudioTestIdentity;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.E2E;
 
 /// <summary>Saved-look thumbnails on WoW2 Files (<c>Files:BaseUrl</c> set): a save stores each new thumbnail once and keeps its
 /// route in the state, a stored data URL stays until its look is saved again with a new one, the route links to Files for the
@@ -27,18 +28,18 @@ public sealed class ThumbnailTests
         var again = await PutAsync(editor, 1, Look(Guid.Parse(Id(1)), thumbnail));
 
         var route = ThumbnailsOf(saved)[0];
-        Assert.Equal(route, ThumbnailsOf(saved)[1]);
-        Assert.Matches("^/api/studio/thumbnails/[0-9a-f]{64}/[0-9a-f-]{36}$", route);
-        Assert.DoesNotContain("data:", saved.ToString());
-        Assert.Equal(1, files.Uploads);
-        var file = Assert.Single(files.Of("studio"));
-        Assert.Equal("image/webp", file.ContentType);
-        Assert.Contains(files.ReferencesOf(file.Id), reference => reference.RecordType == "studio.thumbnail" && reference.RecordId == file.Sha256);
-        Assert.EndsWith($"/{file.Id}", route);
-        Assert.Equal(route, ThumbnailsOf(await editor.GetFromJsonAsync<JsonElement>(State))[0]);
+        ThumbnailsOf(saved)[1].Should().Be(route);
+        route.Should().MatchRegex("^/api/studio/thumbnails/[0-9a-f]{64}/[0-9a-f-]{36}$");
+        saved.ToString().Should().NotContain("data:");
+        files.Uploads.Should().Be(1);
+        var file = files.Of("studio").Should().ContainSingle().Subject;
+        file.ContentType.Should().Be("image/webp");
+        files.ReferencesOf(file.Id).Should().Contain(reference => reference.RecordType == "studio.thumbnail" && reference.RecordId == file.Sha256);
+        route.Should().EndWith($"/{file.Id}");
+        ThumbnailsOf(await editor.GetFromJsonAsync<JsonElement>(State))[0].Should().Be(route);
         // The same bytes sent again, here from a client still holding the data URL, keep the one file.
-        Assert.Equal(1, files.Uploads);
-        Assert.Equal(2, again.GetProperty("revision").GetInt64());
+        files.Uploads.Should().Be(1);
+        again.GetProperty("revision").GetInt64().Should().Be(2);
     }
 
     [Fact]
@@ -55,9 +56,9 @@ public sealed class ThumbnailTests
         var saved = await PutAsync(editor, 1, Look(Guid.Parse(Id(1)), old), Look(Guid.Parse(Id(2)), DataUrl("new")));
 
         var thumbnails = ThumbnailsOf(saved);
-        Assert.Equal(old, thumbnails[0]);
-        Assert.StartsWith("/api/studio/thumbnails/", thumbnails[1]);
-        Assert.Equal(1, files.Uploads);
+        thumbnails[0].Should().Be(old);
+        thumbnails[1].Should().StartWith("/api/studio/thumbnails/");
+        files.Uploads.Should().Be(1);
     }
 
     [Fact]
@@ -67,7 +68,7 @@ public sealed class ThumbnailTests
         await using var host = Host(files);
         using var editor = await SignedIn(host.Factory, Editor);
         var route = ThumbnailsOf(await PutAsync(editor, 0, Look(Guid.NewGuid(), DataUrl("a"))))[0];
-        var file = Assert.Single(files.Of("studio"));
+        var file = files.Of("studio").Should().ContainSingle().Subject;
 
         using var member = await editor.GetAsync(route);
         using var otherMember = await (await SignedIn(host.Factory, SecondEditor)).GetAsync(route);
@@ -76,15 +77,15 @@ public sealed class ThumbnailTests
         using var anonymous = await Anonymous(host.Factory).GetAsync(route);
         using var unknown = await editor.GetAsync($"/api/studio/thumbnails/{new string('0', 64)}/{Guid.NewGuid()}");
 
-        Assert.Equal(HttpStatusCode.Redirect, member.StatusCode);
-        Assert.Equal(TestFiles.Link(file.Id, null), member.Headers.Location);
-        Assert.True(member.Headers.CacheControl!.Private);
-        Assert.Equal(TimeSpan.FromSeconds(300), member.Headers.CacheControl.MaxAge);
-        Assert.Equal(HttpStatusCode.NotFound, otherMember.StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, otherOrganization.StatusCode);
-        Assert.Equal(HttpStatusCode.Forbidden, noOrganization.StatusCode);
-        Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, unknown.StatusCode);
+        member.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        member.Headers.Location.Should().Be(TestFiles.Link(file.Id, null));
+        member.Headers.CacheControl!.Private.Should().BeTrue();
+        member.Headers.CacheControl.MaxAge.Should().Be(TimeSpan.FromSeconds(300));
+        otherMember.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        otherOrganization.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        noOrganization.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        anonymous.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        unknown.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -98,7 +99,7 @@ public sealed class ThumbnailTests
 
         using var response = await other.PutAsJsonAsync(State, BodyOf(0, Look(Guid.NewGuid(), route)));
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -112,9 +113,9 @@ public sealed class ThumbnailTests
         var saved = await PutAsync(editor, 0, Look(Guid.NewGuid(), thumbnail));
         using var route = await editor.GetAsync($"/api/studio/thumbnails/{new string('0', 64)}/{Guid.NewGuid()}");
 
-        Assert.Equal(thumbnail, ThumbnailsOf(saved)[0]);
-        Assert.Equal(0, files.Uploads);
-        Assert.Equal(HttpStatusCode.NotFound, route.StatusCode);
+        ThumbnailsOf(saved)[0].Should().Be(thumbnail);
+        files.Uploads.Should().Be(0);
+        route.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     private static StudioHost Host(TestFiles files) =>
@@ -126,7 +127,7 @@ public sealed class ThumbnailTests
     private static async Task<JsonElement> PutAsync(HttpClient client, long revision, params object[] looks)
     {
         using var response = await client.PutAsJsonAsync(State, BodyOf(revision, looks));
-        Assert.True(response.IsSuccessStatusCode, await response.Content.ReadAsStringAsync());
+        response.IsSuccessStatusCode.Should().BeTrue();
         return await response.Content.ReadFromJsonAsync<JsonElement>();
     }
 

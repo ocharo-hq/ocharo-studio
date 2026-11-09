@@ -1,8 +1,9 @@
 using System.Text.Json;
 using OcharoStudio.Application.Studio.State;
+using AwesomeAssertions;
 using Xunit;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.Unit;
 
 /// <summary>Protects document placement and collection bounds at the application boundary.</summary>
 public sealed class StudioStateValidatorTests
@@ -49,7 +50,7 @@ public sealed class StudioStateValidatorTests
 
         var errors = Validator.Validate(state);
 
-        Assert.Contains(errors, error => error.Contains("rotation", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("rotation", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -91,11 +92,11 @@ public sealed class StudioStateValidatorTests
 
         var errors = Validator.Validate(state);
 
-        Assert.Contains(errors, error => error.Contains(".id", StringComparison.Ordinal));
-        Assert.Contains(errors, error => error.Contains(".name", StringComparison.Ordinal));
-        Assert.Contains(errors, error => error.Contains(".garmentId", StringComparison.Ordinal));
-        Assert.Contains(errors, error => error.Contains(".createdAt", StringComparison.Ordinal));
-        Assert.Contains(errors, error => error.Contains(".materialId", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains(".id", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains(".name", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains(".garmentId", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains(".createdAt", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains(".materialId", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -103,9 +104,7 @@ public sealed class StudioStateValidatorTests
     {
         var errors = Validator.Validate(StateWith(NimchaDocument(2, "catalogue-synthetic-poplin-paisley-ivory-on-black")));
 
-        Assert.Contains(
-            errors,
-            error => error.Contains("not allowed for this garment part", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("not allowed for this garment part", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -113,8 +112,8 @@ public sealed class StudioStateValidatorTests
     {
         var errors = Validator.Validate(StateWith(NimchaDocument(1, "gold")));
 
-        Assert.DoesNotContain(errors, error => error.Contains("materialId", StringComparison.Ordinal));
-        Assert.DoesNotContain(errors, error => error.Contains(".parts", StringComparison.Ordinal));
+        errors.Should().NotContain(error => error.Contains("materialId", StringComparison.Ordinal));
+        errors.Should().NotContain(error => error.Contains(".parts", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -127,7 +126,7 @@ public sealed class StudioStateValidatorTests
 
         var errors = Validator.Validate(state);
 
-        Assert.Contains(errors, error => error.Contains("garmentId is not in the catalog", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("garmentId is not in the catalog", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -145,7 +144,7 @@ public sealed class StudioStateValidatorTests
                 }
             });
 
-        Assert.Empty(Validator.Validate(state));
+        Validator.Validate(state).Should().BeEmpty();
     }
 
     [Fact]
@@ -165,7 +164,7 @@ public sealed class StudioStateValidatorTests
 
         var errors = Validator.Validate(state);
 
-        Assert.Contains(errors, error => error.Contains("must match", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("must match", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -192,8 +191,8 @@ public sealed class StudioStateValidatorTests
 
         var errors = Validator.Validate(state);
 
-        Assert.Contains(errors, error => error.Contains("duplicated", StringComparison.Ordinal));
-        Assert.Contains(errors, error => error.Contains("exactly once", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("duplicated", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("exactly once", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -217,9 +216,7 @@ public sealed class StudioStateValidatorTests
 
         var errors = Validator.Validate(state);
 
-        Assert.Contains(
-            errors,
-            error => error.Contains($"more than {catalog.MaterialCount} entries", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains($"more than {catalog.MaterialCount} entries", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -240,11 +237,11 @@ public sealed class StudioStateValidatorTests
 
         var errors = Validator.Validate(state);
 
-        Assert.Contains(errors, error => error.Contains("not in the catalog", StringComparison.Ordinal));
-        Assert.Contains(errors, error => error.Contains("exactly once", StringComparison.Ordinal));
-        Assert.Contains(errors, error => error.Contains(".scale", StringComparison.Ordinal));
-        Assert.Contains(errors, error => error.Contains("positive safe integer", StringComparison.Ordinal));
-        Assert.Contains(errors, error => error.Contains("milliseconds", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("not in the catalog", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("exactly once", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains(".scale", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("positive safe integer", StringComparison.Ordinal));
+        errors.Should().Contain(error => error.Contains("milliseconds", StringComparison.Ordinal));
     }
 
     private static StudioState StateWith(JsonElement draft, object? materials = null) => new(

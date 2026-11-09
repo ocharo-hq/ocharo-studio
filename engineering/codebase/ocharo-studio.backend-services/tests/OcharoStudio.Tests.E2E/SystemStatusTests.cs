@@ -1,9 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using AwesomeAssertions;
 using Xunit;
 
-namespace OcharoStudio.Tests;
+namespace OcharoStudio.Tests.E2E;
 
 /// <summary>The conventional status endpoint reports the running version, anonymously, beside the retained version route.</summary>
 public sealed class SystemStatusTests
@@ -17,15 +18,14 @@ public sealed class SystemStatusTests
         using var status = await client.GetAsync("/api/system/status");
         using var version = await client.GetAsync("/api/system/version");
 
-        Assert.Equal(HttpStatusCode.OK, status.StatusCode);
-        Assert.True(status.Headers.CacheControl!.NoStore);
+        status.StatusCode.Should().Be(HttpStatusCode.OK);
+        status.Headers.CacheControl!.NoStore.Should().BeTrue();
         var body = await status.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal("OcharoStudio", body.GetProperty("service").GetString());
-        Assert.Equal("live", body.GetProperty("status").GetString());
-        Assert.False(string.IsNullOrWhiteSpace(body.GetProperty("version").GetString()));
-        Assert.Equal(HttpStatusCode.OK, version.StatusCode);
-        Assert.Equal(body.GetProperty("version").GetString(),
-            (await version.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("version").GetString());
-        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/studio/state")).StatusCode);
+        body.GetProperty("service").GetString().Should().Be("OcharoStudio");
+        body.GetProperty("status").GetString().Should().Be("live");
+        string.IsNullOrWhiteSpace(body.GetProperty("version").GetString()).Should().BeFalse();
+        version.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await version.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("version").GetString().Should().Be(body.GetProperty("version").GetString());
+        (await client.GetAsync("/api/studio/state")).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }
