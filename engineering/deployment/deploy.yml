@@ -52,13 +52,15 @@ services:
         # Saved-look thumbnails live in WoW2 Files, tenant `ocharo` on the shared files host, reached with the same client
         # through the member's exchanged token; linked to the Uri ocharo-platform types for its Files resource.
         Files:BaseUrl: { from: { repository: platform, key: Identity:Server:Resources:2:Uri } }
-        # The Ocharo app menu, served anonymously at /api/runtime-config; an unset key leaves that app out.
-        OcharoApps:Desk: { type: url }
-        OcharoApps:Catalogue: { type: url }
-        OcharoApps:Studio: { type: url }
+        # The Ocharo app menu, served anonymously at /api/runtime-config; an unset key leaves that app out. Apps whose
+        # site root is the place to land link to that site, so nobody types them; Marketing deploys no site yet, and
+        # Editorial, Atlas and Wear sit under a path of the blog site, so those stay typed by the owner.
+        OcharoApps:Desk: { from: { repository: platform, key: Sites:desk:Url } }
+        OcharoApps:Catalogue: { from: { repository: platform, key: Sites:catalogue:Url } }
+        OcharoApps:Studio: { from: Sites:studio:Url }
+        OcharoApps:Brand: { from: { repository: platform, key: Sites:brand:Url } }
         OcharoApps:Marketing: { type: url }
         OcharoApps:Editorial: { type: url }
-        OcharoApps:Brand: { type: url }
         OcharoApps:Atlas: { type: url }
         OcharoApps:Wear: { type: url }
         OcharoApps:Blog: { type: url }
