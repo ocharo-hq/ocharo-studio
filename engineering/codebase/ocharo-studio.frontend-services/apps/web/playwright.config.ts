@@ -26,9 +26,9 @@ export default defineConfig({
           timeout: 120000,
           env: {
             // The browser job's PostgreSQL, prepared by OcharoStudio.Tests.Support with Identity's stand-in tables and
-            // Studio's sets; inert fixtures, never a real secret.
+            // Studio's sets; it trusts local connections.
             ConnectionStrings__Database:
-              "Host=localhost;Port=55432;Username=postgres;Password=browser-tests;Database=studio_browser",
+              "Host=127.0.0.1;Port=55432;Username=postgres;Database=studio_browser",
             Migrations__OwnerInstance: "ocharo-studio@test",
             // The API needs a configured Identity client to boot; these are inert fixtures, never a real secret.
             Identity__Client__Authority: "https://identity.test",

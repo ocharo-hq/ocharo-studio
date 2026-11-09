@@ -303,7 +303,7 @@ public sealed class StudioAccessTests
         first.Factory.Services.GetRequiredService<IDistributedCache>().Should().BeOfType<PostgresDistributedCache>();
         // The first session's CSRF token creates the key, in the database the next host reads.
         using var client = await SignedIn(first.Factory, Editor);
-        restarted.Factory.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.XmlRepository.GetAllElements().Should().NotBeEmpty();
+        restarted.Factory.Services.GetRequiredService<IOptions<KeyManagementOptions>>().Value.XmlRepository!.GetAllElements().Should().NotBeEmpty();
         await first.Factory.Services.GetRequiredService<IDistributedCache>().SetStringAsync("session-probe", "kept");
         (await restarted.Factory.Services.GetRequiredService<IDistributedCache>().GetStringAsync("session-probe")).Should().Be("kept");
     }

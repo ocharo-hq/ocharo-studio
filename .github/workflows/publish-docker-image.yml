@@ -53,11 +53,12 @@ jobs:
       # installs, so Playwright's `dotnet run` starts from an up-to-date build; the Frontend check type-checks, and the
       # tests reach the API through the Vite preview, so the SPA is built without either and never copied into wwwroot.
       # The API reads a PostgreSQL container the setup starts and prepares with Identity's stand-in tables and Studio's
-      # sets (OcharoStudio.Tests.Support).
+      # sets (OcharoStudio.Tests.Support). It trusts local connections, so no credential appears in the plan's outputs,
+      # which GitHub skips when they look like a secret.
       browser: |
         {"name": "Browser", "dir": "engineering/codebase/ocharo-studio.frontend-services", "shards": 3,
          "dotnet": "10.0.x", "node": ".nvmrc", "lfs": "engineering/codebase/**", "timeout": 30,
-         "setup": ["docker run -d --name studio-postgres -e POSTGRES_PASSWORD=browser-tests -p 55432:5432 postgres:18-alpine",
+         "setup": ["docker run -d --name studio-postgres -e POSTGRES_HOST_AUTH_METHOD=trust -p 127.0.0.1:55432:5432 postgres:18-alpine",
                    "dotnet build ../ocharo-studio.backend-services/OcharoStudio.Api -p:BuildSpa=false > \"$RUNNER_TEMP/api-build.log\" 2>&1 &",
                    "api=$!",
                    "pnpm --filter @ocharo-studio/web exec vite build",
@@ -65,7 +66,7 @@ jobs:
                    "bash scripts/prepare-ci-https.sh",
                    "wait \"$api\" || { cat \"$RUNNER_TEMP/api-build.log\"; exit 1; }",
                    "until docker exec studio-postgres pg_isready -U postgres -q; do sleep 1; done",
-                   "dotnet run --project ../ocharo-studio.backend-services/tests/OcharoStudio.Tests.Support -- 'Host=localhost;Port=55432;Username=postgres;Password=browser-tests;Database=studio_browser'"],
+                   "dotnet run --project ../ocharo-studio.backend-services/tests/OcharoStudio.Tests.Support -- 'Host=127.0.0.1;Port=55432;Username=postgres;Database=studio_browser'"],
          "run": "pnpm --filter @ocharo-studio/web exec playwright test --fully-parallel --workers=1 --shard=\"$SHARD/$SHARDS\"",
          "artifact": "engineering/codebase/ocharo-studio.frontend-services/apps/web/test-results/",
          "paths": ["engineering/codebase/ocharo-studio.frontend-services/**"]}
