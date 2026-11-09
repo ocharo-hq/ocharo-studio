@@ -87,13 +87,14 @@ async function library() {
   return { root, glb, blobs, release, manifestSha };
 }
 
-// Answers Files' public route `/m/{sha256}` from a map of bytes, recording each request.
+// Answers Files' public route `/t/ocharo/m/{sha256}` from a map of bytes, recording each request; plain `/m/{sha256}`
+// is the shared host's default tenant, which holds none of them.
 function publicFiles(blobs: Map<string, Uint8Array>) {
   const requested: string[] = [];
   const fetch = async (input: URL | string) => {
     const url = new URL(input);
     requested.push(url.href);
-    const match = /^\/m\/([0-9a-f]{64})$/.exec(url.pathname);
+    const match = /^\/t\/ocharo\/m\/([0-9a-f]{64})$/.exec(url.pathname);
     const bytes =
       url.origin === new URL(FILES).origin && match && blobs.get(match[1]);
     return bytes ? new Response(bytes) : new Response(null, { status: 404 });
@@ -117,6 +118,7 @@ describe("garment sync from WoW2 Files", () => {
     const files = publicFiles(blobs);
     await syncFromFiles({
       files: FILES.slice(0, -1),
+      tenant: "ocharo",
       manifest: manifestSha,
       release: release.id,
       output: remote,
@@ -126,7 +128,7 @@ describe("garment sync from WoW2 Files", () => {
     });
 
     expect(files.requested).toEqual([
-      `${FILES}m/${manifestSha}`,
+      `${FILES}t/ocharo/m/${manifestSha}`,
       ...[
         "och-silhouette",
         "och-model",
@@ -137,7 +139,7 @@ describe("garment sync from WoW2 Files", () => {
         "och-abaya",
       ].map(
         (id) =>
-          `${FILES}m/${release.assets.find((asset) => asset.id === id)!.sha256}`,
+          `${FILES}t/ocharo/m/${release.assets.find((asset) => asset.id === id)!.sha256}`,
       ),
     ]);
     const written = (await readdir(local)).sort();
@@ -158,6 +160,7 @@ describe("garment sync from WoW2 Files", () => {
     await expect(
       syncFromFiles({
         files: FILES,
+        tenant: "ocharo",
         manifest: manifestSha,
         output,
         pinPath: join(output, "assetRelease.ts"),
@@ -176,6 +179,7 @@ describe("garment sync from WoW2 Files", () => {
     const sync = (served: Map<string, Uint8Array>) =>
       syncFromFiles({
         files: FILES,
+        tenant: "ocharo",
         manifest: manifestSha,
         output,
         pinPath: join(output, "assetRelease.ts"),
@@ -203,6 +207,7 @@ describe("garment sync from WoW2 Files", () => {
     await expect(
       syncFromFiles({
         files: FILES,
+        tenant: "ocharo",
         manifest: manifestSha,
         release: "ocharo-garments@3.0.0",
         output,
@@ -219,6 +224,7 @@ describe("garment sync from WoW2 Files", () => {
     const output = join(root, "out");
     const options = {
       files: FILES,
+      tenant: "ocharo",
       output,
       pinPath: join(output, "assetRelease.ts"),
       fetch: files.fetch,

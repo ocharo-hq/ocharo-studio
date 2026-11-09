@@ -2,7 +2,8 @@ import { format } from "prettier";
 // Imports the Ocharo 3D library (authored in Blender, kept in the Ocharo workspace) into the studio.
 // Usage: node scripts/sync-garments.mjs --from <library>/glb   (or OCHARO_3D_LIBRARY=<library>)
 // From WoW2 Files: node scripts/sync-garments.mjs --files <Files root>   (or OCHARO_FILES_URL=<Files root>)
-//   fetches the release manifest pinned in garments-release.lock.json (or --manifest <sha256>) from /m/{sha256},
+//   fetches the release manifest pinned in garments-release.lock.json (or --manifest <sha256>) from
+//   {Files root}t/{tenant}/m/{sha256}, the tenant from the lock (or --tenant <name>),
 //   then every listed GLB by its SHA-256, and writes what the library mode writes.
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -291,6 +292,7 @@ async function fetchPublic(fetch, root, sha, bytes, what) {
 /** Imports from WoW2 Files: the release manifest by its SHA-256, then every listed GLB by its own. */
 export async function syncFromFiles({
   files,
+  tenant,
   manifest: manifestSha,
   release: releaseId,
   output,
@@ -300,7 +302,12 @@ export async function syncFromFiles({
 }) {
   if (!SHA256.test(manifestSha ?? ""))
     throw new Error("The release manifest SHA-256 must be 64 lowercase hex.");
-  const root = filesRoot(files);
+  if (!/^[a-z0-9][a-z0-9_-]{0,63}$/.test(tenant ?? ""))
+    throw new Error(
+      "Name the Files tenant the release serves from (--tenant or the lock's tenant).",
+    );
+  // A shared Files host serves plain /m/{sha256} for its default tenant only, so public files are read below theirs.
+  const root = new URL(`t/${tenant}/`, filesRoot(files)).href;
   const release = JSON.parse(
     new TextDecoder().decode(
       await fetchPublic(
@@ -357,16 +364,18 @@ if (
     argument("--files") ??
     (libraryRoot ? undefined : process.env.OCHARO_FILES_URL);
   if (files) {
+    const pinned = JSON.parse(
+      await readFile(
+        new URL("./garments-release.lock.json", import.meta.url),
+        "utf8",
+      ),
+    );
     const lock = argument("--manifest")
       ? { manifestSha256: argument("--manifest") }
-      : JSON.parse(
-          await readFile(
-            new URL("./garments-release.lock.json", import.meta.url),
-            "utf8",
-          ),
-        );
+      : pinned;
     await syncFromFiles({
       files,
+      tenant: argument("--tenant") ?? pinned.tenant,
       manifest: lock.manifestSha256,
       release: lock.release,
       output,
