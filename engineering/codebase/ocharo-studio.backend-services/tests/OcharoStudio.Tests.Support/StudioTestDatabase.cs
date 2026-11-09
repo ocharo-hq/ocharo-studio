@@ -96,6 +96,36 @@ public static class StudioTestDatabase
         return services;
     }
 
+    /// <summary>Brings an existing database to what a deployed Studio finds: Identity's published tables (a stand-in set
+    /// holding <see cref="Organizations"/> and <see cref="Users"/>), Studio's <c>studio</c> set and its session cache.</summary>
+    /// <remarks>Idempotent: a rerun applies nothing and inserts no row twice.</remarks>
+    public static async Task PrepareAsync(string connectionString)
+    {
+        await using (var provider = new ServiceCollection().AddLogging().AddStudioSets(connectionString, withIdentityStub: true).BuildServiceProvider())
+        {
+            var applied = await provider.ApplyMigrationSetsAsync("test");
+            if (applied.IsFailure(out var error, out _))
+                throw new InvalidOperationException($"The test database did not migrate: {error.Message}");
+        }
+
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync();
+        foreach (var organization in Organizations)
+        {
+            await using var insert = new NpgsqlCommand(
+                "INSERT INTO identity.identity_organizations (id, name) VALUES ($1, 'Ocharo') ON CONFLICT (id) DO NOTHING", connection);
+            insert.Parameters.AddWithValue(organization);
+            await insert.ExecuteNonQueryAsync();
+        }
+
+        foreach (var user in Users)
+        {
+            await using var insert = new NpgsqlCommand("INSERT INTO identity.identity_users (id) VALUES ($1) ON CONFLICT (id) DO NOTHING", connection);
+            insert.Parameters.AddWithValue(user);
+            await insert.ExecuteNonQueryAsync();
+        }
+    }
+
     private static async Task<string> EnsureTemplateAsync()
     {
         await Gate.WaitAsync();
@@ -113,32 +143,7 @@ public static class StudioTestDatabase
                 await create.ExecuteNonQueryAsync();
             }
 
-            var template = new NpgsqlConnectionStringBuilder(admin) { Database = Template, Pooling = false }.ConnectionString;
-            await using (var provider = new ServiceCollection().AddLogging().AddStudioSets(template, withIdentityStub: true).BuildServiceProvider())
-            {
-                var applied = await provider.ApplyMigrationSetsAsync("test");
-                if (applied.IsFailure(out var error, out _))
-                    throw new InvalidOperationException($"The test template did not migrate: {error.Message}");
-            }
-
-            await using (var connection = new NpgsqlConnection(template))
-            {
-                await connection.OpenAsync();
-                foreach (var organization in Organizations)
-                {
-                    await using var insert = new NpgsqlCommand("INSERT INTO identity.identity_organizations (id, name) VALUES ($1, 'Ocharo')", connection);
-                    insert.Parameters.AddWithValue(organization);
-                    await insert.ExecuteNonQueryAsync();
-                }
-
-                foreach (var user in Users)
-                {
-                    await using var insert = new NpgsqlCommand("INSERT INTO identity.identity_users (id) VALUES ($1)", connection);
-                    insert.Parameters.AddWithValue(user);
-                    await insert.ExecuteNonQueryAsync();
-                }
-            }
-
+            await PrepareAsync(new NpgsqlConnectionStringBuilder(admin) { Database = Template, Pooling = false }.ConnectionString);
             NpgsqlConnection.ClearAllPools();
             _container = container;
             return admin;

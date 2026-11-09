@@ -22,10 +22,14 @@ export default defineConfig({
         {
           command:
             "dotnet run --project ../../../ocharo-studio.backend-services/OcharoStudio.Api --no-launch-profile -p:BuildSpa=false --urls https://localhost:8260",
-          url: "https://localhost:8260/health",
+          url: "https://localhost:8260/health/ready",
           timeout: 120000,
           env: {
-            DB_CONNECTION: "Data Source=appdata/studio-browser-tests.db",
+            // The browser job's PostgreSQL, prepared by OcharoStudio.Tests.Support with Identity's stand-in tables and
+            // Studio's sets; inert fixtures, never a real secret.
+            ConnectionStrings__Database:
+              "Host=localhost;Port=55432;Username=postgres;Password=browser-tests;Database=studio_browser",
+            Migrations__OwnerInstance: "ocharo-studio@test",
             // The API needs a configured Identity client to boot; these are inert fixtures, never a real secret.
             Identity__Client__Authority: "https://identity.test",
             Identity__Client__ClientId: "ocharo-studio-e2e",
