@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace OcharoStudio.Application.Studio.State;
 
 /// <summary>Keeps a saved look's thumbnail outside the state JSON: a new one is stored once per SHA-256 and the state keeps
-/// the Studio route that links to it (planning/files-adoption.md #12).</summary>
+/// the Studio route that links to it (research/files-adoption.md #12).</summary>
 public interface IStudioThumbnailStore
 {
     /// <summary>Tells whether thumbnails go to WoW2 Files; when not, the state keeps data URLs as ever.</summary>

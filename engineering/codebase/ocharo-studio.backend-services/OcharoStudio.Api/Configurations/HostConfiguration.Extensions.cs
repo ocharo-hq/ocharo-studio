@@ -116,7 +116,7 @@ public static partial class HostConfiguration
 
     /// <summary>Registers the thumbnail store: WoW2 Files over HTTP when <see cref="FilesBaseUrlKey"/> is set, by tokens of
     /// Studio's own Identity client exchanged for the signed-in person (the BFF session), else none. Read at resolve time,
-    /// so a test host's settings decide (planning/files-adoption.md #12).</summary>
+    /// so a test host's settings decide (research/files-adoption.md #12).</summary>
     private static WebApplicationBuilder AddStudioThumbnails(this WebApplicationBuilder builder)
     {
         builder.Services.AddFilesClient(_ => { });
