@@ -8,8 +8,8 @@
 # The full browser suite runs on every frontend or test change (tests live in the frontend workspace), and on any
 # change no check owns, such as a workflow; a backend-only change runs the host checks; a docs-only push runs nothing.
 # Wheelhouse deploys the bundle.
-# Pipelines e134a47 is untagged, so its full SHA pins it: the first commit whose generator accepts deploy.yml's
-# `from` naming another repository of the product.
+# Pipelines v0.16.0 is the first tag whose generator accepts deploy.yml's `from` naming another repository of the
+# product.
 name: publish-docker-image
 
 on:
@@ -35,7 +35,7 @@ concurrency:
 
 jobs:
   delivery:
-    uses: wow-two-platform/wow-two-platform.pipelines/.github/workflows/delivery.yml@e134a47a298970bc6c2d504255a935b89b32a40f
+    uses: wow-two-platform/wow-two-platform.pipelines/.github/workflows/delivery.yml@v0.16.0
     with:
       commit: ${{ inputs.commit }}
       backends: |
