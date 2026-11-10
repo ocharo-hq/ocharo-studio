@@ -178,7 +178,9 @@ describe("Ocharo frame in Studio", () => {
       expect(
         header.find('button[aria-label="Ocharo apps — Studio"]').exists(),
       ).toBe(true);
-      expect(header.get('[title="App version"]').text()).toBe(__APP_VERSION__);
+      // The version badge stands beside the full brand only: Studio starts as the rail, and a phone's bar has room
+      // for the mark alone. The account menu still lists the version.
+      expect(wrapper!.find("[data-version-badge]").exists()).toBe(false);
       // The Designer's controls sit in the one bar, with the account menu last.
       for (const name of ["New design", "Save look", "Export"])
         expect(header.find(`button[aria-label="${name}"]`).exists()).toBe(true);
@@ -299,7 +301,7 @@ describe("Ocharo frame in Studio", () => {
     ).toBe(false);
   });
 
-  it("opens the app and section menus on the glass menu material", async () => {
+  it("opens the app menu on the glass menu material", async () => {
     await mountStudio("/studio", { width: 1440 });
     await wrapper!
       .get('header button[aria-label="Ocharo apps — Studio"]')
@@ -309,16 +311,6 @@ describe("Ocharo frame in Studio", () => {
     expect(titles.map((title) => title.textContent?.trim())).toEqual([
       "Ocharo apps",
     ]);
-    wrapper!.unmount();
-    wrapper = undefined;
-    document.body.innerHTML = "";
-
-    await mountStudio("/studio", { width: 390 });
-    await wrapper!
-      .get('header button[aria-label="Studio sections — Designer"]')
-      .trigger("click");
-    await flushPromises();
-    expect(overlay("menu").classes()).toContain("surface-glass-menu");
   });
 
   it("names the Ocharo session and signs this app out through Identity", async () => {
@@ -474,6 +466,7 @@ describe("Ocharo frame in Studio", () => {
         .find("span.sr-only")
         .exists(),
     ).toBe(false);
+    expect(wrapper!.get("[data-version-badge]").text()).toBe(__APP_VERSION__);
   });
 
   it("moves between Designer and Materials from the sidebar", async () => {
@@ -497,13 +490,14 @@ describe("Ocharo frame in Studio", () => {
     expect(document.body.textContent).not.toContain("Garment studio");
   });
 
-  it("switches places from the top bar on a phone, with no sidebar or bottom bar", async () => {
+  it("switches places from the frame's drawer on a phone, with no sidebar or bottom bar", async () => {
     const { router } = await mountStudio("/studio", { width: 390 });
 
     expect(
       document.querySelector('nav[aria-label="Studio sections"]'),
     ).toBeNull();
     expect(document.querySelector("footer")).toBeNull();
+    expect(document.querySelector("[data-app-frame-phone-nav]")).toBeNull();
     // The look name sits above the canvas there.
     expect(wrapper!.find('header input[aria-label="Look name"]').exists()).toBe(
       false,
@@ -511,28 +505,28 @@ describe("Ocharo frame in Studio", () => {
     expect(
       wrapper!.find('.workspace input[aria-label="Look name"]').exists(),
     ).toBe(true);
-    await wrapper!
-      .get('header button[aria-label="Studio sections — Designer"]')
-      .trigger("click");
+    const toggle = wrapper!.get("header [data-app-frame-toggle]");
+    expect(toggle.attributes("aria-label")).toBe("Open navigation");
+    await toggle.trigger("click");
     await flushPromises();
-    const menu = overlay("menu");
-    const rows = menu.findAll('[role="menuitemradio"]');
-    expect(
-      rows.map((row) => [row.text().trim(), row.attributes("aria-checked")]),
-    ).toEqual([
-      ["Designer", "true"],
-      ["Materials", "false"],
+    const drawer = overlay("dialog");
+    const nav = drawer.get('nav[aria-label="Studio sections"]');
+    expect(nav.get('[aria-current="page"]').text()).toBe("Designer");
+    expect(drawer.findAll("a").map((link) => link.attributes("href"))).toEqual([
+      "/studio",
+      "/studio/materials",
+      "/",
     ]);
-    await rows[1]!.trigger("click");
+    expect(drawer.get('[data-app-frame-nav-footer] a[href="/"]').text()).toBe(
+      "Studio home",
+    );
+
+    await nav.get('a[href="/studio/materials"]').trigger("click");
     await vi.waitFor(() =>
       expect(router.currentRoute.value.path).toBe("/studio/materials"),
     );
     await flushPromises();
-    expect(
-      wrapper!
-        .find('header button[aria-label="Studio sections — Materials"]')
-        .exists(),
-    ).toBe(true);
+    expect(wrapper!.get("h1").text()).toBe("Material Studio");
   });
 
   it("renders the landing introduction outside the frame, on the Ocharo theme", async () => {

@@ -1,7 +1,7 @@
 /** The places inside Studio's frame: the garment designer and the shared-material editor. */
 export type StudioSection = "designer" | "materials";
 
-/** One place in Studio's sidebar and phone section menu. */
+/** One place in Studio's sidebar and navigation drawer. */
 export interface StudioSectionEntry {
   readonly id: StudioSection;
   /** The navigation label; the route metadata carries the same one. */

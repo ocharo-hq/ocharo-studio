@@ -1,10 +1,6 @@
-/* The Ocharo frame: its one bar height and the "O" mark. The approved glass is the fe SDK `ocharo` theme's: the bar,
-   sidebar and menus take the SDK glass variants, other markup the `surface-glass*` materials. */
-
-/* The frame's one top bar; every inset the editor measures from the bar reads this. */
-:root {
-  --frame-bar-height: 56px;
-}
+/* The Ocharo frame's "O" mark. The frame itself, its bar height (`--frame-bar-height`) included, is the fe SDK
+   `AppFrame`; the approved glass is the SDK `ocharo` theme's: the bar, sidebar and menus take the SDK glass variants,
+   other markup the `surface-glass*` materials. */
 
 @layer components {
   .oc-mark {

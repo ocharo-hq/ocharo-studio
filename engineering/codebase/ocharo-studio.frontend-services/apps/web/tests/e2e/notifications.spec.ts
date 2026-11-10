@@ -33,7 +33,10 @@ test("route focus and notifications preserve the frame bar's separator", async (
     }),
   ).toBe(true);
   // One 56px bar: the frame's banner holds it above its separator.
-  await expect(page.locator(".studio-frame-bar")).toHaveCSS("height", "56px");
+  await expect(page.locator("[data-app-frame-bar]")).toHaveCSS(
+    "height",
+    "56px",
+  );
   const bar = page.getByRole("banner");
   const headerBorder = await bar.evaluate(
     (header) => getComputedStyle(header).borderBottom,
@@ -58,7 +61,7 @@ test("phone bar actions remain clear of the design name input", async ({
 
   const actionNames = [
     "Ocharo apps — Studio",
-    "Studio sections — Designer",
+    "Open navigation",
     "New design",
     "Save look",
     "Export",

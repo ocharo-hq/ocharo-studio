@@ -21,7 +21,12 @@ const signedIn = (person: Record<string, unknown> = {}) => ({
   data: {
     isAuthenticated: true,
     person: { sub: "user-a", ...person },
-    organization: { id: studio.organizationId, role: "owner" },
+    organization: {
+      id: studio.organizationId,
+      name: "Ocharo",
+      slug: "ocharo",
+      role: "owner",
+    },
     permissions: ["studio:edit"],
     csrfToken,
     expiresAt: "2099-01-01T00:00:00Z",

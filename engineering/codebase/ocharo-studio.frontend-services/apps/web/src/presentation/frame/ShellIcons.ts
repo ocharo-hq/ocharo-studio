@@ -12,7 +12,7 @@ import {
 import type { OcharoAppKey } from "../../domain/common/OcharoApps";
 import type { StudioSection } from "../../domain/common/StudioSections";
 
-/** The icon beside each Studio section in the sidebar, the rail and the phone section menu. */
+/** The icon beside each Studio section in the sidebar, the rail and the navigation drawer. */
 export const SectionIcons: Readonly<Record<StudioSection, Component>> = {
   designer: Shirt,
   materials: Palette,

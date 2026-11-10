@@ -2,24 +2,14 @@
 import { computed, ref, watch } from "vue";
 import { RouterView, useRoute } from "vue-router";
 import { RefreshCw, Settings } from "lucide-vue-next";
+import { useRunningVersion } from "@wow-two-beta/fe/foundation/net";
 import {
-  TailwindBreakpoints,
-  useBreakpoint,
-} from "@wow-two-beta/fe/foundation/device";
-import {
-  localStorageStorageBroker,
-  usePersistentState,
-} from "@wow-two-beta/fe/foundation/storage";
-import {
-  AppShell,
-  AppShellHeader,
-  AppShellMain,
-  AppShellSidebar,
+  AppFrame,
+  type AppFrameAccount,
+  type AppFrameSwitcher,
 } from "@wow-two-beta/fe/presentation/layout";
 import {
-  AccountMenu,
   AppSwitcherKind,
-  AppSwitcherMenu,
   MenuItem,
   type AccountMenuVersion,
   type AppSwitcherItem,
@@ -31,47 +21,40 @@ import { useStudioAccount } from "../application/studio/hooks/UseStudioAccount";
 import { OcharoAppKind } from "../domain/common/OcharoApps";
 import { readStudioSection } from "../domain/common/StudioSections";
 import { AppIcons } from "../presentation/frame/ShellIcons";
+import StudioHomeLink from "../presentation/frame/StudioHomeLink.vue";
 import StudioNav from "../presentation/frame/StudioNav.vue";
-import StudioSectionMenu from "../presentation/frame/StudioSectionMenu.vue";
 import {
   provideStudioFrame,
   StudioFrameBarId,
   type StudioSessionChange,
 } from "../presentation/common/StudioFrame";
 
-/** The sidebar's widths: full, and the icon rail. @internal */
-const SidebarWidth = { Full: "244px", Rail: "68px" } as const;
-/** Where this browser remembers the sidebar's rail choice; the rail is the default. @internal */
+/** Where this browser remembers the sidebar's rail choice; the key predates the shared frame. @internal */
 const SidebarCollapsedKey = "ocharo-studio.sidebar-collapsed";
 
 /**
- * The Ocharo frame, as Studio wears it, around the Designer and Materials places. One glass top bar carries the suite's
- * app button with the app version, the open place's own controls and the account menu. The sidebar is Studio's two
- * places as an icon rail by default, expandable on desktops; phones hide it and switch places from the top bar, with no
- * bottom bar. Only the main region scrolls.
+ * Studio inside the frame every Ocharo app shares (the fe sdk's `AppFrame`), around the Designer and Materials places.
+ * The bar, the sidebar and the main region are the suite's, at one size in every app; Studio passes what is its own:
+ * the app list, its two places as an icon rail by default, the open place's controls in the bar, and the account.
+ * Phones open the places from the frame's drawer, with no bottom bar. The page runs edge to edge and only the main
+ * region scrolls.
  */
 defineOptions({ name: "AppLayout" });
 const route = useRoute();
 const place = provideStudioFrame();
 const account = useStudioAccount();
-const { backendVersion, refresh: refreshBackendVersion } = useBuildIdentity();
+const {
+  backendVersion,
+  refresh: refreshBackendVersion,
+  readRunningVersion,
+} = useBuildIdentity();
 const apps = useOcharoApps();
 const appVersion = __APP_VERSION__;
-// The stored choice seeds the first render too, so an expanded sidebar never animates out of the rail.
-const collapsed = usePersistentState(
-  SidebarCollapsedKey,
-  localStorageStorageBroker.read<boolean>(SidebarCollapsedKey) !== false,
+// The badge beside the app button follows the release the API serves; a local build has no release to compare.
+const { version: runningVersion } = useRunningVersion(() =>
+  appVersion === "dev" ? null : readRunningVersion(),
 );
-const breakpoint = useBreakpoint(TailwindBreakpoints);
 
-const isDesktop = computed(() =>
-  ["lg", "xl", "2xl"].includes(breakpoint.value ?? ""),
-);
-const isPhone = computed(() => ["sm", null].includes(breakpoint.value));
-const isRail = computed(() => !isDesktop.value || collapsed.value.value);
-const sidebarWidth = computed(() =>
-  isRail.value ? SidebarWidth.Rail : SidebarWidth.Full,
-);
 const section = computed(() => readStudioSection(route.meta));
 const items = computed<AppSwitcherItem[]>(() =>
   apps.map((app) => ({
@@ -86,6 +69,14 @@ const items = computed<AppSwitcherItem[]>(() =>
         : AppSwitcherKind.Site,
   })),
 );
+/** The app menu's own phrases. */
+const switcher: AppFrameSwitcher = {
+  title: "Ocharo apps",
+  sitesLabel: "Public sites",
+  closeLabel: "Close",
+  newTabLabel: "(opens in a new tab)",
+  triggerLabel: "Ocharo apps — Studio",
+};
 
 /** Who is signed in; the account rows and sign-out exist only with an Ocharo session, and anonymous visitors see Sign in. */
 const signedIn = computed(
@@ -114,6 +105,12 @@ const versions = computed<AccountMenuVersion[]>(() => {
     { label: "API", version: api, ...(commit ? { commit } : {}) },
   ];
 });
+/** The account menu: who is signed in, the versions, and sign-out while it runs. */
+const accountMenu = computed<AppFrameAccount>(() => ({
+  ...accountIdentity.value,
+  versions: versions.value,
+  isBusy: account.signingOut.value,
+}));
 watch(accountOpen, (open) => {
   if (open) void refreshBackendVersion();
 });
@@ -139,83 +136,52 @@ async function signOut(): Promise<void> {
 </script>
 
 <template>
-  <AppShell
-    class="studio-frame surface-ambient transition-[grid-template-columns] duration-200 ease-out motion-reduce:transition-none"
-    sidebar-breakpoint="md"
-    :sidebar-width="sidebarWidth"
+  <AppFrame
+    v-model:account-open="accountOpen"
+    class="studio-frame"
+    :version="appVersion"
+    :running-version="runningVersion"
+    :apps="items"
+    current-app="studio"
+    app-label="Studio"
+    app-subtitle="Ocharo"
+    :app-switcher="switcher"
+    :account="accountMenu"
+    :collapse-storage-key="SidebarCollapsedKey"
+    is-collapsed-by-default
+    content-width="full"
+    bar-class="max-sm:[&_[data-account-menu-chevron]]:hidden"
+    main-class="studio-main [scrollbar-gutter:auto]"
   >
-    <AppShellHeader
-      height="auto"
-      variant="glass"
-      class="p-0 pt-[env(safe-area-inset-top)]"
-    >
-      <div
-        class="studio-frame-bar flex min-h-(--frame-bar-height) w-full min-w-0 items-center gap-1 px-2 sm:gap-2 sm:px-4"
+    <template #brand><span class="oc-mark">O</span></template>
+    <template #nav="{ isRail }"
+      ><StudioNav :current="section" :collapsed="isRail"
+    /></template>
+    <template #nav-footer="{ isRail }"
+      ><StudioHomeLink :collapsed="isRail"
+    /></template>
+    <!-- The open place teleports its own controls here; the target mounts with the frame, before the page. -->
+    <template #trail
+      ><div
+        :id="StudioFrameBarId"
+        class="flex min-w-0 flex-1 items-center gap-1 sm:gap-2"
+    /></template>
+    <template #account-items>
+      <MenuItem v-if="place" @select="place.openSettings()"
+        ><Settings :size="15" class="shrink-0" aria-hidden="true" />Studio
+        settings</MenuItem
       >
-        <div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <AppSwitcherMenu
-            :items="items"
-            current="studio"
-            label="Studio"
-            subtitle="Ocharo"
-            title="Ocharo apps"
-            sites-label="Public sites"
-            close-label="Close"
-            new-tab-label="(opens in a new tab)"
-            trigger-label="Ocharo apps — Studio"
-            variant="glass-menu"
-            class="max-sm:gap-1.5 max-sm:[&>span:not([data-app-switcher-mark])]:sr-only [&[data-state=open]_[data-app-switcher-chevron]]:text-primary-soft-foreground"
-          >
-            <template #mark><span class="oc-mark">O</span></template>
-          </AppSwitcherMenu>
-          <span
-            class="font-mono text-[11px] text-muted-foreground max-[359px]:hidden"
-            title="App version"
-            >{{ appVersion }}</span
-          >
-          <StudioSectionMenu v-if="isPhone" :current="section" />
-        </div>
-        <div
-          :id="StudioFrameBarId"
-          class="flex min-w-0 flex-1 items-center gap-1 sm:gap-2 md:border-s md:border-border md:ps-3"
-        />
-        <AccountMenu
-          v-model:open="accountOpen"
-          v-bind="accountIdentity"
-          :versions="versions"
-          :is-busy="account.signingOut.value"
-          variant="glass-menu"
-          class="max-sm:[&_[data-account-menu-chevron]]:hidden"
-        >
-          <template #items>
-            <MenuItem v-if="place" @select="place.openSettings()"
-              ><Settings :size="15" class="shrink-0" aria-hidden="true" />Studio
-              settings</MenuItem
-            >
-            <MenuItem @select="reconnect"
-              ><RefreshCw :size="15" class="shrink-0" aria-hidden="true" />{{
-                signedIn ? "Reconnect with Ocharo" : "Sign in"
-              }}</MenuItem
-            >
-          </template>
-        </AccountMenu>
-      </div>
-    </AppShellHeader>
-    <AppShellSidebar variant="glass">
-      <StudioNav
-        :current="section"
-        :collapsed="isRail"
-        :can-toggle="isDesktop"
-        @toggle="collapsed.setValue((previous) => !previous)"
-      />
-    </AppShellSidebar>
-    <AppShellMain class="studio-main min-w-0 [scrollbar-gutter:auto]">
-      <RouterView v-slot="{ Component }">
-        <component :is="Component" v-if="Component" />
-        <p v-else class="frame-loading" role="status" aria-busy="true">
-          Opening Ocharo Studio…
-        </p>
-      </RouterView>
-    </AppShellMain>
-  </AppShell>
+      <MenuItem @select="reconnect"
+        ><RefreshCw :size="15" class="shrink-0" aria-hidden="true" />{{
+          signedIn ? "Reconnect with Ocharo" : "Sign in"
+        }}</MenuItem
+      >
+    </template>
+    <RouterView v-slot="{ Component }">
+      <component :is="Component" v-if="Component" />
+      <p v-else class="frame-loading" role="status" aria-busy="true">
+        Opening Ocharo Studio…
+      </p>
+    </RouterView>
+  </AppFrame>
 </template>
