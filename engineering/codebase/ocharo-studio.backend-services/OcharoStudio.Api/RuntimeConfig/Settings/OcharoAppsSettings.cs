@@ -12,6 +12,7 @@ public sealed record OcharoAppsSettings
     public string? Marketing { get; init; }
     public string? Editorial { get; init; }
     public string? Brand { get; init; }
+    public string? Events { get; init; }
     public string? Atlas { get; init; }
     public string? Wear { get; init; }
     public string? Blog { get; init; }

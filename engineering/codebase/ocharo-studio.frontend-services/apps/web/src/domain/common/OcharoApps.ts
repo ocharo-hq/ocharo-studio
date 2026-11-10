@@ -14,6 +14,7 @@ export type OcharoAppKey =
   | "marketing"
   | "editorial"
   | "brand"
+  | "events"
   | "atlas"
   | "wear"
   | "blog";
@@ -69,6 +70,12 @@ const OcharoAppEntries: readonly Omit<OcharoApp, "url">[] = [
     key: "brand",
     label: "Brand",
     summary: "Logo and brand guide",
+    kind: OcharoAppKind.Workspace,
+  },
+  {
+    key: "events",
+    label: "Events",
+    summary: "Trade events and deadlines",
     kind: OcharoAppKind.Workspace,
   },
   {

@@ -12,6 +12,7 @@ public static class OcharoAppsSettingsExtensions
         (nameof(OcharoAppsSettings.Marketing), "OCHARO_MARKETING_URL", settings => settings.Marketing),
         (nameof(OcharoAppsSettings.Editorial), "OCHARO_EDITORIAL_URL", settings => settings.Editorial),
         (nameof(OcharoAppsSettings.Brand), "OCHARO_BRAND_URL", settings => settings.Brand),
+        (nameof(OcharoAppsSettings.Events), "OCHARO_EVENTS_URL", settings => settings.Events),
         (nameof(OcharoAppsSettings.Atlas), "OCHARO_ATLAS_URL", settings => settings.Atlas),
         (nameof(OcharoAppsSettings.Wear), "OCHARO_WEAR_URL", settings => settings.Wear),
         (nameof(OcharoAppsSettings.Blog), "OCHARO_BLOG_URL", settings => settings.Blog),

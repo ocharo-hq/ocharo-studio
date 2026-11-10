@@ -59,6 +59,7 @@ services:
         OcharoApps:Catalogue: { from: { repository: platform, key: Sites:catalogue:Url } }
         OcharoApps:Studio: { from: Sites:studio:Url }
         OcharoApps:Brand: { from: { repository: platform, key: Sites:brand:Url } }
+        OcharoApps:Events: { from: { repository: platform, key: Sites:events:Url } }
         OcharoApps:Marketing: { from: { repository: marketing, key: Sites:marketing:Url } }
         OcharoApps:Blog: { from: { repository: marketing, key: Sites:blog:Url } }
         OcharoApps:Editorial: { type: url }
